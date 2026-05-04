@@ -134,7 +134,7 @@
           <h4 class="accent-color">实时行情</h4>
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;">
-          <h2 class="animate-box animated animate__animated" data-animate="animate__fadeInLeft" style="margin:0;">精选农产品行情与交易</h2>
+          <h2 class="animate-box animated animate__animated" data-animate="animate__fadeInLeft" style="margin:0;"></h2>
           <button id="tc-open-orders" class="tc-order-entry">订单记录</button>
         </div>
 
