@@ -59,27 +59,6 @@
   }
 
   main.innerHTML = `
-    <section class="section banner-inner" style="position:relative;overflow:hidden;">
-      <video class="banner-inner-video" autoplay muted loop playsinline>
-        <source src="https://videos.pexels.com/video-files/4612364/4612364-hd_1920_1080_30fps.mp4" type="video/mp4">
-      </video>
-      <div class="banner-inner-overlay"></div>
-      <div class="effect-particles-bg" data-count="14" style="z-index:1;"></div>
-      <div class="effect-hud" aria-hidden="true" style="opacity:0.35;">
-        <div class="effect-hud__scanlines"></div>
-        <div class="effect-hud__corners"></div>
-        <div class="effect-hud__status" style="top:16px;left:18px;font-size:0.55rem;gap:1rem;">
-          <span><span class="effect-hud__dot"></span>系统在线</span>
-        </div>
-      </div>
-      <div class="hero-container">
-        <div class="banner-inner-content">
-          <h1 class="banner-inner-title effect-glow-text">交易中心</h1>
-          <p class="banner-inner-excerpt">全球粮源实时行情，一键交易，安全透明。</p>
-        </div>
-      </div>
-    </section>
-
     <section class="section data-comparison-section data-comparison-section--dark-glass" id="heritage-metrics">
       <div class="hero-container">
         <div class="sub-heading animate-box animated-delay-slow animate__animated" data-animate="animate__fadeIn" style="margin-bottom:1.5rem;">
@@ -88,20 +67,20 @@
         </div>
         <h2 class="animate-box animated animate__animated" data-animate="animate__fadeInLeft" style="margin-bottom:2.5rem;">精选农产品行情与交易</h2>
 
-        <div class="data-comparison-card dc-glass-trio" id="dataComparisonCardHome">
-          <div class="dc-glass-duo">
-            <div class="dc-glass-panel dc-glass-panel--legacy animate-box animated animate__animated" data-animate="animate__fadeInUp">
-              <div class="dc-legacy-projects-inner" aria-label="产品列表">
-                <div class="dc-legacy-scroll">
-                  <div id="dc-legacy-root"></div>
-                </div>
-              </div>
+        <div class="tc-grid">
+          <div class="tc-list-panel animate-box animated animate__animated" data-animate="animate__fadeInUp">
+            <div id="tc-product-list"></div>
+          </div>
+          <div class="tc-detail-panel animate-box animated animate__animated" data-animate="animate__fadeInUp">
+            <h3 id="tc-trend-title" class="dc-trend-title">加载中…</h3>
+            <p id="tc-product-desc" class="tc-product-desc"></p>
+            <div class="dc-chart-shell">
+              <iframe id="dc-chart-frame" class="dc-chart-frame" title="产品走势" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
             </div>
-            <div class="dc-glass-panel dc-glass-panel--trend animate-box animated animate__animated" data-animate="animate__fadeInUp">
-              <h3 id="dc-trend-title" class="dc-trend-title">加载中…</h3>
-              <div class="dc-chart-shell">
-                <iframe id="dc-chart-frame" class="dc-chart-frame" title="产品走势" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
-              </div>
+            <div class="tc-action-bar">
+              <button type="button" data-order-kind="market" data-direction="long">买涨</button>
+              <button type="button" data-order-kind="market" data-direction="short">买跌</button>
+              <button type="button" data-order-kind="entrust" data-direction="long">委买</button>
             </div>
           </div>
         </div>
@@ -138,6 +117,10 @@
     .tc-form input{background:#fff;color:#163323;border:1px solid rgba(26,122,62,.25);border-radius:10px;padding:.55rem}
     .tc-form button{border:0;border-radius:10px;padding:.6rem;color:#fff;background:linear-gradient(135deg,#0d5c2e,#1a7a3e,#2ecc71);cursor:pointer}
     .tc-msg{margin:.55rem 0 0;color:#1f5d46;font-size:.82rem}
+    .tc-grid{display:grid;grid-template-columns:minmax(240px,1fr) minmax(420px,1.9fr);gap:1rem}
+    .tc-list-panel,.tc-detail-panel{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:.95rem}
+    .tc-list-panel{max-height:620px;overflow:auto}
+    .tc-product-desc{margin:0 0 .8rem;color:#9db3cf;font-size:.88rem}
     .dc-proj-block{position:relative;padding:.85rem .9rem;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);margin-bottom:.7rem;cursor:pointer;transition:all .35s ease}
     .dc-proj-block:hover{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.1)}
     .dc-proj-block.is-active{border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.12);box-shadow:0 12px 40px rgba(0,0,0,.25)}
@@ -154,15 +137,21 @@
     .dc-ratio-fill2{display:block;height:100%;border-radius:2px}
     .dc-ratio-fill2--green{background:linear-gradient(90deg,#34d399,#22c55e)}
     .dc-ratio-fill2--red{background:linear-gradient(90deg,#f87171,#ef4444)}
-    .tc-buy-btn{display:inline-flex;align-items:center;gap:.35rem;margin-top:.45rem;padding:.32rem .85rem;border:0;border-radius:999px;font-size:.78rem;color:#fff;background:linear-gradient(135deg,#0d5c2e,#1a7a3e,#2ecc71);cursor:pointer}
-    .tc-mobile-chart{display:none;margin-top:.55rem;border-radius:10px;overflow:hidden;border:1px solid rgba(148,211,255,.25)}
-    .tc-mobile-chart iframe{width:100%;height:210px;border:0;background:#0f172a}
-    @media (max-width: 992px){.tc-mobile-chart{display:block}}
+    .tc-action-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem;margin-top:.85rem}
+    .tc-action-bar button{border:0;border-radius:999px;padding:.52rem .6rem;font-size:.82rem;color:#fff;cursor:pointer}
+    .tc-action-bar button[data-direction="long"][data-order-kind="market"]{background:linear-gradient(135deg,#0d5c2e,#1a7a3e,#2ecc71)}
+    .tc-action-bar button[data-direction="short"]{background:linear-gradient(135deg,#6b1f1f,#ef4444,#f97316)}
+    .tc-action-bar button[data-order-kind="entrust"]{background:linear-gradient(135deg,#164f8b,#2563eb,#38bdf8)}
+    @media (max-width: 992px){
+      .tc-grid{grid-template-columns:1fr}
+      .tc-list-panel{max-height:none}
+    }
   `;
   document.head.appendChild(style);
 
-  const legacyRoot = document.getElementById('dc-legacy-root');
+  const listRoot = document.getElementById('tc-product-list');
   const titleEl = document.getElementById('dc-trend-title');
+  const descEl = document.getElementById('tc-product-desc');
   const iframe = document.getElementById('dc-chart-frame');
   const modal = document.getElementById('tc-trade-modal');
   const closeModalBtn = document.getElementById('tc-close-modal');
@@ -177,7 +166,7 @@
   const quickAmountOptions = [1000, 2000, 5000, 10000, 20000, 50000];
 
   function renderList(list) {
-    legacyRoot.innerHTML = list.map((p, idx) => {
+    listRoot.innerHTML = list.map((p, idx) => {
       const last = idx === list.length - 1 ? ' dc-proj-block--last' : '';
       const price = formatNum(p.livePrice);
       const pctStr = (p.changePct >= 0 ? '+' : '') + p.changePct.toFixed(2) + '%';
@@ -207,35 +196,22 @@
               <span class="dc-ratio-fill2 dc-ratio-fill2--red" style="width:${split.down}%"></span>
             </div>
           </div>
-          <button type="button" class="tc-buy-btn" data-buy-id="${p.id}">购买</button>
-          ${active && active.id === p.id ? '<div class="tc-mobile-chart"><iframe id="tc-mobile-chart-frame" title="移动端走势"></iframe></div>' : ''}
         </div>
       `;
     }).join('');
 
-    legacyRoot.querySelectorAll('.dc-proj-block').forEach((el) => {
+    listRoot.querySelectorAll('.dc-proj-block').forEach((el) => {
       function activate() {
-        legacyRoot.querySelectorAll('.dc-proj-block').forEach((x) => x.classList.remove('is-active'));
+        listRoot.querySelectorAll('.dc-proj-block').forEach((x) => x.classList.remove('is-active'));
         el.classList.add('is-active');
         const i = Number(el.getAttribute('data-idx'));
         if (Number.isFinite(i) && list[i]) setChartForProduct(list[i]);
       }
-      el.addEventListener('click', (e) => {
-        if (e.target.closest('.tc-buy-btn')) return;
+      el.addEventListener('click', () => {
         activate();
       });
       el.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
-      });
-    });
-
-    legacyRoot.querySelectorAll('.tc-buy-btn').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const p = products.find((x) => String(x.id) === btn.getAttribute('data-buy-id'));
-        if (!p) return;
-        active = p;
-        openTradeModal();
       });
     });
   }
@@ -243,12 +219,11 @@
   function setChartForProduct(p) {
     if (!p) return;
     if (titleEl) titleEl.textContent = `${p.name} · 走势`;
+    if (descEl) descEl.textContent = `${p.summary || ''} · 最新价 ${formatNum(p.livePrice)}，涨跌幅 ${(p.changePct >= 0 ? '+' : '') + p.changePct.toFixed(2)}%`;
     const t = String(p.chartSourceType || 'tradingview').toLowerCase();
     const web = String(p.chartWebsiteUrl || '').trim();
     if (t === 'website' && web) { iframe.src = web; return; }
     iframe.src = tvEmbedUrl(p.marketSymbol);
-    const mobileChart = document.getElementById('tc-mobile-chart-frame');
-    if (mobileChart) mobileChart.src = iframe.src;
   }
 
   function renderQuickAmounts() {
@@ -274,16 +249,18 @@
     modal.setAttribute('aria-hidden', 'true');
   }
 
-  orderForm?.addEventListener('submit', async (e) => {
+  orderForm && orderForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!active) return;
     msg.textContent = '提交中...';
     try {
       const amount = Number(document.getElementById('tc-amount').value || 0);
       const tradePassword = document.getElementById('tc-trade-pw').value;
+      const orderKind = orderForm.getAttribute('data-order-kind') || 'market';
+      const direction = orderForm.getAttribute('data-direction') || 'long';
       const data = await api('/api/trade/order', {
         method: 'POST',
-        json: { productId: active.id, amount, direction: 'buy', tradePassword, durationSec: 600 },
+        json: { productId: active.id, amount, direction, orderKind, tradePassword, durationSec: 600 },
       });
       msg.textContent = data.message || '下单成功';
       if (token) summary = await api('/api/me/summary');
@@ -293,9 +270,18 @@
     }
   });
 
-  closeModalBtn?.addEventListener('click', closeTradeModal);
-  modal?.addEventListener('click', (e) => { if (e.target === modal) closeTradeModal(); });
+  closeModalBtn && closeModalBtn.addEventListener('click', closeTradeModal);
+  modal && modal.addEventListener('click', (e) => { if (e.target === modal) closeTradeModal(); });
   renderQuickAmounts();
+
+  document.querySelectorAll('.tc-action-bar button').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (!active) return;
+      orderForm.setAttribute('data-order-kind', btn.getAttribute('data-order-kind') || 'market');
+      orderForm.setAttribute('data-direction', btn.getAttribute('data-direction') || 'long');
+      openTradeModal();
+    });
+  });
 
   (async () => {
     try {
@@ -314,7 +300,7 @@
       renderList(products);
       if (active) setChartForProduct(active);
     } catch (err) {
-      if (legacyRoot) legacyRoot.innerHTML = `<p style="color:#ffd6d6;padding:1rem;">${esc(err.message)}</p>`;
+      if (listRoot) listRoot.innerHTML = `<p style="color:#ffd6d6;padding:1rem;">${esc(err.message)}</p>`;
     }
   })();
 })();

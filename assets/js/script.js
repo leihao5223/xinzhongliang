@@ -3,6 +3,7 @@ jQuery(function ($) {
     initSidebar();
     initSidebarDropdown();
     initUnifiedTopNav();
+    initMobileVideoAutoplay();
     initNavLink();
     initCounterCount();
     initHeaderScroll();
@@ -78,7 +79,7 @@ function initUnifiedTopNav() {
         '资讯': 'blog.html',
         '个人主页': 'personal-home.html'
     };
-    var homeUrl = '/steris/';
+    var homeUrl = '/';
 
     $('.navbar-nav .nav-link').each(function () {
         var $link = $(this);
@@ -133,6 +134,34 @@ function initUnifiedTopNav() {
         $group.removeClass('sidebar-dropdown');
         $header.replaceWith($anchor);
     });
+}
+
+/* =====================
+   Mobile Video Autoplay
+===================== */
+function initMobileVideoAutoplay() {
+    var videos = Array.prototype.slice.call(
+        document.querySelectorAll('video[autoplay][muted], video[autoplay][playsinline]')
+    );
+    if (!videos.length) return;
+
+    function tryPlayAll() {
+        videos.forEach(function (v) {
+            try {
+                v.muted = true;
+                v.setAttribute('muted', 'muted');
+                var p = v.play && v.play();
+                if (p && typeof p.catch === 'function') p.catch(function () {});
+            } catch (_) {}
+        });
+    }
+
+    tryPlayAll();
+    document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) tryPlayAll();
+    });
+    document.addEventListener('touchstart', tryPlayAll, { passive: true });
+    document.addEventListener('click', tryPlayAll, { passive: true });
 }
 
 /* =====================
