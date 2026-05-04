@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>找回登录密码 - 中粮天下</title>
+  <link rel="icon" href="assets/images/Logo-Favicon.png" type="image/png">
+  <link rel="stylesheet" href="assets/css/vendor/fontawesome.css">
+  <link rel="stylesheet" href="assets/css/vendor/solid.css">
+  <link rel="stylesheet" href="assets/css/vendor/regular.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+      background: linear-gradient(160deg, #eef6ef 0%, #f7f2e8 45%, #eaf4ee 100%);
+      padding: 2rem 1rem;
+    }
+    .wrap {
+      max-width: 440px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 24px 60px rgba(26,46,26,0.12);
+      border: 1px solid rgba(26,122,62,0.12);
+    }
+    .brand { text-align: center; margin-bottom: 1.5rem; }
+    .brand img { height: 42px; width: auto; }
+    h1 { font-size: 1.15rem; color: #1a2e1a; margin-bottom: 0.35rem; text-align: center; }
+    .sub { font-size: 0.8rem; color: #5a6b5a; margin-bottom: 1.25rem; text-align: center; line-height: 1.45; }
+    .form-group { margin-bottom: 1rem; }
+    label { display: block; font-size: 0.82rem; color: #1a7a3e; margin-bottom: 0.3rem; font-weight: 500; }
+    input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid rgba(26,122,62,0.15);
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-family: inherit;
+    }
+    input:focus {
+      outline: none;
+      border-color: rgba(26,122,62,0.45);
+      box-shadow: 0 0 0 3px rgba(26,122,62,0.08);
+    }
+    .hint { font-size: 0.75rem; color: #5a6b5a; margin-top: 0.35rem; line-height: 1.4; }
+    .btn {
+      width: 100%;
+      margin-top: 0.5rem;
+      padding: 0.85rem;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      font-family: inherit;
+      color: #fff;
+      background: linear-gradient(135deg, #1a7a3e, #2ecc71);
+      cursor: pointer;
+    }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .btn-secondary {
+      background: rgba(26,122,62,0.1);
+      color: #1a7a3e;
+      margin-top: 0.75rem;
+    }
+    #msg { margin: 0 0 1rem; padding: 0.6rem; border-radius: 8px; font-size: 0.82rem; display: none; }
+    #msg.visible { display: block; }
+    #msg.err { background: rgba(220,53,69,0.1); color: #8b1f2d; border: 1px solid rgba(200,16,46,0.2); }
+    #msg.ok { background: rgba(26,122,62,0.1); color: #146030; border: 1px solid rgba(26,122,62,0.2); }
+    #step2 { display: none; margin-top: 0.5rem; padding-top: 1rem; border-top: 1px solid rgba(26,122,62,0.1); }
+    #step2.visible { display: block; }
+    .q { font-size: 0.8rem; color: #1a2e1a; margin: 0 0 0.25rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">
+      <img src="assets/images/Logo-1.png" alt="" width="140" height="42">
+    </div>
+    <h1>找回登录密码</h1>
+    <p class="sub">请输入注册时的用户名。若账号已设置密保，将展示两道题干；若未设置密保，则只需<strong>交易密码</strong>与新登录密码即可重置。</p>
+    <div id="msg" role="alert"></div>
+    <div id="step1">
+      <div class="form-group">
+        <label for="nick">用户名</label>
+        <input id="nick" type="text" autocomplete="username" minlength="2" maxlength="32" required placeholder="与注册时一致">
+      </div>
+      <button type="button" class="btn" id="btn-preview">查询密保题干</button>
+    </div>
+    <div id="step2">
+      <div id="recovery-security-fields">
+        <div class="form-group">
+          <div class="q" id="qt1"></div>
+          <label for="ans1">答案一</label>
+          <input id="ans1" type="text" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <div class="q" id="qt2"></div>
+          <label for="ans2">答案二</label>
+          <input id="ans2" type="text" autocomplete="off">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="tpw">交易密码</label>
+        <input id="tpw" type="password" autocomplete="off" required minlength="6">
+      </div>
+      <div class="form-group">
+        <label for="npw">新登录密码</label>
+        <input id="npw" type="password" autocomplete="new-password" required minlength="6">
+      </div>
+      <div class="form-group">
+        <label for="npw2">确认新登录密码</label>
+        <input id="npw2" type="password" autocomplete="new-password" required minlength="6">
+      </div>
+      <button type="button" class="btn" id="btn-reset">重置登录密码</button>
+    </div>
+    <a href="login.html" class="btn btn-secondary" style="display:block;text-align:center;text-decoration:none;line-height:1.2;">返回登录</a>
+  </div>
+  <script>
+    (function () {
+      var qids = [];
+      var tradePasswordOnlyRecovery = false;
+      var msgEl = document.getElementById('msg');
+      function showErr(t) {
+        msgEl.textContent = t || '';
+        msgEl.className = 'visible err';
+      }
+      function showOk(t) {
+        msgEl.textContent = t || '';
+        msgEl.className = 'visible ok';
+      }
+      function clearMsg() {
+        msgEl.textContent = '';
+        msgEl.className = '';
+      }
+      function apiPost(path, body) {
+        return fetch(path, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        }).then(function (res) {
+          return res.json().catch(function () { return {}; }).then(function (data) {
+            if (!res.ok) throw new Error(data.message || ('请求失败 ' + res.status));
+            return data;
+          });
+        });
+      }
+      document.getElementById('btn-preview').addEventListener('click', function () {
+        clearMsg();
+        var nick = document.getElementById('nick').value.trim();
+        if (nick.length < 2) {
+          showErr('请输入至少 2 个字符的用户名');
+          return;
+        }
+        var b = document.getElementById('btn-preview');
+        b.disabled = true;
+        apiPost('/api/auth/recovery-preview', { nickname: nick })
+          .then(function (d) {
+            if (!d.success) throw new Error(d.message || '查询失败');
+            tradePasswordOnlyRecovery = Boolean(d.tradePasswordOnly);
+            var secWrap = document.getElementById('recovery-security-fields');
+            if (tradePasswordOnlyRecovery) {
+              qids = [];
+              secWrap.style.display = 'none';
+              document.getElementById('ans1').value = '';
+              document.getElementById('ans2').value = '';
+              showOk('该账号未设置密保，请填写交易密码与新登录密码');
+            } else {
+              if (!d.questions || d.questions.length < 2) throw new Error(d.message || '无法获取密保');
+              secWrap.style.display = '';
+              qids = [d.questions[0].questionId, d.questions[1].questionId];
+              document.getElementById('qt1').textContent = d.questions[0].text || qids[0];
+              document.getElementById('qt2').textContent = d.questions[1].text || qids[1];
+              showOk('请继续填写密保答案、交易密码与新登录密码');
+            }
+            document.getElementById('step2').classList.add('visible');
+          })
+          .catch(function (e) { showErr(e.message || String(e)); })
+          .finally(function () { b.disabled = false; });
+      });
+      document.getElementById('btn-reset').addEventListener('click', function () {
+        clearMsg();
+        if (!tradePasswordOnlyRecovery && qids.length < 2) {
+          showErr('请先完成上一步查询');
+          return;
+        }
+        var nick = document.getElementById('nick').value.trim();
+        var npw = document.getElementById('npw').value;
+        var npw2 = document.getElementById('npw2').value;
+        if (npw !== npw2) {
+          showErr('两次输入的新登录密码不一致');
+          return;
+        }
+        var securityAnswers = [];
+        if (!tradePasswordOnlyRecovery) {
+          var a1 = document.getElementById('ans1').value.trim();
+          var a2 = document.getElementById('ans2').value.trim();
+          if (!a1 || !a2) {
+            showErr('请填写两道密保答案');
+            return;
+          }
+          securityAnswers = [
+            { questionId: qids[0], answer: a1 },
+            { questionId: qids[1], answer: a2 },
+          ];
+        }
+        var b = document.getElementById('btn-reset');
+        b.disabled = true;
+        apiPost('/api/auth/reset-login-password', {
+          nickname: nick,
+          tradePassword: document.getElementById('tpw').value,
+          securityAnswers: securityAnswers,
+          newPassword: npw,
+          passwordConfirm: npw2,
+        })
+          .then(function (d) {
+            showOk(d.message || '重置成功，请使用新密码登录');
+            setTimeout(function () { window.location.href = 'login.html'; }, 1200);
+          })
+          .catch(function (e) { showErr(e.message || String(e)); })
+          .finally(function () { b.disabled = false; });
+      });
+    })();
+  </script>
+</body>
+</html>

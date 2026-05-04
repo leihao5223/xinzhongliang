@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>科技创新驱动 - 中粮天下</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;list-style-type:none;}
+body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;color:#1a1a1a;line-height:1.8;overflow-x:hidden;}
+#sakura{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:0.35;pointer-events:none;}
+.article-wrapper{position:relative;z-index:1;min-height:100vh;padding:3rem 1rem;}
+.article-container{max-width:920px;margin:0 auto;background:rgba(255,255,255,0.72);border-radius:18px;padding:3rem 3.5rem;box-shadow:0 12px 50px rgba(0,0,0,0.15);}
+.back-link{display:inline-flex;align-items:center;gap:0.4rem;color:#0d6efd;text-decoration:none;font-weight:600;margin-bottom:1.5rem;font-size:0.95rem;}
+.back-link:hover{text-decoration:underline;}
+.article-header{text-align:center;margin-bottom:2.5rem;border-bottom:2px solid #e0e6f0;padding-bottom:1.8rem;}
+.article-header h1{font-size:2.3rem;color:#0f1f3d;margin-bottom:0.8rem;letter-spacing:2px;font-weight:700;}
+.article-meta{color:#789;font-size:0.9rem;}
+.article-body p{margin-bottom:1.3rem;text-indent:2em;font-size:1.06rem;color:#2a2a2a;}
+.article-body h2{font-size:1.55rem;color:#1a3a6e;margin:2.2rem 0 1.1rem;border-left:5px solid #c9302c;padding-left:0.9rem;font-weight:700;}
+.article-body h3{font-size:1.2rem;color:#2a4a7a;margin:1.6rem 0 0.8rem;font-weight:600;}
+.quote-box{background:#f4f7fb;border-left:4px solid #c9302c;padding:1.2rem 1.5rem;margin:1.5rem 0;border-radius:0 8px 8px 0;font-style:italic;color:#445;}
+@media(max-width:768px){.article-container{padding:2rem 1.6rem;}.article-header h1{font-size:1.7rem;}}
+</style>
+</head>
+<body>
+<canvas id="sakura"></canvas>
+<script id="sakura_point_vsh" type="x-shader/x_vertex">
+uniform mat4 uProjection;
+uniform mat4 uModelview;
+uniform vec3 uResolution;
+uniform vec3 uOffset;
+uniform vec3 uDOF;
+uniform vec3 uFade;
+attribute vec3 aPosition;
+attribute vec3 aEuler;
+attribute vec2 aMisc;
+varying vec3 pposition;
+varying float psize;
+varying float palpha;
+varying float pdist;
+varying vec3 normX;
+varying vec3 normY;
+varying vec3 normZ;
+varying vec3 normal;
+varying float diffuse;
+varying float specular;
+varying float rstop;
+varying float distancefade;
+void main(void) {
+    vec4 pos = uModelview * vec4(aPosition + uOffset, 1.0);
+    gl_Position = uProjection * pos;
+    gl_PointSize = aMisc.x * uProjection[1][1] / -pos.z * uResolution.y * 0.5;
+    pposition = pos.xyz;
+    psize = aMisc.x;
+    pdist = length(pos.xyz);
+    palpha = smoothstep(0.0, 1.0, (pdist - 0.1) / uFade.z);
+    vec3 elrsn = sin(aEuler);
+    vec3 elrcs = cos(aEuler);
+    mat3 rotx = mat3(1.0, 0.0, 0.0, 0.0, elrcs.x, elrsn.x, 0.0, -elrsn.x, elrcs.x);
+    mat3 roty = mat3(elrcs.y, 0.0, -elrsn.y, 0.0, 1.0, 0.0, elrsn.y, 0.0, elrcs.y);
+    mat3 rotz = mat3(elrcs.z, elrsn.z, 0.0, -elrsn.z, elrcs.z, 0.0, 0.0, 0.0, 1.0);
+    mat3 rotmat = rotx * roty * rotz;
+    normal = rotmat[2];
+    mat3 trrotm = mat3(rotmat[0][0], rotmat[1][0], rotmat[2][0], rotmat[0][1], rotmat[1][1], rotmat[2][1], rotmat[0][2], rotmat[1][2], rotmat[2][2]);
+    normX = trrotm[0]; normY = trrotm[1]; normZ = trrotm[2];
+    const vec3 lit = vec3(0.6917144638660746, 0.6917144638660746, -0.20751433915982237);
+    float tmpdfs = dot(lit, normal);
+    if(tmpdfs < 0.0) { normal = -normal; tmpdfs = dot(lit, normal); }
+    diffuse = 0.4 + tmpdfs;
+    vec3 eyev = normalize(-pos.xyz);
+    if(dot(eyev, normal) > 0.0) {
+        vec3 hv = normalize(eyev + lit);
+        specular = pow(max(dot(hv, normal), 0.0), 20.0);
+    } else { specular = 0.0; }
+    rstop = clamp((abs(pdist - uDOF.x) - uDOF.y) / uDOF.z, 0.0, 1.0);
+    rstop = pow(rstop, 0.5);
+    distancefade = min(1.0, exp((uFade.x - pdist) * 0.69315 / uFade.y));
+}
+</script>
+<script id="sakura_point_fsh" type="x-shader/x_fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+uniform vec3 uDOF;
+uniform vec3 uFade;
+const vec3 fadeCol = vec3(0.08, 0.03, 0.06);
+varying vec3 pposition;
+varying float psize;
+varying float palpha;
+varying float pdist;
+varying vec3 normX;
+varying vec3 normY;
+varying vec3 normZ;
+varying vec3 normal;
+varying float diffuse;
+varying float specular;
+varying float rstop;
+varying float distancefade;
+float ellipse(vec2 p, vec2 o, vec2 r) {
+    vec2 lp = (p - o) / r;
+    return length(lp) - 1.0;
+}
+void main(void) {
+    vec3 p = vec3(gl_PointCoord - vec2(0.5, 0.5), 0.0) * 2.0;
+    vec3 d = vec3(0.0, 0.0, -1.0);
+    float nd = normZ.z;
+    if(abs(nd) < 0.0001) discard;
+    float np = dot(normZ, p);
+    vec3 tp = p + d * np / nd;
+    vec2 coord = vec2(dot(normX, tp), dot(normY, tp));
+    const float flwrsn = 0.258819045102521;
+    const float flwrcs = 0.965925826289068;
+    mat2 flwrm = mat2(flwrcs, -flwrsn, flwrsn, flwrcs);
+    vec2 flwrp = vec2(abs(coord.x), coord.y) * flwrm;
+    float r;
+    if(flwrp.x < 0.0) {
+        r = ellipse(flwrp, vec2(0.065, 0.024) * 0.5, vec2(0.36, 0.96) * 0.5);
+    } else {
+        r = ellipse(flwrp, vec2(0.065, 0.024) * 0.5, vec2(0.58, 0.96) * 0.5);
+    }
+    if(r > rstop) discard;
+    vec3 col = mix(vec3(1.0, 0.8, 0.75), vec3(1.0, 0.9, 0.87), r);
+    float grady = mix(0.0, 1.0, pow(coord.y * 0.5 + 0.5, 0.35));
+    col *= vec3(1.0, grady, grady);
+    col *= mix(0.8, 1.0, pow(abs(coord.x), 0.3));
+    col = col * diffuse + specular;
+    col = mix(fadeCol, col, distancefade);
+    float alpha = (rstop > 0.001)? (0.5 - r / (rstop * 2.0)) : 1.0;
+    alpha = smoothstep(0.0, 1.0, alpha) * palpha;
+    gl_FragColor = vec4(col * 0.5, alpha);
+}
+</script>
+<script id="fx_common_vsh" type="x-shader/x_vertex">
+uniform vec3 uResolution;
+attribute vec2 aPosition;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    gl_Position = vec4(aPosition, 0.0, 1.0);
+    texCoord = aPosition.xy * 0.5 + vec2(0.5, 0.5);
+    screenCoord = aPosition.xy * vec2(uResolution.z, 1.0);
+}
+</script>
+<script id="bg_fsh" type="x-shader/x_fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+uniform vec2 uTimes;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    vec3 col;
+    float c;
+    vec2 tmpv = texCoord * vec2(0.8, 1.0) - vec2(0.95, 1.0);
+    c = exp(-pow(length(tmpv) * 1.8, 2.0));
+    col = mix(vec3(0.02, 0.0, 0.03), vec3(0.96, 0.98, 1.0) * 1.5, c);
+    gl_FragColor = vec4(col * 0.5, 1.0);
+}
+</script>
+<script id="fx_brightbuf_fsh" type="x-shader/x_fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+uniform sampler2D uSrc;
+uniform vec2 uDelta;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    vec4 col = texture2D(uSrc, texCoord);
+    gl_FragColor = vec4(col.rgb * 2.0 - vec3(0.5), 1.0);
+}
+</script>
+<script id="fx_dirblur_r4_fsh" type="x-shader/x_fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+uniform sampler2D uSrc;
+uniform vec2 uDelta;
+uniform vec4 uBlurDir;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    vec4 col = texture2D(uSrc, texCoord);
+    col = col + texture2D(uSrc, texCoord + uBlurDir.xy * uDelta);
+    col = col + texture2D(uSrc, texCoord - uBlurDir.xy * uDelta);
+    col = col + texture2D(uSrc, texCoord + (uBlurDir.xy + uBlurDir.zw) * uDelta);
+    col = col + texture2D(uSrc, texCoord - (uBlurDir.xy + uBlurDir.zw) * uDelta);
+    gl_FragColor = col / 5.0;
+}
+</script>
+<script id="pp_final_vsh" type="x-shader/x_vertex">
+uniform vec3 uResolution;
+attribute vec2 aPosition;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    gl_Position = vec4(aPosition, 0.0, 1.0);
+    texCoord = aPosition.xy * 0.5 + vec2(0.5, 0.5);
+    screenCoord = aPosition.xy * vec2(uResolution.z, 1.0);
+}
+</script>
+<script id="pp_final_fsh" type="x-shader/x_fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+uniform sampler2D uSrc;
+uniform sampler2D uBloom;
+uniform vec2 uDelta;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    vec4 srccol = texture2D(uSrc, texCoord) * 2.0;
+    vec4 bloomcol = texture2D(uBloom, texCoord);
+    vec4 col = srccol + bloomcol * (vec4(1.0) + srccol);
+    col *= smoothstep(1.0, 0.0, pow(length((texCoord - vec2(0.5)) * 2.0), 1.2) * 0.5);
+    col = pow(col, vec4(0.45454545454545));
+    gl_FragColor = vec4(col.rgb, 1.0);
+}
+</script>
+
+<div class="article-wrapper">
+  <div class="article-container">
+    <a href="index.html" class="back-link">&#8592; 返回首页</a>
+    <div class="article-header">
+      <h1>科技创新驱动</h1>
+      <div class="article-meta">中粮集团 · 深度报道 · 科技创新专栏</div>
+    </div>
+    <div class="article-body">
+      <p>农业现代化，关键是农业科技现代化。在粮食产量连续多年站稳高位、资源环境约束日益趋紧的背景下，依靠科技创新提高单产、改善品质、降低消耗，已成为中国粮食安全的根本出路。作为粮油行业的领军企业，中粮集团始终将科技创新置于战略核心位置，每年投入大量资源用于技术研发、设备升级和人才培养，在生物育种、智慧农业、精深加工、绿色低碳等领域取得了一系列突破性成果，为传统农粮产业注入了强劲的创新动能。</p>
+
+      <h2>一、生物育种：从分子层面重塑作物基因</h2>
+      <p>种子是农业的"芯片"，良种对粮食增产的贡献率超过四成。中粮集团旗下拥有多家专业从事农作物种子研发、生产和销售的子公司，构建了覆盖玉米、水稻、小麦、大豆、油菜等主要粮食品种的育种体系。</p>
+
+      <p>在玉米育种领域，中粮的研发团队利用全基因组选择、分子标记辅助选择等现代生物技术，大幅缩短了育种周期。传统育种方法培育一个新品种通常需要八到十年，而通过基因芯片技术对育种材料进行早期筛选，可以在实验室阶段就淘汰大量不符合目标的植株，将育种周期缩短三到五年。近年来，中粮推出的多个玉米新品种，在抗倒伏、抗病虫害、耐密植等方面表现优异，平均亩产比主推品种提高8%以上。</p>
+
+      <p>水稻育种方面，中粮积极参与国家"绿色超级稻"计划，培育出多个优质、高产、多抗的水稻新品种。其中一个突破性成果是耐盐碱水稻的选育。我国拥有大面积沿海滩涂和内陆盐碱地，如果能够开发利用，将极大拓展粮食生产空间。中粮的科研团队通过将野生耐盐碱稻种与高产栽培稻种进行杂交回交，结合分子标记辅助选择，成功选育出可在含盐量0.3%土壤中正常生长的水稻新品系，为"改造亿亩盐碱地"的国家战略提供了有力的品种支撑。</p>
+
+      <p>在大豆育种上，面对进口依存度高的现实挑战，中粮加大了对高蛋白、高油大豆品种的攻关力度。通过引进国外优质种质资源，与国内的适应性品种进行杂交，结合单倍体育种技术，快速纯合优良基因型，选育出了一批适合不同生态区种植的高产大豆品种。这些品种的推广应用，对于提高国产大豆自给率、降低对进口的过度依赖具有重要意义。</p>
+
+      <div class="quote-box">"一粒种子可以改变一个世界，一项技术能够创造一个奇迹。我们把育种作为科技创新的重中之重，就是要掌握农业发展的主动权。" ——中粮集团科技管理部</div>
+
+      <h2>二、智慧农业：让数据在田野间流动</h2>
+      <p>如果说生物育种解决的是"种什么"的问题，那么智慧农业回答的就是"怎么种"的问题。中粮积极推进物联网、大数据、人工智能等信息技术与农业生产的深度融合，打造了一批智慧农业示范基地。</p>
+
+      <p>在黑龙江的某大型农场，中粮部署了覆盖万亩农田的物联网感知系统。田间布设的气象站、土壤墒情传感器、作物长势监测仪等设备，每隔十分钟采集一次数据，通过5G网络实时传输至云端平台。平台内置的作物生长模型和专家决策系统，能够根据实时数据自动生成灌溉、施肥、植保方案，并通过手机APP推送给农场管理人员。管理人员只需在手机上轻点几下，就能遥控指挥田间的智能灌溉设备和无人机植保机完成作业。</p>
+
+      <p>无人机技术在中粮的农业生产中得到了广泛应用。搭载多光谱相机的植保无人机，可以在飞行过程中实时获取作物的NDVI指数，精准识别长势异常区域，实现"哪里需要打药、哪里需要施肥"的变量作业。相比传统的大水漫灌、均匀撒施，这种精准农业技术可以节约农药使用量20%以上、化肥使用量15%以上，既降低了生产成本，又减轻了面源污染。</p>
+
+      <p>在收获环节，中粮引进了配备产量监测系统的联合收割机。这种收割机在作业的同时，能够实时记录每一块地的产量数据，并生成产量分布图。农民通过分析产量分布图，可以清楚地看到田块内部的空间变异，为来年的精准施肥、土壤改良提供数据依据。</p>
+
+      <h2>三、加工技术：把每一粒粮食吃干榨净</h2>
+      <p>粮油加工是中粮的核心业务，也是科技创新的主战场。通过引进消化吸收再创新，中粮在多个加工技术领域达到了国际先进水平，部分领域甚至实现了从跟跑到并跑、领跑的跨越。</p>
+
+      <p>在油脂加工领域，中粮开发出了具有自主知识产权的低温脱溶技术。传统的豆粕脱溶采用高温蒸汽处理，虽然能够有效去除溶剂，但会造成蛋白质的热变性，降低豆粕的饲用价值。中粮的低温脱溶技术通过优化脱溶塔的结构和工艺参数，将脱溶温度控制在60摄氏度以下，最大限度地保留了蛋白质的活性，生产出的高品质豆粕深受高端饲料企业的青睐。</p>
+
+      <p>在淀粉糖领域，中粮建成了国内首条以玉米为原料生产结晶果糖的生产线。果糖具有甜度高、升糖指数低的特点，是食品工业的理想甜味剂。但果糖的分离提纯技术长期被国外公司垄断。中粮通过自主研发，突破了模拟移动床色谱分离技术，实现了葡萄糖和果糖的高效分离，打破了国外的技术封锁，填补了国内空白。</p>
+
+      <p>在生物发酵领域，中粮利用先进的菌种改造和发酵工艺控制技术，开发了多种高附加值的生物基产品。例如，利用玉米淀粉生产的聚乳酸，是一种可完全生物降解的环保材料，可以替代传统的石油基塑料，广泛应用于包装、纺织、医疗等领域。随着"限塑令"的逐步升级，聚乳酸的市场前景十分广阔。</p>
+
+      <h2>四、数字中台：用算法优化每一个决策</h2>
+      <p>除了生产技术的创新，中粮还在企业管理数字化方面进行了大胆探索。集团层面的数字化转型战略，旨在打通采购、生产、仓储、物流、销售等各环节的数据孤岛，构建统一的"数字中台"，以数据驱动业务决策。</p>
+
+      <p>在采购端，中粮开发了基于机器学习的农产品价格预测模型。该模型综合考虑全球主要产区的天气数据、作物生长进度、库存水平、宏观经济指标、汇率波动等上百个变量，对未来三个月到一年的大豆、玉米、小麦等品种价格走势进行预测。虽然农产品价格受多种不确定性因素影响，预测精度有限，但模型提供的概率分布和情景分析，仍然为采购决策提供了有价值的参考，帮助采购人员在市场低点增加库存、在高点减少敞口。</p>
+
+      <p>在销售端，中粮搭建了面向终端消费者的电商平台和会员系统，通过分析消费者的购买行为数据，进行精准营销和个性化推荐。同时，这些数据也反馈给产品研发部门，指导新产品的开发方向。例如，通过分析电商平台的数据，中粮发现年轻消费者对于健康、便捷、小包装的粮油产品需求增长迅速，于是推出了主打"低GI"概念的功能性大米、适合单身人群的小瓶装食用油等创新产品，获得了市场的积极反响。</p>
+
+      <h2>五、面向未来：抢占农业科技制高点</h2>
+      <p>科技创新永无止境。面向未来，中粮将继续加大研发投入，在合成生物学、基因编辑、细胞培养肉、农业机器人等前沿领域进行战略布局，力争在新一轮农业科技革命中抢占先机。</p>
+
+      <p>合成生物学被誉为"第三次生物技术革命"，其核心思想是通过设计和构建新的生物部件、设备和系统，或者重新设计已有的自然生物系统，来实现特定的功能。中粮正在探索利用合成生物学技术，构建能够高效转化农业废弃物的微生物细胞工厂，将秸秆、稻壳等原本被焚烧或废弃的生物质资源，转化为燃料、化学品和材料，实现农业资源的循环利用。</p>
+
+      <p>细胞培养肉是食品科技的另一前沿方向。通过在生物反应器中培养动物肌肉细胞，可以在不饲养、不屠宰动物的情况下生产出真正的肉类产品。这种生产方式不仅可以大幅减少土地、水和能源的消耗，还能避免抗生素残留和动物疫病传播的风险。中粮已经启动了细胞培养肉的前期研究，与国内外多家科研机构开展合作，力争在这一新兴领域占据一席之地。</p>
+
+      <p>从一粒种子的基因改良，到万亩农田的智慧管理，从现代化工厂的精密加工，到消费终端的数据洞察，科技创新已经渗透到中粮产业链的每一个环节。未来，中粮将继续以创新为第一动力，推动中国农粮产业向更高质量、更有效率、更加可持续的方向迈进。</p>
+    </div>
+  </div>
+</div>
+
+<script src="特效/飘雪/js/index.js"></script>
+
+<style>
+.latest-news-section {
+  position: relative;
+  z-index: 1;
+  padding: 4rem 1rem;
+  background: linear-gradient(180deg, #f0f4f8 0%, #e8eef5 100%);
+}
+.latest-news-section .news-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.latest-news-section .news-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+.latest-news-section .news-subtitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #c9302c;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+}
+.latest-news-section .news-subtitle span {
+  font-size: 0.5rem;
+}
+.latest-news-section .news-title {
+  font-size: 1.9rem;
+  color: #0f1f3d;
+  font-weight: 700;
+}
+.latest-news-section .news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+.latest-news-section .news-card {
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,0.65);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(31,38,80,0.08);
+  display: flex;
+  flex-direction: column;
+}
+.latest-news-section .news-card-image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+.latest-news-section .news-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.latest-news-section .news-card-body {
+  padding: 1.4rem 1.3rem 0.6rem;
+  flex: 1;
+}
+.latest-news-section .news-card-body h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a3a6e;
+  margin-bottom: 0.5rem;
+  line-height: 1.45;
+}
+.latest-news-section .news-card-body p {
+  font-size: 0.92rem;
+  color: #4a5568;
+  line-height: 1.7;
+  margin: 0;
+}
+.latest-news-section .news-card-footer {
+  padding: 0 1.3rem 1.1rem;
+  font-size: 0.85rem;
+  color: #8899aa;
+}
+@media(max-width:768px){
+  .latest-news-section .news-title { font-size: 1.5rem; }
+}
+</style>
+<section class="latest-news-section">
+  <div class="news-container">
+    <div class="news-header">
+      <div class="news-subtitle"><span>&#9679;</span> 行业前沿</div>
+      <h2 class="news-title">洞察粮农趋势，引领产业未来</h2>
+    </div>
+    <div class="news-grid">
+      <div class="news-card">
+        <div class="news-card-image"><img src="assets/images/blog-smart-agriculture-drone.jpg" alt="智慧农业"></div>
+        <div class="news-card-body">
+          <h3>数字农田：智慧农业重塑耕种方式</h3>
+          <p>无人机巡田、卫星遥感与物联网传感器的深度融合，让每一寸土地的管理都进入厘米级精准时代，产量与品质同步跃升。</p>
+        </div>
+        <div class="news-card-footer">2025年05月15日</div>
+      </div>
+      <div class="news-card">
+        <div class="news-card-image"><img src="assets/images/blog-quality-lab-inspection.jpg" alt="品质检测"></div>
+        <div class="news-card-body">
+          <h3>从田间到舌尖：全链路品质守护</h3>
+          <p>依托全球领先的检测实验室与标准化加工基地，建立覆盖原料采购、生产加工、仓储物流的全流程质量追溯网络。</p>
+        </div>
+        <div class="news-card-footer">2025年06月02日</div>
+      </div>
+      <div class="news-card">
+        <div class="news-card-image"><img src="assets/images/blog-green-eco-farm.jpg" alt="绿色农业"></div>
+        <div class="news-card-body">
+          <h3>绿色低碳：可持续农业的中国方案</h3>
+          <p>推进生态农业、循环农业与清洁能源应用，在保障粮食产量的同时守护碧水蓝天，为全球农业可持续发展贡献力量。</p>
+        </div>
+        <div class="news-card-footer">2025年07月18日</div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

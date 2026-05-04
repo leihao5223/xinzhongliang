@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>关于我们 - 中粮天下</title>
+    <link rel="stylesheet" href="assets/css/main.css?v=zhongliang5">
+    <link rel="stylesheet" href="assets/css/responsive.css?v=zhongliang5">
+    <link rel="stylesheet" href="assets/css/steris-effects.css?v=18">
+    <link rel="icon" href="assets/images/zhongliang-favicon.svg?v=1" type="image/svg+xml">
+<style>
+    .banner-inner-video {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.75;
+    }
+    .banner-inner-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: linear-gradient(180deg, rgba(11,17,24,0.35) 0%, rgba(11,17,24,0.75) 100%);
+    }
+    .banner-inner .hero-container {
+      position: relative;
+      z-index: 2;
+    }
+    .banner-inner .effect-hud {
+      z-index: 3;
+    }
+    </style>
+</head>
+<body>
+    <div class="effect-top-hud"></div>
+    <!-- Header Section（全局统一：与首页同构 + 全站「页面」入口） -->
+    <header>
+        <div class="header-container">
+
+            <!-- Header Info -->
+            <div class="header-info-wrapper">
+                <div class="hero-container">
+                    <div class="header-info-container">
+                        <div class="header-info">
+                            <div class="header-info-item">
+                                <i class="fa-solid fa-envelope accent-color"></i>
+                                <span class="header-info-text">ir@cofco.com</span>
+                            </div>
+                            <div class="header-info-item">
+                                <i class="fa-solid fa-phone accent-color"></i>
+                                <span class="header-info-text">+86-10-85006688</span>
+                            </div>
+                        </div>
+                        <div class="header-social">
+                            <a href="#" class="social-icon">
+                                <i class="fa-brands fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="social-icon">
+                                <i class="fa-brands fa-instagram"></i>
+                            </a>
+                            <a href="#" class="social-icon">
+                                <i class="fa-brands fa-twitter"></i>
+                            </a>
+                            <a href="#" class="social-icon">
+                                <i class="fa-brands fa-youtube"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Header Navbar -->
+            <div class="header-navbar-fixed index-glass-navbar">
+                <div class="hero-container">
+                    <nav class="navbar navbar-expand-lg">
+                        <div class="container-fluid p-0">
+                            <div class="logo-container header-logo">
+                                <a class="navbar-brand" href="index.html"><img src="assets/images/zhongliang-logo-light.svg" class="img-fluid" alt="中粮天下"></a>
+                            </div>
+                            <div class="nav-link-wrapper">
+                                <button class="btn nav-btn" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                                aria-controls="navbarNav" aria-expanded="false" aria-label="切换导航">
+                                    <i class="fa-solid fa-bars"></i>
+                                </button>
+                                <div class="collapse navbar-collapse" id="navbarNav">
+                                    <ul class="navbar-nav">
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="index.html">首页</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="about.html">公司介绍</a>
+                                        </li>
+                                        <li class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                                交易中心 <i class="fa-solid fa-angle-down"></i>
+                                            </a>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="product.html">交易中心</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                                资讯 <i class="fa-solid fa-angle-down"></i>
+                                            </a>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="blog.html">资讯列表</a></li>
+                                                <li><a class="dropdown-item" href="single-post.html">文章详情</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                                个人主页 <i class="fa-solid fa-angle-down"></i>
+                                            </a>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="personal-home.html">个人主页</a></li>
+                                                <li><a class="dropdown-item" href="contact.html">联系我们</a></li>
+                                                <li><a class="dropdown-item" href="case-studies.html">合作专题</a></li>
+                                                <li><a class="dropdown-item" href="faq.html">常见问题</a></li>
+                                                <li><a class="dropdown-item" href="team.html">团队介绍</a></li>
+                                                <li><a class="dropdown-item" href="admin-console.html">后台控台</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="navbar-cta-container d-flex flex-row align-items-center gspace-2">
+                                <a href="login.html" class="btn btn-nav-login-green">账号登录</a>
+                                <a href="contact.html" class="btn btn-animated btn-animated--post-3 btn-nav-contact">
+                                    <span>联系客服</span>
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar Section -->
+    <aside>
+        <div class="sidebar-overlay"></div>
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container sidebar-logo">
+                    <img src="assets/images/zhongliang-logo-dark.svg" alt="中粮天下" class="img-fluid">
+                </div>
+                <button class="close-btn btn-white-accent"><span>关</span></button>
+            </div>
+            <ul class="menu">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="about.html">公司介绍</a></li>
+                <li class="sidebar-dropdown">
+                    <div class="dropdown-header">
+                        <a href="#">交易中心</a>
+                        <button class="sidebar-dropdown-btn"><i class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                    <ul class="sidebar-dropdown-menu">
+                        <li><a href="product.html">交易中心</a></li>
+                    </ul>
+                </li>
+                <li class="sidebar-dropdown">
+                    <div class="dropdown-header">
+                        <a href="#">资讯</a>
+                        <button class="sidebar-dropdown-btn"><i class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                    <ul class="sidebar-dropdown-menu">
+                        <li><a href="blog.html">资讯列表</a></li>
+                        <li><a href="single-post.html">文章详情</a></li>
+                    </ul>
+                </li>
+                <li class="sidebar-dropdown">
+                    <div class="dropdown-header">
+                        <a href="#">个人主页</a>
+                        <button class="sidebar-dropdown-btn"><i class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                    <ul class="sidebar-dropdown-menu">
+                        <li><a href="personal-home.html">个人主页</a></li>
+                        <li><a href="contact.html">联系我们</a></li>
+                        <li><a href="case-studies.html">合作专题</a></li>
+                        <li><a href="faq.html">常见问题</a></li>
+                        <li><a href="team.html">团队介绍</a></li>
+                        <li><a href="admin-console.html">后台控台</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </aside>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <main>
+<section class="section banner-inner" style="position:relative;overflow:hidden;">
+        <video class="banner-inner-video" autoplay muted loop playsinline>
+            <source src="https://videos.pexels.com/video-files/2887908/2887908-uhd_2560_1440_25fps.mp4" type="video/mp4">
+        </video>
+        <div class="banner-inner-overlay"></div>
+            <div class="effect-particles-bg" data-count="14" style="z-index:1;"></div>
+<div class="effect-hud" aria-hidden="true">
+                <div class="effect-hud__scanlines"></div>
+                <div class="effect-hud__corners"></div>
+                <div class="effect-hud__status">
+                    <span><span class="effect-hud__dot"></span>系统在线</span>
+                    <span>AR MODE</span>
+                    <span>RENDER 60FPS</span>
+                </div>
+            </div>
+            <div class="hero-container">
+                <div class="banner-inner-content">
+                    <h1 class="banner-inner-title effect-glow-text">关于我们</h1>
+                    <p class="banner-inner-excerpt">中粮集团坚持市场化、国际化、专业化方向，持续完善从田间到餐桌的全产业链布局。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section about-showcase-section" id="about-intro">
+            <div class="hero-container">
+                <div class="d-flex flex-column gspace-3">
+                    <div class="d-flex flex-column flex-md-row align-items-center gspace-2">
+                        <div class="heading-wrapper-title">
+                            <div class="row row-cols-lg-2 row-cols-md-2 row-cols-1 grid-spacer-x-0 grid-spacer-y-3">
+                                <div class="col col-md-4">
+                                    <div class="sub-heading">
+                                        <i class="fa-solid fa-circle"></i>
+                                        <h4 class="accent-color">关于我们</h4>
+                                    </div>
+                                </div>
+                                <div class="col col-md-8">
+                                    <div class="overflow-hidden">
+                                        <h2 class="animate-box animated animate__animated" data-animate="animate__fadeInLeft">走进中粮：服务国计民生的大粮商</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="heading-wrapper-link">
+                            <a href="#heritage-metrics" class="btn btn-accent">
+                                <span>查看更多</span>
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row row-cols-md-2 row-cols-1 grid-spacer-3 about-showcase-split">
+                        <div class="col col-lg-5 col-md-6">
+                            <div class="image-container overflow-hidden about-hero-wrap animate-box animated animate__animated" data-animate="animate__fadeInRight">
+                                <img src="assets/images/about-hero-reference.png" alt="中粮服务国计民生" class="img-fluid">
+                            </div>
+                        </div>
+                        <div class="col col-lg-7 col-md-6">
+                            <div class="about-content-description-container">
+                                <p class="about-showcase-lead">中粮集团坚持市场化、国际化、专业化方向，持续完善从田间到餐桌的全产业链布局，推动粮油糖棉肉乳等主业高质量发展，并依托科技与创新提升供应链韧性与食品安全保障能力。</p>
+                                <div class="row row-cols-lg-2 row-cols-1 grid-spacer-2 align-items-start">
+                                    <div class="col">
+                                        <div class="about-stat-container">
+                                            <span class="about-stat about-stat--showcase" aria-label="25 年以上传承发展">25+</span>
+                                            <h6>传承发展年数</h6>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="about-glass-card animate-box animated animate__animated" data-animate="animate__fadeInUp">
+                                            <ul class="chevron-circle-list chevron-circle-list--glass">
+                                                <li>全产业链：从全球粮源到国民餐桌</li>
+                                                <li>食品安全：标准、检测与可追溯体系</li>
+                                                <li>国际化经营：海外港口、贸易与加工网络</li>
+                                                <li>科技创新：生物科技与绿色低碳转型</li>
+                                                <li>服务民生：稳价保供与乡村振兴协同</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section data-comparison-section data-comparison-section--dark-glass" id="heritage-metrics">
+            <div class="hero-container">
+                <div class="sub-heading animate-box animated-delay-slow animate__animated" data-animate="animate__fadeIn" style="margin-bottom:1.5rem;">
+                    <i class="fa-solid fa-circle"></i>
+                    <h4 class="accent-color">核心数据</h4>
+                </div>
+                <h2 class="animate-box animated animate__animated" data-animate="animate__fadeInLeft" style="margin-bottom:2.5rem;">全产业链能力对比与核心指标</h2>
+
+                <div class="data-comparison-card dc-glass-trio" id="dataComparisonCard">
+                    <div class="dc-glass-duo">
+                    <div class="dc-glass-panel dc-glass-panel--legacy animate-box animated animate__animated" data-animate="animate__fadeInUp">
+                        <div class="dc-legacy-projects-inner" aria-label="产品列表">
+                            <div class="dc-legacy-scroll">
+                                <div id="dc-legacy-root"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dc-glass-panel dc-glass-panel--trend animate-box animated animate__animated" data-animate="animate__fadeInUp">
+                        <h3 id="dc-trend-title" class="dc-trend-title">加载中…</h3>
+                        <div class="dc-chart-shell">
+                            <iframe id="dc-chart-frame" class="dc-chart-frame" title="产品走势" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="dc-glass-panel dc-glass-panel--table dc-glass-panel--table-below animate-box animated animate__animated" data-animate="animate__fadeInUp">
+                        <div class="comparison-table-title">产业链能力对比</div>
+                        <div class="dc-table-scroll">
+                            <table class="comparison-table comparison-table--on-glass">
+                                <thead>
+                                    <tr>
+                                        <th>核心维度</th>
+                                        <th>传统粮贸模式</th>
+                                        <th>行业一般水平</th>
+                                        <th>中粮集团</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>全球供应链节点</td>
+                                        <td>分散低效</td>
+                                        <td>区域性布局</td>
+                                        <td>5000+ 协同节点</td>
+                                    </tr>
+                                    <tr>
+                                        <td>食品安全标准</td>
+                                        <td>基础检测</td>
+                                        <td>国标合规</td>
+                                        <td>200+ 项专业检测</td>
+                                    </tr>
+                                    <tr>
+                                        <td>产业链覆盖</td>
+                                        <td>单环节作业</td>
+                                        <td>多环节衔接</td>
+                                        <td>全链条闭环</td>
+                                    </tr>
+                                    <tr>
+                                        <td>数字化能力</td>
+                                        <td>&lt;20%</td>
+                                        <td>30% - 50%</td>
+                                        <td>全链路数字化</td>
+                                    </tr>
+                                    <tr>
+                                        <td>服务持续性</td>
+                                        <td>短期交易</td>
+                                        <td>中长期合作</td>
+                                        <td>25+ 年深耕</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="dc-glass-footnote">* 以上数据仅为版面展示，不代表经审计财务或经营数据</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="hero-container">
+                <div class="d-flex flex-column flex-md-row gspace-3 gspace-lg-5 w-100 flex-wrap flex-lg-nowrap">
+                    <div class="whychooseus-title-container">
+                        <div class="sub-heading animate-box animated-delay-slow animate__animated" data-animate="animate__fadeIn">
+                            <i class="fa-solid fa-circle"></i>
+                            <h4 class="accent-color">为何选择我们</h4>
+                        </div>
+                        <h2 class="animate-box animated animate__animated" data-animate="animate__zoomIn">选择中粮：全产业链、全渠道、全场景的综合服务伙伴</h2>
+                        <p>中粮集团以保障粮食安全为使命，持续提升主业核心竞争力，推动绿色低碳与数字化转型，携手合作伙伴共建稳定、共赢的产业生态。</p>
+                        <div>
+                            <a href="contact.html" class="btn btn-accent">
+                                <span>立即咨询</span>
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="whychooseus-image-container">
+                        <div class="image-container chooseus-image">
+                            <img src="assets/images/zhongliang-wheat-field.jpg" alt="为何选择我们">
+                        </div>
+                    </div>
+                    <div class="whychooseus-feature">
+                        <div class="d-flex flex-row align-items-start gspace-2 animate-box animated animate__animated" data-animate="animate__fadeInLeft">
+                            <div class="whychooseus-icon"><i class="fa-solid fa-thumbs-up"></i></div>
+                            <div class="d-flex flex-column gspace-1">
+                                <h3>成熟经验</h3>
+                                <p>依托国有骨干企业的治理能力与风控体系，提供规范、透明、可持续的合作机制与合规保障。</p>
+                            </div>
+                        </div>
+                        <div class="underline-accent-5"></div>
+                        <div class="d-flex flex-row align-items-start gspace-2 animate-box animated animate__animated" data-animate="animate__fadeInLeft">
+                            <div class="whychooseus-icon"><i class="fa-solid fa-award"></i></div>
+                            <div class="d-flex flex-column gspace-1">
+                                <h3>认证品质</h3>
+                                <p>依托国有骨干企业的治理能力与风控体系，提供规范、透明、可持续的合作机制与合规保障。</p>
+                            </div>
+                        </div>
+                        <div class="underline-accent-5"></div>
+                        <div class="d-flex flex-row align-items-start gspace-2 animate-box animated animate__animated" data-animate="animate__fadeInLeft">
+                            <div class="whychooseus-icon"><i class="fa-solid fa-handshake"></i></div>
+                            <div class="d-flex flex-column gspace-1">
+                                <h3>值得信赖的合作</h3>
+                                <p>依托国有骨干企业的治理能力与风控体系，提供规范、透明、可持续的合作机制与合规保障。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section contact-cta-banner">
+            <div class="hero-container">
+                <div class="contact-cta-content">
+                    <h2 class="contact-cta-title animate-box animated animate__animated" data-animate="animate__fadeInLeft">把握市场机遇，与中粮同行</h2>
+                    <p class="contact-cta-description">欢迎了解中粮集团在粮油食品、科技创新与综合服务方面的最新举措，预约业务交流与市场对接。</p>
+                    <div>
+                        <a href="contact.html" class="btn btn-animated btn-animated--post-1">
+                            <span>预约咨询</span>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- Footer Section -->
+    <footer>
+        <div class="section-none bg-primary-accent">
+            <div class="d-flex flex-column gspace-0">
+                <div class="footer-container">
+
+                    <!-- Footer Content -->
+                     <div class="footer-content-wrapper">
+                        <div class="hero-container">
+                            <div class="footer-content-container">
+                                <div class="footer-contact-container">
+                                    <div class="contact-info-container">
+                                        <h5>致电我们</h5>
+                                        <div class="d-flex flex-row gspace-1 align-items-center">
+                                            <i class="fa-solid fa-phone contact-icon"></i>
+                                            <p class="footer-contact-text">+86-10-85006688</p>
+                                        </div>
+                                    </div>
+                                    <div class="contact-info-container">
+                                        <h5>电子邮箱</h5>
+                                        <div class="d-flex flex-row gspace-1 align-items-center">
+                                            <i class="fa-solid fa-envelope contact-icon"></i>
+                                            <p class="footer-contact-text">ir@cofco.com</p>
+                                        </div>
+                                    </div>
+                                    <div class="contact-info-container">
+                                        <h5>公司地址</h5>
+                                        <div class="d-flex flex-row gspace-1 align-items-center">
+                                            <i class="fa-solid fa-location-dot contact-icon"></i>
+                                            <p class="footer-contact-text">中国北京市朝阳区</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="footer-info-container">
+                                    <div class="image-container footer-logo">
+                                        <img src="assets/images/zhongliang-logo-light.svg" alt="中粮天下">
+                                    </div>
+                                    <p class="footer-info-text">中粮天下聚焦粮油食品与综合服务，与中粮集团品牌与业务协同。</p>
+                                    <div class="d-flex flex-row gspace-2 align-items-center flex-wrap justify-content-center">
+                                        <a href="about.html" class="footer-link">公司介绍</a>
+                                        <a href="product.html" class="footer-link">交易中心</a>
+                                        <a href="contact.html" class="footer-link">联系我们</a>
+                                        <a href="team.html" class="footer-link">团队介绍</a>
+                                    </div>
+                                    <div class="footer-divider"></div>
+                                    <div class="overflow-hidden">
+                                        <div class="swiper swiper-gallery">
+                                            <div class="swiper-wrapper">
+                                                <div class="swiper-slide">
+                                                    <div class="image-container gallery-image footer-gallery-img">
+                                                        <a href="assets/images/zhongliang-grain-silo.jpg" data-fslightbox="gallery">
+                                                            <img src="assets/images/zhongliang-grain-silo.jpg" alt="页脚图库" class="img-fluid">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="swiper-slide">
+                                                    <div class="image-container gallery-image footer-gallery-img">
+                                                        <a href="assets/images/zhongliang-port-containers.jpg" data-fslightbox="gallery">
+                                                            <img src="assets/images/zhongliang-port-containers.jpg" alt="页脚图库" class="img-fluid">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="swiper-slide">
+                                                    <div class="image-container gallery-image footer-gallery-img">
+                                                        <a href="assets/images/zhongliang-corporate-handshake.jpg" data-fslightbox="gallery">
+                                                            <img src="assets/images/zhongliang-corporate-handshake.jpg" alt="页脚图库" class="img-fluid">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="swiper-slide">
+                                                    <div class="image-container gallery-image footer-gallery-img">
+                                                        <a href="assets/images/advert/field-terraces.jpg" data-fslightbox="gallery">
+                                                            <img src="assets/images/advert/field-terraces.jpg" alt="页脚图库" class="img-fluid">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="swiper-slide">
+                                                    <div class="image-container gallery-image footer-gallery-img">
+                                                        <a href="assets/images/advert/village-aerial.jpg" data-fslightbox="gallery">
+                                                            <img src="assets/images/advert/village-aerial.jpg" alt="页脚图库" class="img-fluid">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="swiper-slide">
+                                                    <div class="image-container gallery-image footer-gallery-img">
+                                                        <a href="assets/images/advert/snow-mountain.jpg" data-fslightbox="gallery">
+                                                            <img src="assets/images/advert/snow-mountain.jpg" alt="页脚图库" class="img-fluid">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="swiper-slide">
+                                                    <div class="image-container gallery-image footer-gallery-img">
+                                                        <a href="assets/images/experienced-gray-haired-businessman-with-a-beard-i-2025-03-25-20-08-46-utc.jpg" data-fslightbox="gallery">
+                                                            <img src="assets/images/experienced-gray-haired-businessman-with-a-beard-i-2025-03-25-20-08-46-utc.jpg" alt="页脚图库" class="img-fluid">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="swiper-slide">
+                                                    <div class="image-container gallery-image footer-gallery-img">
+                                                        <a href="assets/images/confident-leader-2025-04-02-00-33-39-utc.jpg" data-fslightbox="gallery">
+                                                            <img src="assets/images/confident-leader-2025-04-02-00-33-39-utc.jpg" alt="页脚图库" class="img-fluid">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="footer-cta-container">
+                                    <h5>订阅电子报</h5>
+                                    <p class="secondary-accent">订阅邮件，获取首发折扣、动态与资讯。</p>
+                                    <form id="newsletter-form" action="./assets/php/newsletter-form.php" class="form">
+                                        <input type="email" name="newsletter" id="newsletter" placeholder="邮箱" required>
+                                        <button type="submit" class="btn btn-accent btn-accent--alt">订阅</button>
+                                    </form>
+                                    <div id="success-message-footer" class="alert success d-none">
+                                        <p class="form-validaton"><span class="fa-solid fa-check text-success"></span> 提交成功。</p>
+                                    </div>
+                                    <div id="error-message-footer" class="alert failed d-none">
+                                        <p class="form-validaton"><span class="fa-solid fa-times text-danger"></span> 提交失败，请稍后重试。</p>
+                                    </div>
+                                    <h5>关注我们</h5>
+                                    <div class="d-flex flex-row align-items-center gspace-1">
+                                        <a href="#" class="social-icon">
+                                            <i class="fa-brands fa-facebook-f"></i>
+                                        </a>
+                                        <a href="#" class="social-icon">
+                                            <i class="fa-brands fa-instagram"></i>
+                                        </a>
+                                        <a href="#" class="social-icon">
+                                            <i class="fa-brands fa-twitter"></i>
+                                        </a>
+                                        <a href="#" class="social-icon">
+                                            <i class="fa-brands fa-youtube"></i>
+                                        </a>
+                                        <a href="#" class="social-icon">
+                                            <i class="fa-brands fa-weixin"></i>
+                                        </a>
+                                        <a href="#" class="social-icon">
+                                            <i class="fa-brands fa-qq"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                     </div>
+
+                    <!-- Footer Copyright -->
+                    <div class="footer-copyright-wrapper">
+                        <div class="hero-container">
+                            <div class="footer-copyright-container">
+                                <p class="copyright-text">版权所有 © 2026 中粮天下。权威信息请以中粮集团有限公司官网为准。<a href="https://www.cofco.com/" target="_blank" rel="noopener noreferrer">中粮集团官网</a></p>
+                                <div class="legallink-container">
+                                    <a href="#" class="legallink">条款与条件</a>
+                                    <a href="#" class="legallink">隐私政策</a>
+                                    <a href="#" class="legallink">帮助与常见问题</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button type="button" class="zl-chat-fab" id="zl-chat-fab" aria-label="联系客服">
+            <i class="fa-solid fa-headset"></i>
+        </button>
+        <div class="zl-chat-panel" id="zl-chat-panel" aria-label="客服会话窗口">
+            <div class="zl-chat-head">
+                <strong>在线客服</strong>
+                <button type="button" id="zl-chat-close" aria-label="关闭客服会话">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="zl-chat-body">
+                <div id="zl-chat-list"></div>
+            </div>
+            <div class="zl-chat-actions">
+                <input type="text" id="zl-chat-input" placeholder="请输入咨询内容..." />
+                <input type="file" id="zl-chat-file" accept="image/*" style="display:none" />
+                <button type="button" id="zl-chat-file-btn">上传</button>
+                <button type="button" id="zl-chat-send">发送</button>
+            </div>
+        </div>
+        <script>
+        (function () {
+          var TOKEN_KEYS = ['zhongliang_token', 'zl_token', 'token'];
+          var token = TOKEN_KEYS.map(function (k) { return localStorage.getItem(k); }).find(function (v) { return v && String(v).trim(); }) || '';
+          var fab = document.getElementById('zl-chat-fab');
+          var panel = document.getElementById('zl-chat-panel');
+          var closeBtn = document.getElementById('zl-chat-close');
+          var listEl = document.getElementById('zl-chat-list');
+          var inputEl = document.getElementById('zl-chat-input');
+          var sendBtn = document.getElementById('zl-chat-send');
+          var fileInput = document.getElementById('zl-chat-file');
+          var fileBtn = document.getElementById('zl-chat-file-btn');
+          if (!fab || !panel) return;
+          var timer = null;
+          var sessionId = '';
+
+          function addBubble(text, role) {
+            if (!listEl) return;
+            var row = document.createElement('div');
+            row.style.marginBottom = '0.45rem';
+            row.style.display = 'flex';
+            row.style.justifyContent = role === 'user' ? 'flex-end' : 'flex-start';
+            row.innerHTML = '<span style="max-width:82%;display:inline-block;padding:.42rem .58rem;border-radius:10px;background:' +
+              (role === 'user' ? 'rgba(45,212,191,.22)' : 'rgba(148,211,255,.2)') +
+              ';color:#e7f4ff;font-size:.8rem;line-height:1.45;">' + text + '</span>';
+            listEl.appendChild(row);
+            listEl.scrollTop = listEl.scrollHeight;
+          }
+
+          async function api(url, opt) {
+            var headers = (opt && opt.headers) ? opt.headers : {};
+            if (token) headers.Authorization = 'Bearer ' + token;
+            var payload = { method: (opt && opt.method) || 'GET', headers: headers };
+            if (opt && opt.json) {
+              headers['Content-Type'] = 'application/json';
+              payload.body = JSON.stringify(opt.json);
+            }
+            var res = await fetch(url, payload);
+            var data = await res.json().catch(function () { return {}; });
+            if (!res.ok) throw new Error(data.message || ('请求失败(' + res.status + ')'));
+            return data;
+          }
+
+          async function openSession() {
+            if (!token) {
+              addBubble('请先登录后再发起实时客服会话。', 'agent');
+              return;
+            }
+            if (sessionId) return;
+            var opened = await api('/api/support/session/open', { method: 'POST', json: { source: 'steris' } });
+            sessionId = opened && opened.session && opened.session.id ? opened.session.id : '';
+            if (sessionId) {
+              addBubble('客服会话已建立，请输入你的问题。', 'agent');
+              await loadMessages();
+              if (timer) clearInterval(timer);
+              timer = setInterval(loadMessages, 3000);
+            }
+          }
+
+          async function loadMessages() {
+            if (!sessionId) return;
+            var data = await api('/api/support/messages?session_id=' + encodeURIComponent(sessionId));
+            if (!listEl) return;
+            listEl.innerHTML = '';
+            (data.list || []).forEach(function (m) {
+              var role = m.sender_role === 'user' ? 'user' : 'agent';
+              var txt = String(m.content || '');
+              addBubble(txt, role);
+            });
+            api('/api/support/messages/read', { method: 'POST', json: { session_id: sessionId } }).catch(function () {});
+          }
+
+          async function sendText() {
+            var val = inputEl && inputEl.value ? inputEl.value.trim() : '';
+            if (!val) return;
+            if (!sessionId) await openSession();
+            if (!sessionId) return;
+            inputEl.value = '';
+            await api('/api/support/messages/send', { method: 'POST', json: { session_id: sessionId, content: val } });
+            await loadMessages();
+          }
+
+          async function sendImage(file) {
+            if (!file) return;
+            if (!sessionId) await openSession();
+            if (!sessionId) return;
+            var reader = new FileReader();
+            reader.onload = async function () {
+              try {
+                var up = await api('/api/support/upload-image', { method: 'POST', json: { imageBase64: reader.result } });
+                var txt = '图片凭证：' + (up.url || '');
+                await api('/api/support/messages/send', { method: 'POST', json: { session_id: sessionId, content: txt } });
+                await loadMessages();
+              } catch (e) {
+                addBubble(e.message || '上传失败', 'agent');
+              }
+            };
+            reader.readAsDataURL(file);
+          }
+
+          function openPanel() { panel.classList.add('is-open'); }
+          function closePanel() {
+            panel.classList.remove('is-open');
+            if (timer) { clearInterval(timer); timer = null; }
+          }
+          fab.addEventListener('click', function () {
+            openPanel();
+            openSession().catch(function (e) { addBubble(e.message || '会话开启失败', 'agent'); });
+          });
+          if (closeBtn) closeBtn.addEventListener('click', closePanel);
+          if (sendBtn) sendBtn.addEventListener('click', function () { sendText().catch(function (e) { addBubble(e.message, 'agent'); }); });
+          if (inputEl) inputEl.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              sendText().catch(function (err) { addBubble(err.message, 'agent'); });
+            }
+          });
+          if (fileBtn && fileInput) fileBtn.addEventListener('click', function () { fileInput.click(); });
+          if (fileInput) fileInput.addEventListener('change', function () { sendImage(fileInput.files && fileInput.files[0]).catch(function (e) { addBubble(e.message, 'agent'); }); });
+          document.querySelectorAll('[data-open-chat]').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+              e.preventDefault();
+              openPanel();
+              openSession().catch(function (err) { addBubble(err.message, 'agent'); });
+            });
+          });
+
+          var dragging = false;
+          var startX = 0;
+          var startY = 0;
+          var originRight = 0;
+          var originBottom = 0;
+          fab.addEventListener('pointerdown', function (e) {
+            dragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            originRight = parseFloat(getComputedStyle(fab).right) || 0;
+            originBottom = parseFloat(getComputedStyle(fab).bottom) || 0;
+            fab.setPointerCapture(e.pointerId);
+          });
+          fab.addEventListener('pointermove', function (e) {
+            if (!dragging) return;
+            var dx = e.clientX - startX;
+            var dy = e.clientY - startY;
+            var nextRight = Math.max(8, originRight - dx);
+            var nextBottom = Math.max(8, originBottom - dy);
+            fab.style.right = nextRight + 'px';
+            fab.style.bottom = nextBottom + 'px';
+            panel.style.right = nextRight + 'px';
+            panel.style.bottom = (nextBottom + 68) + 'px';
+          });
+          fab.addEventListener('pointerup', function () { dragging = false; });
+        })();
+        </script>
+    </footer>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script src="assets/js/vendor/jquery.min.js"></script>
+    <script src="assets/js/vendor/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/vendor/swiper-bundle.min.js"></script>
+    <script src="assets/js/vendor/fslightbox.js"></script>
+    <script src="assets/js/script.js"></script>
+    <script src="assets/js/shared-page-hero.js"></script>
+    <script src="assets/js/form-script.js"></script>
+    <script src="assets/js/swiper-script.js"></script>
+    <script src="assets/js/video_embedded.js"></script>
+    <script src="assets/js/company-intro-page.js"></script>
+
+    <script>
+    // Scroll reveal animation
+    (function() {
+      const reveals = document.querySelectorAll('.animate-box, .card, .image-container, .sub-heading, .about-stat-container, .about-glass-card, .chevron-circle-list, .whychooseus-icon, .whychooseus-feature h3, .whychooseus-feature p, .contact-cta-title, .contact-cta-description, .blog-link, .blog-cta, .blog-meta, .footer-link, .partner-image, .testimonial-avatar');
+      reveals.forEach((el, i) => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'all 0.8s cubic-bezier(0.22, 1, 0.36, 1)';
+        el.style.transitionDelay = (i % 4 * 0.08) + 's';
+      });
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      reveals.forEach(el => observer.observe(el));
+    })();
+    </script>
+    <script src="assets/data/grain-products-fallback.js?v=1"></script>
+    <script src="assets/js/dc-heritage-core.js?v=4"></script>
+    <script src="assets/js/zhongliang-animations.js"></script>
+</body>
+</html>

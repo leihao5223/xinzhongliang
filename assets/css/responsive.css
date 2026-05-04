@@ -1,0 +1,703 @@
+/* 01. Tablet Responsive - 平板响应式 */
+
+@media screen and (max-width: 991.98px) {
+    h1{
+        font-size: 4.25rem;
+        line-height: 1.05em;
+    }
+    h2{
+        font-size: 2.5rem;
+    }
+    h3{
+        font-size: 1.313rem;
+        line-height: 1.175em;
+    }
+    h4{
+        font-size: 1.25rem;
+    }
+    h5{
+        font-size: 1.05rem;
+        line-height: 1.25em;
+    }
+    h6{
+        font-size: 1rem;
+        line-height: 1.25em;
+    }
+    p{
+        font-size: 0.875rem;
+    }
+    button, a, .btn{
+        font-size: 0.75rem;
+    }
+    .logo-container.header-logo{
+        max-width: 30%;
+    }
+    .logo-container.header-logo img{
+        width: 90%;
+    }
+    .nav-link-wrapper{
+        width: 45%;
+        justify-content: flex-end;
+    }
+    .navbar-cta-container{
+        width: 25%;
+    }
+    .home-sub-heading-container{
+        width: 30%;
+    }
+    .home-heading-container{
+        width: 70%;
+        padding-left: 1em;
+    }
+    .header-info{
+        width: 100%;
+    }
+    .header-social{
+        display: none;
+    }
+    .nav-btn{
+        display: block;
+    }
+    .navbar-collapse{
+        display: none;
+    }
+    .navbar-nav{
+        display: none;
+    }
+    .banner-inner{
+        padding: 20em 1em 12em 1em;
+    }
+    .banner-inner-excerpt{
+        width: 70%;
+    }
+    .btn-animated--post-1{
+        background-position: -163px 0px;
+    }
+    .btn-animated--post-2{
+        background-position: -198px 0px;
+    }
+    .btn-animated--post-3{
+        background-position: -163px 0px;
+    }
+    .btn-animated--post-4{
+        background-position: -187px 0px;
+    }
+    .form label{
+        font-size: 1rem;
+        line-height: 1.25em;
+    }
+    #newsletter-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #newsletter-form button {
+        width: 100%;
+    }
+    .about-content-description-container{
+        padding-left: 0px;
+    }
+    .about-stat{
+        font-size: 6rem;
+    }
+    .product-category-container{
+        width: 30%;
+    }
+    .product-content-container{
+        width: 70%;
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .whychooseus-title-container{
+        width: 48%;
+    }
+    .whychooseus-image-container{
+        width: 47%;
+        min-height: 280px;
+    }
+    .whychooseus-feature{
+        width: 100%;
+    }
+    .testimonial-reviewer-name{
+        font-size: 1rem;
+        line-height: 1.25em;
+    }
+    .testimonial-designation{
+        font-size: 0.875rem;
+    }
+    .card-testimonial-rating{
+        gap: 20px 20px;
+        padding: 1.5em 1.5em 1.5em 1.5em;
+    }
+    .testimonial-rating-count{
+        font-size: 4.25rem;
+        line-height: 1.05em;
+    }
+    .card-contact{
+        padding: 8em 2em 3em 2em;
+    }
+    .blog-link{
+        font-size: 1.05rem;
+    }
+    .contact-cta-content{
+        width: 70%;
+    }
+    .single-product-list li,
+    .single-product-list a{
+        font-size: 0.875rem;
+    }
+    .product-details-list li{
+        font-size: 0.875rem;
+    }
+    .product-detail-content{
+        width: 60%;
+    }
+    .product-detail-sidebar{
+        width: 40%;
+    }
+    .faq-cta-container{
+        width: 40%;
+    }
+    .accordion .accordion-button{
+        font-size: 1rem;
+    }
+    .accordion .accordion-item .accordion-body{
+        font-size: 0.875rem;
+    }
+    .faq-content-container{
+        width: 60%;
+        padding-left: 0px;
+    }
+    .meta-post-item{
+        font-size: 0.875rem;
+    }
+    .banner-notfound-excerpt{
+        width: 70%;
+    }
+    .footer-contact-container{
+        padding: 4em 1em 2em 0em;
+    }
+    .footer-link{
+        font-size: 1rem;
+    }
+    .footer-cta-container{
+        padding: 4em 0em 2em 1em;
+    }
+    .copyright-text{
+        max-width: 40%;
+    }
+    .legallink-container{
+        max-width: 60%;
+    }
+    .legallink{
+        font-size: 0.875rem;
+        padding: 0px 12px 0px 12px;
+    }
+}
+
+/* 02. Mobile Responsive */
+
+@media screen and (max-width: 767.98px) {
+    h1{
+        font-size: 3.45rem;
+    }
+    h2{
+        font-size: 2.25rem;
+    }
+    h3{
+        font-size: 1.313rem;
+        line-height: 1.25em;
+    }
+    h4{
+        font-size: 1.25rem;
+    }
+    h5{
+        font-size: 1.05rem;
+        line-height: 1.125em;
+    }
+    h6{
+        font-size: 1rem;
+        line-height: 1.25em;
+    }
+    .home-sub-heading-container{
+        width: 100%;
+    }
+    .home-heading-container{
+        width: 100%;
+        padding-left: 0em;
+    }
+    .btn-animated--post-1{
+        background-position: -163px 0px;
+    }
+    .btn-animated--post-2{
+        background-position: -199px 0px;
+    }
+    .btn-animated--post-3{
+        background-position: 0px 0px;
+    }
+    .btn-animated--post-4{
+        background-position: -168px 0px;
+    }
+    .header-container {
+        margin-bottom: 0;
+    }
+    .header-info-wrapper {
+        height: 0;
+        overflow: hidden;
+        opacity: 0;
+        display: none;
+        visibility: hidden;
+        pointer-events: none;
+        transition: none;
+    }
+    .header-container.scrolled .header-info-wrapper {
+        opacity: 0;
+    }
+    .logo-container.header-logo{
+        max-width: 70%;
+    }
+    .nav-link-wrapper{
+        width: 30%;
+        justify-content: flex-end;
+    }
+    .navbar-cta-container{
+        display: none;
+    }
+    .banner-inner{
+        padding: 12em 1em 12em 1em;
+    }
+    .banner-inner-excerpt{
+        width: 100%;
+    }
+    .heading-wrapper-title{
+        width: 100%;
+    }
+    .heading-wrapper-link{
+        width: 100%;
+        justify-content: flex-start;
+    }
+    .heading-wrapper-text{
+        width: 100%;
+        justify-content: flex-start;
+    }
+    .product-category-container{
+        width: 100%;
+        position: relative;
+        top: 0px;
+    }
+    .product-content-container{
+        width: 100%;
+        grid-template-columns: repeat(1, 1fr);
+    }
+    .company-overview__container{
+        flex-direction: column;
+    }
+    .company-overview__content{
+        width: 100%;
+    }
+    .company-overview__stat-content{
+        width: 100%;
+    }
+    .project-image-wrapper .image-spacer{
+        height: 300px;
+    }
+    .project-image-wrapper{
+        width: 100%;
+    }
+    .project-info{
+        width: 100%;
+    }
+    .project-content-background{
+        flex-direction: column;
+        gap: 20px 20px;
+        background-position: top center;
+        background-size: 100% auto;
+    }
+    .project-content-background:hover{
+        background-size: 110% auto;
+    }
+    .whychooseus-title-container{
+        width: 100%;
+    }
+    .chooseus-image {
+        width: 100%;
+    }
+    .whychooseus-image-container{
+        width: 90%;
+        align-self: center;
+        min-height: 240px;
+    }
+    .testimonial-rating-count{
+        font-size: 3.45rem;
+    }
+    .card-contact{
+        margin-top: 0px;
+        padding: 3em 2em 3em 2em;
+    }
+    .blog-link{
+        line-height: 1.125em;
+    }
+    .contact-cta-content{
+        width: 100%;
+    }
+    .single-product-content-container{
+        flex-direction: column;
+    }
+    .product-detail-content{
+        width: 100%;
+    }
+    .product-detail-sidebar{
+        width: 100%;
+    }
+    .product-detail-sidebar-content{
+        position: relative;
+        top: 0px;
+    }
+    .faq-cta-container{
+        width: 100%;
+    }
+    .faq-content-container{
+        width: 100%;
+    }
+    .banner-notfound-excerpt{
+        width: 100%;
+    }
+    .footer-content-container{
+        flex-direction: column;
+    }
+    .footer-contact-container{
+        width: 100%;
+    }
+    .footer-info-container{
+        width: 100%;
+        border-width: 1px 0px 1px 0px;
+    }
+    .footer-cta-container{
+        width: 100%;
+    }
+    .footer-copyright-container{
+        flex-direction: column;
+        justify-content: center;
+    }
+    .copyright-text{
+        text-align: center;
+        max-width: 100%;
+    }
+    .legallink-container{
+        max-width: 100%;
+    }
+}
+
+/* 03. Mobile Spacing Responsive */
+
+@media screen and (min-width: 767px){
+
+    /* Flex spacing (gap) */
+
+    .gspace-md-0 { 
+        gap: 0px 0px; 
+    }
+    .gspace-md-1 { 
+        gap: 10px 10px; 
+    }
+    .gspace-md-2 { 
+        gap: 20px 20px; 
+    }
+    .gspace-md-3 { 
+        gap: 30px 30px; 
+    }
+    .gspace-md-4 { 
+        gap: 40px 40px; 
+    }
+    .gspace-md-5 { 
+        gap: 50px 50px; 
+    }
+    .gspace-md-100 { 
+        gap: 100px 100px; 
+    }
+
+    /* Grid spacing (column-gap) */
+
+    .gspace-x-md-0 { 
+        column-gap: 0px; 
+    }
+    .gspace-x-md-0 { 
+        column-gap: 0px; 
+    }
+    .gspace-x-md-1 { 
+        column-gap: 10px; 
+    }
+    .gspace-x-md-2 { 
+        column-gap: 20px; 
+    }
+    .gspace-x-md-3 { 
+        column-gap: 30px; 
+    }
+    .gspace-x-md-4 { 
+        column-gap: 40px; 
+    }
+    .gspace-x-md-5 { 
+        column-gap: 50px; 
+    }
+    .gspace-x-md-100 { 
+        column-gap: 100px; 
+    }
+
+    /* Grid spacing (row-gap) */
+
+    .gspace-y-md-0 { 
+        row-gap: 0px; 
+    }
+    .gspace-y-md-1 { 
+        row-gap: 10px; 
+    }
+    .gspace-y-md-2 { 
+        row-gap: 20px; 
+    }
+    .gspace-y-md-3 { 
+        row-gap: 30px; 
+    }
+    .gspace-y-md-4 { 
+        row-gap: 40px; 
+    }
+    .gspace-y-md-5 { 
+        row-gap: 50px; 
+    }
+    .gspace-y-md-100 { 
+        row-gap: 100px; 
+    }
+
+    /* Grid spacing (row-gap & column-gap) */
+
+    .grid-spacer-md-1 { 
+        --bs-gutter-x: 10px; 
+        --bs-gutter-y: 10px; 
+    }
+    .grid-spacer-md-2 { 
+        --bs-gutter-x: 20px; 
+        --bs-gutter-y: 20px; 
+    }
+    .grid-spacer-md-3 { 
+        --bs-gutter-x: 30px; 
+        --bs-gutter-y: 30px; 
+    }
+    .grid-spacer-md-4 { 
+        --bs-gutter-x: 40px; 
+        --bs-gutter-y: 40px; 
+    }
+    .grid-spacer-md-5 { 
+        --bs-gutter-x: 50px; 
+        --bs-gutter-y: 50px; 
+    }
+    .grid-spacer-md-100 { 
+        --bs-gutter-x: 100px; 
+        --bs-gutter-y: 100px; 
+    }
+
+    /* Grid spacing (column-gap) */
+
+    .grid-spacer-x-md-0 { 
+        --bs-gutter-x: 0px; 
+    }
+    .grid-spacer-x-md-1 { 
+        --bs-gutter-x: 10px; 
+    }
+    .grid-spacer-x-md-2 { 
+        --bs-gutter-x: 20px; 
+    }
+    .grid-spacer-x-md-3 { 
+        --bs-gutter-x: 30px; 
+    }
+    .grid-spacer-x-md-4 { 
+        --bs-gutter-x: 40px; 
+    }
+    .grid-spacer-x-md-5 { 
+        --bs-gutter-x: 50px; 
+    }
+    .grid-spacer-x-md-100 { 
+        --bs-gutter-x: 100px; 
+    }
+
+    /* Grid spacing (row-gap) */
+
+    .grid-spacer-y-md-0 { 
+        --bs-gutter-y: 0px; 
+    }
+    .grid-spacer-y-md-1 { 
+        --bs-gutter-y: 10px; 
+    }
+    .grid-spacer-y-md-2 { 
+        --bs-gutter-y: 20px; 
+    }
+    .grid-spacer-y-md-3 { 
+        --bs-gutter-y: 30px; 
+    }
+    .grid-spacer-y-md-4 { 
+        --bs-gutter-y: 40px; 
+    }
+    .grid-spacer-y-md-5 { 
+        --bs-gutter-y: 50px; 
+    }
+    .grid-spacer-y-md-100 { 
+        --bs-gutter-y: 100px; 
+    }
+}
+
+/* 04. Tablet Spacing Responsive */
+
+@media screen and (min-width: 991.98px){
+    /* Flex spacing (gap) */
+    .gspace-lg-0 { 
+        gap: 0px 0px; 
+    }
+    .gspace-lg-1 { 
+        gap: 10px 10px; 
+    }
+    .gspace-lg-2 { 
+        gap: 20px 20px; 
+    }
+    .gspace-lg-3 { 
+        gap: 30px 30px; 
+    }
+    .gspace-lg-4 { 
+        gap: 40px 40px; 
+    }
+    .gspace-lg-5 { 
+        gap: 50px 50px; 
+    }
+    .gspace-lg-100{
+        gap: 100px 100px;
+    }
+
+    /* Grid spacing (column-gap) */
+
+    .gspace-x-lg-0 { 
+        column-gap: 0px;
+    }
+    .gspace-x-lg-1 { 
+        column-gap: 10px; 
+    }
+    .gspace-x-lg-2 {
+         column-gap: 20px; 
+    }
+    .gspace-x-lg-3 { 
+        column-gap: 30px; 
+    }
+    .gspace-x-lg-4 { 
+        column-gap: 40px; 
+    }
+    .gspace-x-lg-5 { 
+        column-gap: 50px; 
+    }
+    .gspace-x-lg-100{
+        column-gap: 100px;
+    }
+
+    /* Grid spacing (row-gap) */
+
+    .gspace-y-lg-0 { 
+        row-gap: 0px; 
+    }
+    .gspace-y-lg-1 { 
+        row-gap: 10px; 
+    }
+    .gspace-y-lg-2 { 
+        row-gap: 20px; 
+    }
+    .gspace-y-lg-3 { 
+        row-gap: 30px; 
+    }
+    .gspace-y-lg-4 { 
+        row-gap: 40px; 
+    }
+    .gspace-y-lg-5 { 
+        row-gap: 50px; 
+    }
+    .gspace-y-lg-100 {
+        row-gap: 100px;
+    }
+
+    /* Grid spacing (row-gap & column-gap) */
+
+    .grid-spacer-lg-0 { 
+        --bs-gutter-x: 0px; 
+        --bs-gutter-y: 0px; 
+    }
+    .grid-spacer-lg-1 { 
+        --bs-gutter-x: 10px; 
+        --bs-gutter-y: 10px; 
+    }
+    .grid-spacer-lg-2 { 
+        --bs-gutter-x: 20px; 
+        --bs-gutter-y: 20px; 
+    }
+    .grid-spacer-lg-3 { 
+        --bs-gutter-x: 30px; 
+        --bs-gutter-y: 30px; 
+    }
+    .grid-spacer-lg-4 { 
+        --bs-gutter-x: 40px; 
+        --bs-gutter-y: 40px; 
+    }
+    .grid-spacer-lg-5 { 
+        --bs-gutter-x: 50px; 
+        --bs-gutter-y: 50px; 
+    }
+    .grid-spacer-lg-100 { 
+        --bs-gutter-x: 100px; 
+        --bs-gutter-y: 100px; 
+    }
+
+    /* Grid spacing (column-gap) */
+
+    .grid-spacer-x-lg-0 { 
+        --bs-gutter-x: 0px; 
+    }
+    .grid-spacer-x-lg-1 { 
+        --bs-gutter-x: 10px; 
+    }
+    .grid-spacer-x-lg-1 { 
+        --bs-gutter-x: 10px; 
+    }
+    .grid-spacer-x-lg-2 { 
+        --bs-gutter-x: 20px;
+    }
+    .grid-spacer-x-lg-3 { 
+        --bs-gutter-x: 30px; 
+    }
+    .grid-spacer-x-lg-4 { 
+        --bs-gutter-x: 40px; 
+    }
+    .grid-spacer-x-lg-5 { 
+        --bs-gutter-x: 50px; 
+    }
+    .grid-spacer-x-lg-100 { 
+        --bs-gutter-x: 100px; 
+    }
+
+    /* Grid spacing (row-gap) */
+
+    .grid-spacer-y-lg-0 { 
+        --bs-gutter-y: 0px; 
+    }
+    .grid-spacer-y-lg-1 { 
+        --bs-gutter-y: 10px; 
+    }
+    .grid-spacer-y-lg-1 { 
+        --bs-gutter-y: 10px; 
+    }
+    .grid-spacer-y-lg-2 { 
+        --bs-gutter-y: 20px; 
+    }
+    .grid-spacer-y-lg-3 { 
+        --bs-gutter-y: 30px; 
+    }
+    .grid-spacer-y-lg-4 { 
+        --bs-gutter-y: 40px; 
+    }
+    .grid-spacer-y-lg-5 { 
+        --bs-gutter-y: 50px; 
+    }
+    .grid-spacer-y-lg-100 { 
+        --bs-gutter-y: 100px; 
+    }
+}

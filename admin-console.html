@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>后台控台 - 中粮天下</title>
+  <link rel="stylesheet" href="assets/css/main.css?v=zhongliang5">
+  <link rel="stylesheet" href="assets/css/responsive.css?v=zhongliang5">
+  <link rel="stylesheet" href="assets/css/steris-effects.css?v=18">
+  <link rel="icon" href="assets/images/zhongliang-favicon.svg?v=1" type="image/svg+xml">
+  <style>
+    :root { color-scheme: dark; }
+    .admin-wrap { display: flex; min-height: calc(100vh - 200px); }
+    .admin-sidebar {
+      width: 240px;
+      background: linear-gradient(180deg, #071527, #0d2440);
+      border-right: 1px solid rgba(148,211,255,.22);
+      padding: 1.2rem 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .admin-sidebar .admin-brand {
+      display: flex; align-items: center; gap: .6rem; padding: 0 1rem 1rem; border-bottom: 1px solid rgba(148,211,255,.18); margin-bottom: .8rem;
+    }
+    .admin-sidebar .admin-brand img { height: 32px; }
+    .admin-sidebar .admin-brand span { color: #e8f4ff; font-weight: 700; font-size: 1rem; }
+    .admin-nav { display: flex; flex-direction: column; gap: .15rem; padding: 0 .6rem; }
+    .admin-nav-item {
+      display: flex; align-items: center; gap: .6rem;
+      padding: .55rem .7rem; border-radius: 10px;
+      color: #b0cce8; font-size: .88rem; cursor: pointer; transition: all .2s ease;
+      text-decoration: none;
+    }
+    .admin-nav-item:hover, .admin-nav-item.active {
+      background: rgba(148,211,255,.14); color: #fff;
+    }
+    .admin-nav-item i { width: 18px; text-align: center; }
+    .admin-main { flex: 1; padding: 1.4rem 1.6rem; background: linear-gradient(180deg, #0a1220, #0d1f33); }
+    .admin-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; }
+    .admin-head h2 { margin: 0; color: #e8f4ff; font-size: 1.25rem; }
+    .admin-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.2rem; }
+    @media (max-width: 1100px) { .admin-kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 768px) { .admin-sidebar { display: none; } .admin-kpi-grid { grid-template-columns: 1fr; } }
+    .admin-kpi {
+      background: rgba(148,211,255,.12); border: 1px solid rgba(148,211,255,.28);
+      border-radius: 14px; backdrop-filter: blur(14px); padding: 1rem;
+    }
+    .admin-kpi p { margin: 0; color: #9ec7ea; font-size: .82rem; }
+    .admin-kpi h3 { margin: .35rem 0 0; color: #fff; font-size: 1.35rem; }
+    .admin-card {
+      background: rgba(148,211,255,.12); border: 1px solid rgba(148,211,255,.28);
+      border-radius: 14px; backdrop-filter: blur(14px); padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    .admin-card h3 { margin: 0 0 .7rem; color: #e8f4ff; font-size: 1rem; }
+    .admin-toolbar { display: flex; flex-wrap: wrap; gap: .45rem; align-items: center; }
+    .admin-toolbar input, .admin-toolbar select, .admin-toolbar button {
+      border: 1px solid rgba(148,211,255,.35); background: rgba(8,27,44,.55); color: #e7f4ff;
+      border-radius: 8px; padding: .4rem .55rem; font-size: .85rem;
+    }
+    .admin-toolbar button { cursor: pointer; border: 0; }
+    .admin-list { max-height: 260px; overflow: auto; margin-top: .6rem; }
+    .admin-list-row {
+      border: 1px solid rgba(148,211,255,.18); border-radius: 8px;
+      padding: .42rem .5rem; margin-bottom: .4rem; color: #dbeeff; font-size: .82rem;
+      display: flex; justify-content: space-between; align-items: center; gap: .5rem;
+    }
+    .admin-list-row button {
+      border: 0; border-radius: 6px; background: #ef4444; color: #fff; padding: .15rem .45rem; font-size: .75rem; cursor: pointer;
+    }
+    .btn-green { background: linear-gradient(135deg, #0d5c2e, #1a7a3e, #2ecc71) !important; }
+    .btn-red { background: linear-gradient(135deg, #a0182d, #ef4444) !important; }
+    .btn-blue { background: linear-gradient(135deg, #0b5f8e, #0ea5e9) !important; }
+    .muted { color: #9ec7ea; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="admin-wrap">
+      <nav class="admin-sidebar">
+        <div class="admin-brand">
+          <img src="assets/images/zhongliang-logo-light.svg" alt="中粮天下">
+          <span>管理后台</span>
+        </div>
+        <div class="admin-nav">
+          <a class="admin-nav-item active" href="#dashboard" onclick="showSec('dashboard')"><i class="fa-solid fa-gauge-high"></i> 运营概览</a>
+          <a class="admin-nav-item" href="#finance" onclick="showSec('finance')"><i class="fa-solid fa-money-bill-wave"></i> 充提审核</a>
+          <a class="admin-nav-item" href="#orders" onclick="showSec('orders')"><i class="fa-solid fa-receipt"></i> 订单管理</a>
+          <a class="admin-nav-item" href="#products" onclick="showSec('products')"><i class="fa-solid fa-boxes-stacked"></i> 产品管理</a>
+          <a class="admin-nav-item" href="#users" onclick="showSec('users')"><i class="fa-solid fa-users"></i> 用户管理</a>
+          <a class="admin-nav-item" href="#market" onclick="showSec('market')"><i class="fa-solid fa-chart-line"></i> 行情控制</a>
+          <a class="admin-nav-item" href="#articles" onclick="showSec('articles')"><i class="fa-solid fa-newspaper"></i> 文章管理</a>
+          <a class="admin-nav-item" href="#settings" onclick="showSec('settings')"><i class="fa-solid fa-sliders"></i> 前端设置</a>
+        </div>
+      </nav>
+
+      <div class="admin-main">
+        <div id="sec-login">
+          <div class="admin-card" style="max-width:520px;">
+            <h3>管理员登录</h3>
+            <div class="admin-toolbar">
+              <input id="ac-admin-id" value="admin" placeholder="管理员账号" style="min-width:160px;flex:1;">
+              <input id="ac-admin-pw" type="password" placeholder="管理员密码" style="min-width:160px;flex:1;">
+              <button id="ac-login-btn" class="btn-green">登录</button>
+            </div>
+            <p id="ac-login-msg" class="muted" style="margin:.5rem 0 0;font-size:.82rem;"></p>
+          </div>
+        </div>
+
+        <div id="sec-dashboard" class="hidden">
+          <div class="admin-head"><h2>运营概览</h2><span class="muted" style="font-size:.82rem;">v5.0 Pro Edition</span></div>
+          <div class="admin-kpi-grid">
+            <div class="admin-kpi"><p>总用户数</p><h3 id="kpi-users">--</h3></div>
+            <div class="admin-kpi"><p>平台总余额 (CNY)</p><h3 id="kpi-balance">--</h3></div>
+            <div class="admin-kpi"><p>今日订单</p><h3 id="kpi-orders">--</h3></div>
+            <div class="admin-kpi"><p>待处理提现</p><h3 id="kpi-withdraw">--</h3></div>
+          </div>
+
+          <div class="admin-card">
+            <h3>全局结算覆盖</h3>
+            <p id="ov-state" class="muted">读取中...</p>
+            <div class="admin-toolbar">
+              <input id="ac-ov-min" type="number" value="5" min="1" style="width:90px;">
+              <select id="ac-ov-mode"><option value="win">全赢</option><option value="lose">全输</option></select>
+              <button id="ac-ov-start" class="btn-green">启动</button>
+              <button id="ac-ov-stop" class="btn-red">停止</button>
+            </div>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-12 col-lg-6">
+              <div class="admin-card">
+                <h3>产品结算控盘</h3>
+                <div class="admin-toolbar">
+                  <select id="ac-prd-id"></select>
+                  <select id="ac-prd-res"><option value="win">赢</option><option value="lose">输</option></select>
+                  <input id="ac-prd-rate" type="number" step="0.01" value="0.95" style="width:90px;">
+                  <input id="ac-prd-from" type="datetime-local">
+                  <input id="ac-prd-to" type="datetime-local">
+                  <button id="ac-prd-add" class="btn-blue">新增规则</button>
+                </div>
+                <div id="ac-prd-list" class="admin-list"></div>
+              </div>
+            </div>
+            <div class="col-12 col-lg-6">
+              <div class="admin-card">
+                <h3>委买控盘</h3>
+                <div class="admin-toolbar">
+                  <select id="ac-ent-id"></select>
+                  <select id="ac-ent-res"><option value="win">赢</option><option value="lose">输</option></select>
+                  <input id="ac-ent-rate" type="number" step="0.01" value="0.90" style="width:90px;">
+                  <input id="ac-ent-from" type="datetime-local">
+                  <input id="ac-ent-to" type="datetime-local">
+                  <button id="ac-ent-add" class="btn-blue">新增规则</button>
+                </div>
+                <div id="ac-ent-list" class="admin-list"></div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="admin-card">
+                <h3>交易审计（最近 20 条）</h3>
+                <div id="ac-order-list" class="admin-list"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="sec-finance" class="hidden"><div class="admin-card"><h3>充提审核</h3><p class="muted">功能开发中...</p></div></div>
+        <div id="sec-orders" class="hidden"><div class="admin-card"><h3>订单管理</h3><p class="muted">功能开发中...</p></div></div>
+        <div id="sec-products" class="hidden"><div class="admin-card"><h3>产品管理</h3><p class="muted">功能开发中...</p></div></div>
+        <div id="sec-users" class="hidden"><div class="admin-card"><h3>用户管理</h3><p class="muted">功能开发中...</p></div></div>
+        <div id="sec-market" class="hidden"><div class="admin-card"><h3>行情控制</h3><p class="muted">功能开发中...</p></div></div>
+        <div id="sec-articles" class="hidden"><div class="admin-card"><h3>文章管理</h3><p class="muted">功能开发中...</p></div></div>
+        <div id="sec-settings" class="hidden"><div class="admin-card"><h3>前端设置</h3><p class="muted">功能开发中...</p></div></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="section-none bg-primary-accent">
+      <div class="d-flex flex-column gspace-0">
+        <div class="footer-container">
+          <div class="footer-content-wrapper">
+            <div class="hero-container">
+              <div class="footer-content-container">
+                <div class="footer-contact-container">
+                  <div class="contact-info-container"><h5>致电我们</h5><div class="d-flex flex-row gspace-1 align-items-center"><i class="fa-solid fa-phone contact-icon"></i><p class="footer-contact-text">+86-10-85006688</p></div></div>
+                  <div class="contact-info-container"><h5>电子邮箱</h5><div class="d-flex flex-row gspace-1 align-items-center"><i class="fa-solid fa-envelope contact-icon"></i><p class="footer-contact-text">ir@cofco.com</p></div></div>
+                  <div class="contact-info-container"><h5>公司地址</h5><div class="d-flex flex-row gspace-1 align-items-center"><i class="fa-solid fa-location-dot contact-icon"></i><p class="footer-contact-text">中国北京市朝阳区</p></div></div>
+                </div>
+                <div class="footer-info-container">
+                  <div class="image-container footer-logo"><img src="assets/images/zhongliang-logo-light.svg" alt="中粮天下"></div>
+                  <p class="footer-info-text">中粮天下聚焦粮油食品与综合服务，与中粮集团品牌与业务协同。</p>
+                  <div class="d-flex flex-row gspace-2 align-items-center flex-wrap justify-content-center">
+                    <a href="about.html" class="footer-link">公司介绍</a>
+                    <a href="product.html" class="footer-link">交易中心</a>
+                    <a href="contact.html" class="footer-link">联系我们</a>
+                    <a href="team.html" class="footer-link">团队介绍</a>
+                  </div>
+                </div>
+                <div class="footer-cta-container">
+                  <h5>关注我们</h5>
+                  <div class="d-flex flex-row align-items-center gspace-1">
+                    <a href="#" class="social-icon"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#" class="social-icon"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="#" class="social-icon"><i class="fa-brands fa-weixin"></i></a>
+                    <a href="#" class="social-icon"><i class="fa-brands fa-qq"></i></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="footer-copyright-wrapper">
+            <div class="hero-container">
+              <div class="footer-copyright-container">
+                <p class="copyright-text">版权所有 © 2026 中粮天下。权威信息请以中粮集团有限公司官网为准。<a href="https://www.cofco.com/" target="_blank" rel="noopener noreferrer">中粮集团官网</a></p>
+                <div class="legallink-container">
+                  <a href="#" class="legallink">条款与条件</a>
+                  <a href="#" class="legallink">隐私政策</a>
+                  <a href="#" class="legallink">帮助与常见问题</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/vendor/jquery.min.js"></script>
+  <script src="assets/js/vendor/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/script.js"></script>
+  <script>
+  (() => {
+    const adminTokenKey = 'zhongliang_admin_token';
+    const loginMsg = document.getElementById('ac-login-msg');
+    const secLogin = document.getElementById('sec-login');
+    const secDashboard = document.getElementById('sec-dashboard');
+    let token = localStorage.getItem(adminTokenKey) || '';
+    let offlineMode = false;
+
+    const mockProducts = [
+      { id: 1, name: '黄大豆1号' }, { id: 2, name: '黄大豆2号' }, { id: 3, name: '豆粕' },
+      { id: 4, name: '豆油' }, { id: 5, name: '玉米' }, { id: 6, name: '强麦' },
+      { id: 7, name: '早籼稻' }, { id: 8, name: '菜籽粕' }, { id: 9, name: '棕榈油' },
+    ];
+    let mockOrders = [
+      { id: 'ORD20260504001', productName: '黄大豆1号', orderKind: 'normal', direction: '买涨', status: '已结算', amount: 5000, createdAt: new Date(Date.now() - 3600000 * 2).toISOString() },
+      { id: 'ORD20260504002', productName: '豆粕', orderKind: 'normal', direction: '买跌', status: '进行中', amount: 12000, createdAt: new Date(Date.now() - 3600000 * 5).toISOString() },
+      { id: 'ORD20260504003', productName: '玉米', orderKind: 'normal', direction: '买涨', status: '已结算', amount: 8000, createdAt: new Date(Date.now() - 3600000 * 8).toISOString() },
+      { id: 'ORD20260504004', productName: '豆油', orderKind: 'normal', direction: '买涨', status: '进行中', amount: 15000, createdAt: new Date(Date.now() - 3600000 * 12).toISOString() },
+      { id: 'ORD20260504005', productName: '强麦', orderKind: 'normal', direction: '买跌', status: '已结算', amount: 3000, createdAt: new Date(Date.now() - 3600000 * 24).toISOString() },
+    ];
+    let mockPRules = [{ id: 'p1', productId: 1, productName: '黄大豆1号', result: '赢', profitRate: 0.95 }];
+    let mockERules = [{ id: 'e1', productId: 3, productName: '豆粕', result: '输', profitRate: 0.90 }];
+    let mockOverride = { label: '正常结算', secondsLeft: 0 };
+
+    function toast(msg) {
+      let t = document.getElementById('admin-toast');
+      if (!t) {
+        t = document.createElement('div');
+        t.id = 'admin-toast';
+        t.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;background:rgba(13,92,46,0.92);color:#fff;padding:.6rem 1rem;border-radius:10px;font-size:.85rem;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.2);transition:opacity .3s;opacity:0;';
+        document.body.appendChild(t);
+      }
+      t.textContent = msg;
+      t.style.opacity = '1';
+      setTimeout(() => { t.style.opacity = '0'; }, 2500);
+    }
+
+    async function api(url, opt = {}) {
+      if (offlineMode) {
+        if (url === '/api/admin/settlement-override' && (!opt.method || opt.method === 'GET')) return { data: mockOverride };
+        if (url === '/api/admin/product-settlement' && (!opt.method || opt.method === 'GET')) return { rules: mockPRules, products: mockProducts };
+        if (url === '/api/admin/entrust-control' && (!opt.method || opt.method === 'GET')) return { rules: mockERules, products: mockProducts };
+        if (url === '/api/admin/trade-orders?limit=20' && (!opt.method || opt.method === 'GET')) return { list: mockOrders, totalUsers: 1248, totalBalance: 8563200.50, pendingWithdraw: 3 };
+        if (opt.method === 'POST' || opt.method === 'DELETE') {
+          return { success: true };
+        }
+        return {};
+      }
+      const headers = { ...(opt.headers || {}) };
+      if (token) headers.Authorization = `Bearer ${token}`;
+      if (opt.json) { headers['Content-Type'] = 'application/json'; opt.body = JSON.stringify(opt.json); delete opt.json; }
+      try {
+        const res = await fetch(url, { ...opt, headers });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          if ([404, 501, 502, 503].includes(res.status)) {
+            offlineMode = true; toast('已切换为演示模式（无后端服务）');
+            return api(url, opt);
+          }
+          throw new Error(data.message || `请求失败(${res.status})`);
+        }
+        return data;
+      } catch (e) {
+        if (e.message.includes('Failed to fetch') || e.message.includes('NetworkError')) {
+          offlineMode = true; toast('已切换为演示模式（无后端服务）');
+          return api(url, opt);
+        }
+        throw e;
+      }
+    }
+
+    function val(id) { const x = document.getElementById(id); return x ? x.value : ''; }
+    function toMs(v) { const t = new Date(v).getTime(); return Number.isFinite(t) ? t : 0; }
+
+    function showSec(name) {
+      document.querySelectorAll('[id^="sec-"]').forEach((el) => el.classList.add('hidden'));
+      const target = document.getElementById('sec-' + name);
+      if (target) target.classList.remove('hidden');
+      document.querySelectorAll('.admin-nav-item').forEach((el) => el.classList.remove('active'));
+      const nav = document.querySelector('.admin-nav-item[href="#' + name + '"]');
+      if (nav) nav.classList.add('active');
+    }
+
+    window.showSec = showSec;
+
+    async function loadDashboard() {
+      const [overrideRes, productRes, entrustRes, ordersRes] = await Promise.all([
+        api('/api/admin/settlement-override'),
+        api('/api/admin/product-settlement'),
+        api('/api/admin/entrust-control'),
+        api('/api/admin/trade-orders?limit=20'),
+      ]);
+      const override = overrideRes.data || {};
+      const pRules = productRes.rules || [];
+      const eRules = entrustRes.rules || [];
+      const products = productRes.products || entrustRes.products || [];
+      const orders = ordersRes.list || [];
+
+      document.getElementById('ov-state').textContent = '当前状态：' + (override.label || '正常结算') + '；剩余 ' + (override.secondsLeft || 0) + ' 秒';
+      document.getElementById('kpi-users').textContent = ordersRes.totalUsers || '--';
+      document.getElementById('kpi-balance').textContent = ordersRes.totalBalance ? Number(ordersRes.totalBalance).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '--';
+      document.getElementById('kpi-orders').textContent = orders.length || 0;
+      document.getElementById('kpi-withdraw').textContent = ordersRes.pendingWithdraw || 0;
+
+      const prdSel = document.getElementById('ac-prd-id');
+      const entSel = document.getElementById('ac-ent-id');
+      const opts = (products || []).map((p) => `<option value="${p.id}">${p.name || p.tradeName || p.id}</option>`).join('');
+      prdSel.innerHTML = opts; entSel.innerHTML = opts;
+
+      document.getElementById('ac-prd-list').innerHTML = pRules.map((r) => `
+        <div class="admin-list-row"><span>${r.productName || r.productId} · ${r.result} · ${r.profitRate}</span><button data-del-prd="${r.id}">删除</button></div>
+      `).join('') || '<p class="muted">暂无规则</p>';
+
+      document.getElementById('ac-ent-list').innerHTML = eRules.map((r) => `
+        <div class="admin-list-row"><span>${r.productName || r.productId} · ${r.result} · ${r.profitRate}</span><button data-del-ent="${r.id}">删除</button></div>
+      `).join('') || '<p class="muted">暂无规则</p>';
+
+      document.getElementById('ac-order-list').innerHTML = (orders || []).map((o) => `
+        <div class="admin-list-row" style="display:block;">
+          <div>${o.productName || o.productId || o.id} · ${o.orderKind || 'normal'} · ${o.direction || '--'}</div>
+          <div style="opacity:.82;margin-top:.2rem;">${o.status || '--'} · ${Number(o.amount || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} · ${o.createdAt ? new Date(o.createdAt).toLocaleString('zh-CN') : '--'}</div>
+        </div>
+      `).join('') || '<p class="muted">暂无交易记录</p>';
+
+      bindActions();
+    }
+
+    async function bindActions() {
+      const refresh = () => loadDashboard().catch((e) => { loginMsg.textContent = e.message; });
+      document.getElementById('ac-ov-start')?.addEventListener('click', async () => {
+        if (offlineMode) {
+          mockOverride = { label: val('ac-ov-mode') === 'win' ? '全局全赢' : '全局全输', secondsLeft: (Number(val('ac-ov-min')) || 5) * 60 };
+          toast('演示模式：已模拟启动全局结算覆盖');
+        } else {
+          await api('/api/admin/settlement-override', { method: 'POST', json: { action: 'start', minutes: Number(val('ac-ov-min')) || 5, mode: val('ac-ov-mode') || 'win' } });
+        }
+        refresh();
+      });
+      document.getElementById('ac-ov-stop')?.addEventListener('click', async () => {
+        if (offlineMode) {
+          mockOverride = { label: '正常结算', secondsLeft: 0 };
+          toast('演示模式：已模拟停止全局结算覆盖');
+        } else {
+          await api('/api/admin/settlement-override', { method: 'POST', json: { action: 'clear' } });
+        }
+        refresh();
+      });
+      document.getElementById('ac-prd-add')?.addEventListener('click', async () => {
+        const pid = Number(val('ac-prd-id'));
+        const pName = mockProducts.find(p => p.id == pid)?.name || pid;
+        if (offlineMode) {
+          mockPRules.push({ id: 'p' + Date.now(), productId: pid, productName: pName, result: val('ac-prd-res'), profitRate: Number(val('ac-prd-rate')) || 0.95 });
+          toast('演示模式：产品结算规则已添加');
+        } else {
+          await api('/api/admin/product-settlement', { method: 'POST', json: { productId: pid, result: val('ac-prd-res'), profitRate: Number(val('ac-prd-rate')) || 0.95, startAtMs: toMs(val('ac-prd-from')), endAtMs: toMs(val('ac-prd-to')) } });
+        }
+        refresh();
+      });
+      document.getElementById('ac-ent-add')?.addEventListener('click', async () => {
+        const pid = Number(val('ac-ent-id'));
+        const pName = mockProducts.find(p => p.id == pid)?.name || pid;
+        if (offlineMode) {
+          mockERules.push({ id: 'e' + Date.now(), productId: pid, productName: pName, result: val('ac-ent-res'), profitRate: Number(val('ac-ent-rate')) || 0.9 });
+          toast('演示模式：委买结算规则已添加');
+        } else {
+          await api('/api/admin/entrust-control', { method: 'POST', json: { productId: pid, result: val('ac-ent-res'), profitRate: Number(val('ac-ent-rate')) || 0.9, startAtMs: toMs(val('ac-ent-from')), endAtMs: toMs(val('ac-ent-to')) } });
+        }
+        refresh();
+      });
+      document.querySelectorAll('[data-del-prd]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const rid = btn.getAttribute('data-del-prd');
+          if (offlineMode) { mockPRules = mockPRules.filter(r => r.id !== rid); toast('演示模式：规则已删除'); }
+          else { await api(`/api/admin/product-settlement/${rid}`, { method: 'DELETE' }); }
+          refresh();
+        });
+      });
+      document.querySelectorAll('[data-del-ent]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const rid = btn.getAttribute('data-del-ent');
+          if (offlineMode) { mockERules = mockERules.filter(r => r.id !== rid); toast('演示模式：规则已删除'); }
+          else { await api(`/api/admin/entrust-control/${rid}`, { method: 'DELETE' }); }
+          refresh();
+        });
+      });
+    }
+
+    async function login() {
+      const id = (document.getElementById('ac-admin-id').value || 'admin').trim();
+      const pw = (document.getElementById('ac-admin-pw').value || '').trim();
+      if (!pw) { loginMsg.textContent = '请输入密码'; return; }
+      loginMsg.textContent = '登录中...';
+      try {
+        const res = await fetch('/api/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: id, password: pw }) });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.token) {
+          if ([404, 501, 502, 503].includes(res.status)) {
+            offlineMode = true;
+            token = 'demo-token'; localStorage.setItem(adminTokenKey, token);
+            loginMsg.textContent = '演示模式登录成功（无后端服务）';
+            secLogin.classList.add('hidden'); secDashboard.classList.remove('hidden');
+            showSec('dashboard');
+            toast('已切换为演示模式，所有数据为模拟数据');
+            await loadDashboard();
+            return;
+          }
+          throw new Error(data.message || '登录失败');
+        }
+        token = data.token; localStorage.setItem(adminTokenKey, token);
+        loginMsg.textContent = '登录成功';
+        secLogin.classList.add('hidden'); secDashboard.classList.remove('hidden');
+        showSec('dashboard');
+        await loadDashboard();
+      } catch (e) {
+        if (e.message.includes('Failed to fetch') || e.message.includes('NetworkError')) {
+          offlineMode = true;
+          token = 'demo-token'; localStorage.setItem(adminTokenKey, token);
+          loginMsg.textContent = '演示模式登录成功（无后端服务）';
+          secLogin.classList.add('hidden'); secDashboard.classList.remove('hidden');
+          showSec('dashboard');
+          toast('已切换为演示模式，所有数据为模拟数据');
+          await loadDashboard();
+        } else {
+          loginMsg.textContent = e.message || '登录失败';
+        }
+      }
+    }
+
+    document.getElementById('ac-login-btn')?.addEventListener('click', login);
+    if (token) {
+      secLogin.classList.add('hidden'); secDashboard.classList.remove('hidden');
+      showSec('dashboard');
+      loadDashboard().catch((e) => {
+        if (e.message.includes('Failed to fetch') || e.message.includes('NetworkError')) {
+          offlineMode = true; token = 'demo-token'; localStorage.setItem(adminTokenKey, token);
+          toast('已切换为演示模式（无后端服务）');
+          loadDashboard();
+        } else {
+          token = ''; localStorage.removeItem(adminTokenKey); secLogin.classList.remove('hidden'); secDashboard.classList.add('hidden');
+        }
+      });
+    }
+  })();
+  </script>
+</body>
+</html>

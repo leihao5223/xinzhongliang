@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 72" role="img" aria-labelledby="lg1 lg2">
+  <title id="lg1">中粮天下</title>
+  <desc id="lg2">中粮集团数字化产业服务平台</desc>
+  <defs>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffd88a"/>
+      <stop offset="50%" stop-color="#e85d4a"/>
+      <stop offset="100%" stop-color="#c8102e"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffd88a"/>
+      <stop offset="100%" stop-color="#c8102e"/>
+    </linearGradient>
+    <filter id="fg" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="1" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <g transform="translate(8,10)">
+    <!-- 外环 - 科技感圆环 -->
+    <circle cx="28" cy="24" r="24" fill="none" stroke="url(#g1)" stroke-width="1.5" opacity="0.85"/>
+    <circle cx="28" cy="24" r="20" fill="none" stroke="url(#g1)" stroke-width="0.8" opacity="0.4" stroke-dasharray="4 3"/>
+    <!-- 中心六边形 - 粮食/科技融合 -->
+    <path d="M28 10 L39.3 16.5 L39.3 31.5 L28 38 L16.7 31.5 L16.7 16.5 Z" fill="none" stroke="url(#g1)" stroke-width="1.8" opacity="0.9"/>
+    <!-- 中心粮粒 -->
+    <ellipse cx="28" cy="24" rx="6" ry="9" fill="url(#g2)" filter="url(#fg)" opacity="0.95"/>
+    <ellipse cx="28" cy="24" rx="3.5" ry="5.5" fill="#fff8e7" opacity="0.9"/>
+    <!-- 顶部麦芒 -->
+    <path d="M28 6 Q31 2 34 5" fill="none" stroke="url(#g1)" stroke-width="1.2" stroke-linecap="round" opacity="0.85"/>
+    <path d="M28 6 Q25 2 22 5" fill="none" stroke="url(#g1)" stroke-width="1.2" stroke-linecap="round" opacity="0.85"/>
+    <!-- 底部科技线条 -->
+    <rect x="6" y="44" width="44" height="2" rx="1" fill="#e8eef5" opacity="0.7"/>
+    <rect x="14" y="48" width="28" height="1.5" rx="0.75" fill="#b8c5d6" opacity="0.5"/>
+    <!-- 装饰点 -->
+    <circle cx="10" cy="24" r="1.5" fill="#ffd88a" opacity="0.7"/>
+    <circle cx="46" cy="24" r="1.5" fill="#c8102e" opacity="0.7"/>
+  </g>
+  <text x="76" y="32" fill="#ffffff" font-family="'Noto Sans SC', system-ui, 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="22" font-weight="700" letter-spacing="0.1em">中粮天下</text>
+  <text x="76" y="50" fill="#b8c5d6" font-family="'Noto Sans SC', system-ui, 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="9.5" font-weight="500" letter-spacing="0.2em">COFCO DIGITAL PLATFORM</text>
+</svg>

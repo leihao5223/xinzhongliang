@@ -1,0 +1,322 @@
+/* 港口与物流嵌入区：圆角卡片轮播相册 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.port-logistics-embed {
+  margin: 0;
+  min-height: 0;
+  background: #0b1118;
+  color: #fff;
+  font-family: 'Noto Sans SC', 'Segoe UI', system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ========== 外壳 ========== */
+.pll-shell {
+  position: relative;
+  min-height: 62vh;
+  isolation: isolate;
+}
+
+/* 视频背景层 */
+.pll-video-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.pll-shell-backdrop .pll-bg-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.92;
+  background: #0b1118;
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+.pll-bg-video.pll-bg-video--hidden {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+.pll-bg-image {
+  position: absolute;
+  inset: 0;
+  display: none;
+  z-index: 0;
+  background-color: #0b1118;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+.pll-bg-image.is-visible {
+  display: block;
+}
+
+.pll-video-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, rgba(11, 17, 24, 0.88) 0%, rgba(11, 17, 24, 0.55) 42%, rgba(11, 17, 24, 0.25) 100%);
+  z-index: 1;
+}
+
+/* ========== 网格布局 ========== */
+.pll-grid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr minmax(300px, 42vw);
+  gap: clamp(1.25rem, 3vw, 3rem);
+  align-items: center;
+  max-width: 1366px;
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 3vw, 2rem);
+  min-height: 62vh;
+}
+
+@media (max-width: 991.98px) {
+  .pll-grid {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    gap: 2rem;
+  }
+  .pll-overlap-wrap {
+    max-width: 520px;
+    margin: 0 auto;
+    height: min(50vh, 420px);
+  }
+}
+
+/* ========== 左侧文案 ========== */
+.pll-copy h2 {
+  margin: 0 0 1rem;
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.2;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
+}
+
+.pll-copy p {
+  margin: 0;
+  font-size: clamp(0.9rem, 1.8vw, 1.05rem);
+  line-height: 1.65;
+  max-width: 36rem;
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* ========== 右侧轮播区 ========== */
+.pll-overlap-wrap {
+  position: relative;
+  width: 100%;
+  height: min(72vh, 560px);
+  min-height: 320px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+/* 圆角卡片外壳 —— 缩小至约30%，右下角对齐 */
+.pll-carousel-wrap {
+  position: relative;
+  width: 30%;
+  min-width: 160px;
+  max-width: 260px;
+  aspect-ratio: 16 / 10;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #0b1118;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+/* 轮播轨道 */
+.pll-carousel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* 单张幻灯片 */
+.pll-carousel-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 1;
+}
+
+.pll-carousel-slide.active {
+  opacity: 1;
+  z-index: 2;
+}
+
+/* 图片/视频完整显示，不裁切 */
+.pll-carousel-slide img,
+.pll-carousel-slide video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  background: #0b1118;
+}
+
+/* 底部内容叠加层 */
+.pll-slide-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.7rem 0.7rem 0.9rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.2) 60%, transparent 100%);
+  color: #fff;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+}
+
+.pll-slide-content h3 {
+  margin: 0;
+  font-size: clamp(0.65rem, 1.2vw, 0.8rem);
+  font-weight: 700;
+  line-height: 1.3;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.02em;
+}
+
+.pll-slide-content p {
+  margin: 0;
+  font-size: clamp(0.55rem, 1vw, 0.68rem);
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.82);
+  max-width: 95%;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* 相册内 CTA 按钮已移除 */
+.pll-slide-btns {
+  display: none !important;
+}
+
+/* ========== 导航箭头 ========== */
+.pll-nav-arrows {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 0.25rem;
+  pointer-events: none;
+}
+
+.pll-nav-arrows button {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  backdrop-filter: blur(6px);
+  transition: background 0.2s ease, transform 0.15s ease;
+  pointer-events: all;
+}
+
+.pll-nav-arrows button:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: scale(1.08);
+}
+
+/* ========== 分页小点 ========== */
+.pll-dots {
+  position: absolute;
+  bottom: 0.4rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  gap: 0.3rem;
+  pointer-events: all;
+}
+
+.pll-dots button {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: background 0.25s ease, transform 0.2s ease;
+  padding: 0;
+}
+
+.pll-dots button.active {
+  background: rgba(255, 255, 255, 0.92);
+  transform: scale(1.35);
+}
+
+/* ========== 自动轮播进度条 ========== */
+.pll-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #1a7a3e, #2ecc71);
+  z-index: 11;
+  transition: width 0.1s linear;
+  border-radius: 0 2px 2px 0;
+  box-shadow: 0 0 6px rgba(26, 122, 62, 0.3);
+}
+
+/* ========== 响应式 ========== */
+@media (max-width: 991.98px) {
+  .pll-overlap-wrap {
+    height: auto;
+    min-height: auto;
+    justify-content: center;
+    align-items: flex-end;
+    padding-bottom: 1rem;
+  }
+  .pll-carousel-wrap {
+    width: 45%;
+    min-width: 140px;
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 500px) {
+  .pll-carousel-wrap {
+    border-radius: 12px;
+    width: 50%;
+  }
+  .pll-slide-content {
+    padding: 0.5rem 0.5rem 0.7rem;
+  }
+  .pll-slide-content h3 {
+    font-size: 0.6rem;
+  }
+}

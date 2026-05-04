@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 / 注册 - 中粮天下</title>
+    <link rel="icon" href="assets/images/Logo-Favicon.png" type="image/png">
+  <link rel="stylesheet" href="assets/css/vendor/fontawesome.css">
+  <link rel="stylesheet" href="assets/css/vendor/solid.css">
+  <link rel="stylesheet" href="assets/css/vendor/regular.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Long+Cang&family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+    :root {
+      --zhong-brand-green: #1a7a3e;
+      --zhong-brand-green-light: #2ea65a;
+      --zhong-brand-gold: #d4a843;
+      --zhong-brand-gold-light: #f0dfa0;
+      --zhong-brand-red: #c8102e;
+      --text-bright: #0a0a0a;
+      --text-bright-soft: #1c1c1c;
+      --flow-blue: #00d4ff;
+      --flow-blue-bright: #7aebff;
+      --flow-blue-deep: #1565c0;
+      --flow-blue-mid: #29b6f6;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+      overflow: hidden;
+      background: #000;
+    }
+
+    /* ========== 视频背景 ========== */
+    .video-bg {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+    .video-bg.visible { opacity: 1; }
+
+    /* ========== 黑屏淡出 ========== */
+    .black-screen {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 2;
+      transition: opacity 1s ease;
+    }
+    .black-screen.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* ========== 开场文字序列（从左至右生成） ========== */
+    .intro-text-stage {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .intro-text {
+      position: absolute;
+      font-size: clamp(2rem, 5vw, 4rem);
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.2em;
+      text-align: center;
+      opacity: 0;
+      white-space: nowrap;
+    }
+    .intro-text.visible { opacity: 1; }
+
+    /* 从左至右揭示效果 */
+    .lr-reveal {
+      position: relative;
+      display: inline-block;
+      overflow: hidden;
+    }
+    .lr-reveal::after {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 100%;
+      background: #000;
+      transform-origin: right;
+      transform: scaleX(1);
+      transition: transform 3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .intro-text.revealed .lr-reveal::after {
+      transform: scaleX(0);
+    }
+
+    /* 渐隐 */
+    .intro-text.fade-out {
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    /* 玻璃闪光：黑底 + 高光条扫过 */
+    @keyframes text-glass-shine {
+      0% { background-position: 130% center; }
+      100% { background-position: -130% center; }
+    }
+
+    /* ---------- 正中央「中粮天下」水印（卷帘落下时挡住；z 低于登录层） ---------- */
+    .portal-center-brand {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 12;
+      pointer-events: none;
+    }
+    .portal-center-brand__txt {
+      font-family: 'Long Cang', 'KaiTi', 'STKaiti', 'Ma Shan Zheng', serif;
+      font-size: clamp(3.2rem, 11vw, 7.5rem);
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      color: transparent;
+      background-image: linear-gradient(
+        100deg,
+        #0a0a0a 0%,
+        #0a0a0a 34%,
+        rgba(255, 255, 255, 0.95) 47%,
+        rgba(210, 236, 255, 0.92) 50%,
+        rgba(255, 255, 255, 0.98) 52%,
+        #0a0a0a 64%,
+        #0a0a0a 100%
+      );
+      background-size: 240% 100%;
+      background-position: 130% center;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 3px 14px rgba(0, 0, 0, 0.55));
+      opacity: 0;
+      transform: scale(0.94);
+      transition: opacity 2s cubic-bezier(0.22, 1, 0.36, 1), transform 2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .portal-center-brand.portal-center--in .portal-center-brand__txt {
+      opacity: 1;
+      transform: scale(1);
+      animation: text-glass-shine 3.4s ease-in-out infinite;
+    }
+    /* 登录卷帘打开后隐藏背景大字，仅保留卡片内 Logo 品牌区 */
+    .portal-center-brand.portal-center--behind-login {
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.35s ease, visibility 0s linear 0.35s;
+    }
+    .portal-center-brand.portal-center--behind-login .portal-center-brand__txt {
+      animation: none;
+    }
+
+    /* ---------- PC：左右两翼竖排行楷标语（卷帘不挡字） ---------- */
+    .portal-flank {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 14;
+      pointer-events: none;
+      display: none;
+    }
+    @media (min-width: 769px) {
+      .portal-flank { display: block; }
+    }
+    .portal-flank--left { left: clamp(1.25rem, 4vw, 3rem); }
+    .portal-flank--right { right: clamp(1.25rem, 4vw, 3rem); }
+
+    .portal-flank span {
+      display: block;
+      font-family: 'Long Cang', 'KaiTi', 'Ma Shan Zheng', serif;
+      font-size: clamp(2rem, 4vw, 3.85rem);
+      font-weight: 600;
+      color: transparent;
+      background-image: linear-gradient(
+        100deg,
+        #0a0a0a 0%,
+        #0a0a0a 32%,
+        rgba(255, 255, 255, 0.92) 46%,
+        rgba(200, 230, 255, 0.88) 50%,
+        rgba(255, 255, 255, 0.95) 53%,
+        #0a0a0a 66%,
+        #0a0a0a 100%
+      );
+      background-size: 240% 100%;
+      background-position: 130% center;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.65));
+      writing-mode: vertical-rl;
+      text-orientation: upright;
+      letter-spacing: 0.22em;
+      opacity: 0;
+      transform: translateY(1rem);
+      transition: opacity 1.6s cubic-bezier(0.22, 1, 0.36, 1), transform 1.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .portal-flank.portal-flank--in span {
+      opacity: 1;
+      transform: translateY(0);
+      animation: text-glass-shine 3.6s ease-in-out infinite;
+      animation-delay: 0.15s;
+    }
+
+    /* ---------- 卷帘内顶部：Logo + 标题（纵向居中，无并排重复） ---------- */
+    .login-card-brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 0.5rem;
+      margin-bottom: 1.15rem;
+    }
+    .login-card-logo {
+      height: clamp(40px, 10vw, 48px);
+      width: auto;
+      flex-shrink: 0;
+      display: block;
+    }
+    .login-card-brand-text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.12rem;
+    }
+    .login-card-title {
+      font-size: clamp(1.05rem, 4vw, 1.42rem);
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      color: var(--text-bright);
+      text-shadow:
+        0 0 1px rgba(255, 255, 255, 0.5),
+        0 1px 0 rgba(255, 255, 255, 0.25);
+      line-height: 1.2;
+    }
+    .login-card-sub {
+      font-size: clamp(0.58rem, 1.85vw, 0.72rem);
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(26, 46, 26, 0.58);
+      font-family: 'Noto Sans SC', 'Segoe UI', system-ui, sans-serif;
+    }
+
+    /* ========== 登录窗口（窗帘下拉） ========== */
+    .login-curtain {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 20;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding-top: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .login-curtain.active {
+      pointer-events: auto;
+      opacity: 1;
+    }
+
+    .login-curtain-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      width: calc(100% - 2rem);
+      max-width: min(100% - 2rem, 520px);
+      margin-top: 10vh;
+    }
+    @media (min-width: 769px) {
+      .login-curtain-stack {
+        width: min(94vw, 760px);
+        max-width: min(94vw, 760px);
+      }
+      .login-curtain-inner {
+        padding: 1.85rem 2.85rem 2.5rem;
+      }
+    }
+
+    .login-curtain-tray {
+      width: 100%;
+      transform: translateY(-120%);
+      transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .login-curtain.active .login-curtain-tray {
+      transform: translateY(0);
+    }
+
+    /* 手机：卷帘下方两行标语（黑色加亮） */
+    .login-mobile-slogan {
+      display: none;
+      margin: 0;
+      padding: 0.95rem 0.5rem 0;
+      text-align: center;
+      font-family: 'Long Cang', 'KaiTi', 'Ma Shan Zheng', serif;
+      opacity: 0;
+      transform: translateY(0.5rem);
+      transition: opacity 1.2s ease 0.35s, transform 1.2s ease 0.35s;
+    }
+    .login-mobile-slogan__line {
+      display: block;
+      font-size: clamp(1.35rem, 6.5vw, 2rem);
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      color: transparent;
+      background-image: linear-gradient(
+        100deg,
+        #0a0a0a 0%,
+        #0a0a0a 32%,
+        rgba(255, 255, 255, 0.94) 46%,
+        rgba(200, 230, 255, 0.86) 50%,
+        rgba(255, 255, 255, 0.96) 53%,
+        #0a0a0a 66%,
+        #0a0a0a 100%
+      );
+      background-size: 240% 100%;
+      background-position: 130% center;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.45));
+      line-height: 1.55;
+      margin: 0;
+    }
+    .login-mobile-slogan.login-mobile-slogan--in .login-mobile-slogan__line {
+      animation: text-glass-shine 3.5s ease-in-out infinite;
+    }
+    .login-mobile-slogan.login-mobile-slogan--in .login-mobile-slogan__line:nth-child(2) {
+      animation-delay: 0.35s;
+    }
+    .login-mobile-slogan__line + .login-mobile-slogan__line {
+      margin-top: 0.35rem;
+    }
+    @media (max-width: 768px) {
+      .login-mobile-slogan { display: block; }
+    }
+    .login-mobile-slogan.login-mobile-slogan--in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* 流动描边：加亮蓝色系 */
+    .login-flow-outer {
+      position: relative;
+      border-radius: 0 0 22px 22px;
+      padding: 3px;
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .login-flow-outer::before,
+    .login-flow-outer::after {
+      content: '';
+      position: absolute;
+      z-index: 0;
+      width: 220%;
+      height: 220%;
+      top: -60%;
+      left: -60%;
+      transform-origin: center;
+      opacity: 0.95;
+      background: conic-gradient(
+        from 0deg,
+        transparent,
+        var(--flow-blue-deep),
+        var(--flow-blue-mid),
+        var(--flow-blue-bright),
+        #e1f5fe,
+        var(--flow-blue),
+        #b3e5fc,
+        var(--flow-blue-mid),
+        var(--flow-blue-deep),
+        transparent,
+        transparent
+      );
+      animation: login-flow-spin 8s linear infinite;
+    }
+    .login-flow-outer::after {
+      animation-delay: -4s;
+      opacity: 0.58;
+    }
+    @keyframes login-flow-spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .login-curtain-inner {
+      width: 100%;
+      max-width: 100%;
+      max-height: 92vh;
+      overflow-x: hidden;
+      overflow-y: auto;
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(24px) saturate(1.3);
+      -webkit-backdrop-filter: blur(24px) saturate(1.3);
+      border-radius: 0 0 18px 18px;
+      border-top: none;
+      box-shadow:
+        0 32px 80px rgba(0,0,0,0.26),
+        inset 0 1px 0 rgba(255,255,255,0.65);
+      padding: 1.75rem 2.35rem 2.35rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 细绿玻璃边：旋转高光（用于 Tab、输入框、下拉等子区域） */
+    @keyframes subfield-edge-spin {
+      to { transform: rotate(360deg); }
+    }
+    .sub-glow {
+      position: relative;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+    .sub-glow::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 260%;
+      height: 260%;
+      margin-left: -130%;
+      margin-top: -130%;
+      z-index: 0;
+      pointer-events: none;
+      background: conic-gradient(
+        from 0deg,
+        transparent 0%,
+        transparent 12%,
+        rgba(26, 122, 62, 0.35) 22%,
+        rgba(200, 255, 220, 0.92) 38%,
+        rgba(46, 166, 90, 0.55) 52%,
+        rgba(180, 255, 215, 0.88) 68%,
+        rgba(26, 122, 62, 0.3) 82%,
+        transparent 100%
+      );
+      animation: subfield-edge-spin 6.5s linear infinite;
+      opacity: 0.88;
+    }
+
+    .form-toggle {
+      display: flex;
+      gap: 0.35rem;
+      margin-bottom: 1.35rem;
+      padding: 4px;
+      border-radius: 12px;
+    }
+    .form-toggle button {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      padding: 0.6rem;
+      border: none;
+      background: rgba(248, 250, 252, 0.96);
+      color: var(--text-bright-soft);
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 9px;
+      cursor: pointer;
+      transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+      font-family: inherit;
+    }
+    .form-toggle button.active {
+      background: rgba(232, 248, 238, 0.98);
+      color: var(--text-bright);
+      box-shadow: 0 1px 8px rgba(26, 122, 62, 0.12);
+    }
+
+    /* 登录 / 注册 双栏横滑（对齐特效/表单 · 0.6s 切换节奏） */
+    /* 固定表单区高度：注册项多时在栏内滚动，整体白卡不再被拉高 */
+    .auth-forms-viewport {
+      overflow: hidden;
+      width: 100%;
+      margin-bottom: 0.35rem;
+      height: clamp(300px, 46vh, 440px);
+      max-height: clamp(300px, 46vh, 440px);
+      flex-shrink: 0;
+    }
+    .auth-forms-slider {
+      display: flex;
+      flex-direction: row;
+      width: 200%;
+      height: 100%;
+      transform: translate3d(0, 0, 0);
+      transition: transform 0.6s ease-in-out;
+      align-items: stretch;
+    }
+    .auth-forms-slider.is-signup {
+      transform: translate3d(-50%, 0, 0);
+    }
+    .auth-form-pane {
+      flex: 0 0 50%;
+      width: 50%;
+      height: 100%;
+      min-height: 0;
+      box-sizing: border-box;
+      padding: 0 3px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
+    }
+
+    .form-group { margin-bottom: 1rem; }
+    .form-group label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-bright);
+      margin-bottom: 0.3rem;
+      letter-spacing: 0.02em;
+      text-shadow: 0 0 1px rgba(255, 255, 255, 0.45);
+    }
+    .input-wrap {
+      position: relative;
+      overflow: hidden;
+      border-radius: 11px;
+      padding: 1px;
+    }
+    .input-wrap::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 240%;
+      height: 240%;
+      margin-left: -120%;
+      margin-top: -120%;
+      z-index: 0;
+      pointer-events: none;
+      background: conic-gradient(
+        from 0deg,
+        transparent 0%,
+        rgba(26, 122, 62, 0.28) 20%,
+        rgba(210, 255, 225, 0.9) 40%,
+        rgba(46, 166, 90, 0.5) 55%,
+        rgba(190, 255, 210, 0.85) 72%,
+        rgba(26, 122, 62, 0.25) 88%,
+        transparent 100%
+      );
+      animation: subfield-edge-spin 5.5s linear infinite;
+      opacity: 0.9;
+    }
+    .input-wrap input {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      padding: 0.85rem 2.6rem 0.85rem 1rem;
+      background: rgba(255, 255, 255, 0.98);
+      border: none;
+      border-radius: 10px;
+      color: var(--text-bright);
+      font-size: 0.88rem;
+      font-weight: 500;
+      font-family: inherit;
+      outline: none;
+      transition: box-shadow 0.3s ease, background 0.3s ease;
+    }
+    .input-wrap input:focus {
+      background: #fff;
+      box-shadow: 0 0 0 2px rgba(41, 182, 246, 0.2), 0 4px 12px rgba(21, 101, 192, 0.08);
+    }
+    .input-wrap input::placeholder { color: rgba(26, 26, 26, 0.45); }
+    .input-wrap i {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(10, 10, 10, 0.55);
+      font-size: 0.88rem;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .input-wrap .toggle-pw {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(10, 10, 10, 0.55);
+      font-size: 0.85rem;
+      cursor: pointer;
+      pointer-events: auto;
+      transition: color 0.2s;
+      z-index: 2;
+    }
+    .input-wrap .toggle-pw:hover { color: #1565c0; }
+
+    .form-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.1rem;
+      font-size: 0.78rem;
+    }
+    .form-options label {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: var(--text-bright-soft);
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .form-options input[type="checkbox"] {
+      width: 14px; height: 14px;
+      accent-color: #1565c0;
+    }
+    .form-options a {
+      color: var(--text-bright);
+      font-weight: 600;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      transition: opacity 0.2s;
+    }
+    .form-options a:hover { opacity: 0.75; }
+
+    .form-options.sub-glow {
+      position: relative;
+      overflow: hidden;
+      border-radius: 10px;
+      padding: 6px 8px;
+    }
+    .form-options.sub-glow > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn-nature {
+      width: 100%;
+      padding: 0.9rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      font-family: inherit;
+      color: #fff;
+      background: linear-gradient(135deg, #1a7a3e, #2ecc71);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 16px rgba(26,122,62,0.25);
+    }
+    .btn-nature:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 28px rgba(26,122,62,0.35);
+    }
+    .btn-nature::after {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.18), transparent);
+      transform: rotate(30deg) translateX(-100%);
+      transition: transform 0.6s;
+    }
+    .btn-nature:hover::after {
+      transform: rotate(30deg) translateX(100%);
+    }
+
+    .form-hint {
+      font-size: 0.75rem;
+      color: var(--text-bright-soft);
+      font-weight: 600;
+      line-height: 1.45;
+      margin: -0.25rem 0 1rem;
+    }
+    .auth-msg {
+      font-size: 0.82rem;
+      margin-bottom: 0.85rem;
+      padding: 0.55rem 0.65rem;
+      border-radius: 8px;
+      display: none;
+    }
+    .auth-msg.visible { display: block; }
+    .auth-msg--err {
+      background: rgba(220, 53, 69, 0.1);
+      color: #8b1f2d;
+      border: 1px solid rgba(200,16,46,0.22);
+    }
+    .auth-msg--ok {
+      background: rgba(26,122,62,0.1);
+      color: #146030;
+      border: 1px solid rgba(26,122,62,0.2);
+    }
+    .login-portal-footer {
+      text-align: center;
+      margin-top: 1rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(26,122,62,0.08);
+    }
+    .login-portal-footer a {
+      font-size: 0.72rem;
+      color: var(--text-bright-soft);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .login-portal-footer a:hover {
+      color: var(--text-bright);
+      text-decoration: underline;
+    }
+
+    /* ========== 跳过按钮 ========== */
+    .skip-btn {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 50;
+      padding: 0.5rem 1.2rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: rgba(255,255,255,0.55);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-family: inherit;
+      transition: all 0.3s ease;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .skip-btn.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .skip-btn:hover {
+      background: rgba(255,255,255,0.18);
+      color: #fff;
+      border-color: rgba(255,255,255,0.35);
+    }
+
+    /* ========== 响应式 ========== */
+    @media (max-width: 768px) {
+      .portal-center-brand__txt {
+        font-size: clamp(2.5rem, 11vw, 3.85rem);
+        letter-spacing: 0.12em;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .login-curtain-stack {
+        margin-top: 6vh;
+        width: calc(100% - 1.25rem);
+      }
+      .auth-forms-viewport {
+        height: clamp(260px, 42vh, 400px);
+        max-height: clamp(260px, 42vh, 400px);
+      }
+      .login-curtain-inner {
+        max-width: 92vw;
+        padding: 1.45rem 1.35rem 1.75rem;
+        border-radius: 0 0 14px 14px;
+      }
+      .login-flow-outer {
+        border-radius: 0 0 16px 16px;
+      }
+      .intro-text {
+        font-size: clamp(1.4rem, 6vw, 2.2rem);
+        white-space: normal;
+        padding: 0 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 视频背景 -->
+  <video class="video-bg" id="intro-video" autoplay muted loop playsinline>
+    <source src="assets/videos/intro.mp4" type="video/mp4">
+    <source src="/steris/assets/videos/intro.mp4" type="video/mp4">
+  </video>
+
+  <!-- 黑屏遮罩 -->
+  <div class="black-screen" id="black-screen"></div>
+
+  <!-- 正中被卷帘遮住的「中粮天下」水印（先于手机端下方标语显现） -->
+  <div id="portal-center-brand" class="portal-center-brand" aria-hidden="true">
+    <span class="portal-center-brand__txt">中粮天下</span>
+  </div>
+
+  <!-- PC：左右竖排两翼标语 -->
+  <div id="portal-flank-left" class="portal-flank portal-flank--left" aria-hidden="true">
+    <span>忠于国计</span>
+  </div>
+  <div id="portal-flank-right" class="portal-flank portal-flank--right" aria-hidden="true">
+    <span>良于民生</span>
+  </div>
+
+  <!-- 开场文字序列（从左至右生成」-->
+  <div class="intro-text-stage" id="text-stage">
+    <div class="intro-text" id="text-1">
+      <span class="lr-reveal">77年的忠贞守护</span>
+    </div>
+    <div class="intro-text" id="text-2">
+      <span class="lr-reveal">忠于国，爱于民</span>
+    </div>
+  </div>
+
+  <!-- 登录 / 注册 窗帘窗口 -->
+  <div class="login-curtain" id="login-curtain">
+    <div class="login-curtain-stack">
+    <div class="login-curtain-tray">
+      <div class="login-flow-outer">
+        <div class="login-curtain-inner">
+
+      <div class="login-card-brand">
+        <img src="assets/images/zhongliang-logo-dark.svg" class="login-card-logo" width="132" height="40" alt="中粮天下">
+        <div class="login-card-brand-text">
+          <span class="login-card-title">中粮天下</span>
+          <span class="login-card-sub">COFCO DIGITAL PLATFORM</span>
+        </div>
+      </div>
+
+      <div id="auth-msg" class="auth-msg auth-msg--err" role="alert"></div>
+
+      <div class="form-toggle sub-glow">
+        <button type="button" class="active" data-target="signin">账号登录</button>
+        <button type="button" data-target="signup">注册账号</button>
+      </div>
+
+      <div class="auth-forms-viewport">
+      <div class="auth-forms-slider" id="auth-forms-slider">
+      <!-- 登录（与后端 /api/auth/login 一致：账号为注册时的用户名）-->
+      <div class="auth-form-pane" id="pane-signin">
+        <form id="signin-form" action="#" method="post" novalidate>
+          <div class="form-group">
+            <label>用户名（账号）</label>
+            <div class="input-wrap">
+              <input type="text" id="signin-nickname" name="nickname" placeholder="请输入注册时的用户名" required autocomplete="username" minlength="2" maxlength="32">
+              <i class="fa-regular fa-user"></i>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>登录密码</label>
+            <div class="input-wrap">
+              <input type="password" id="pw-in" name="password" placeholder="请输入登录密码" required autocomplete="current-password">
+              <i class="fa-regular fa-eye-slash toggle-pw" data-target="pw-in"></i>
+            </div>
+          </div>
+          <div class="form-options sub-glow">
+            <label><input type="checkbox" id="remember-me"> 记住账号</label>
+            <a href="forgot-login.html">忘记登录密码</a>
+          </div>
+          <button type="submit" class="btn-nature" id="btn-login">立即登录</button>
+        </form>
+      </div>
+
+      <!-- 注册：密保已取消；交易密码仍用于资金与「忘记登录密码」验证。」-->
+      <div class="auth-form-pane" id="pane-signup">
+        <form id="signup-form" action="#" method="post" novalidate>
+          <p class="form-hint">用户名至少 2 个字符；登录密码、交易密码均至少 6 位。请牢记交易密码，找回登录密码时将校验交易密码。</p>
+          <div class="form-group">
+            <label>用户名（昵称）</label>
+            <div class="input-wrap">
+              <input type="text" id="reg-nickname" placeholder="登录时使用，注册后不可在此修改" required minlength="2" maxlength="32" autocomplete="off">
+              <i class="fa-regular fa-user"></i>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>登录密码</label>
+            <div class="input-wrap">
+              <input type="password" id="pw-up" placeholder="不少于 6 位" required minlength="6" autocomplete="new-password">
+              <i class="fa-regular fa-eye-slash toggle-pw" data-target="pw-up"></i>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>确认登录密码</label>
+            <div class="input-wrap">
+              <input type="password" id="pw-up2" placeholder="再次输入登录密码" required minlength="6" autocomplete="new-password">
+              <i class="fa-regular fa-eye-slash toggle-pw" data-target="pw-up2"></i>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>交易密码</label>
+            <div class="input-wrap">
+              <input type="password" id="trade-pw" placeholder="用于资金安全与找回登录密码，不少于 6 位" required minlength="6" autocomplete="off">
+              <i class="fa-regular fa-eye-slash toggle-pw" data-target="trade-pw"></i>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>确认交易密码</label>
+            <div class="input-wrap">
+              <input type="password" id="trade-pw2" placeholder="再次输入交易密码" required minlength="6" autocomplete="off">
+              <i class="fa-regular fa-eye-slash toggle-pw" data-target="trade-pw2"></i>
+            </div>
+          </div>
+          <div class="form-options sub-glow">
+            <label><input type="checkbox" id="terms-agree" required> 已阅读并同意服务条款与安全提示</label>
+          </div>
+          <button type="submit" class="btn-nature" id="btn-register">提交注册</button>
+        </form>
+      </div>
+      </div>
+      </div>
+
+      <p class="login-portal-footer"><a href="index.html">浏览中粮天下官网（介绍与资讯）</a></p>
+        </div>
+      </div>
+    </div>
+    <div class="login-mobile-slogan" id="login-mobile-slogan" aria-hidden="true">
+      <span class="login-mobile-slogan__line">忠于国计</span>
+      <span class="login-mobile-slogan__line">良于民生</span>
+    </div>
+    </div>
+  </div>
+
+  <!-- 跳过按钮 -->
+  <button class="skip-btn" id="skip-btn">跳过</button>
+
+  <script>
+    (function() {
+      const video        = document.getElementById('intro-video');
+      const blackScreen  = document.getElementById('black-screen');
+      const text1        = document.getElementById('text-1');
+      const text2        = document.getElementById('text-2');
+      const portalCenter = document.getElementById('portal-center-brand');
+      const flankLeft    = document.getElementById('portal-flank-left');
+      const flankRight   = document.getElementById('portal-flank-right');
+      const mobileSlogan = document.getElementById('login-mobile-slogan');
+      const loginCurtain = document.getElementById('login-curtain');
+      const skipBtn      = document.getElementById('skip-btn');
+
+      let skipped = false;
+
+      function isMobileView() {
+        return typeof window.matchMedia !== 'undefined' &&
+          window.matchMedia('(max-width: 768px)').matches;
+      }
+
+      // 页面加载时强制重置状态（防止 bfcache 恢复旧状态）
+      loginCurtain.classList.remove('active');
+      video.classList.remove('visible');
+      blackScreen.classList.remove('fade-out');
+      skipBtn.classList.remove('visible');
+      skipBtn.style.display = '';
+      text1.classList.remove('visible', 'revealed', 'fade-out');
+      text2.classList.remove('visible', 'revealed', 'fade-out');
+      portalCenter.classList.remove('portal-center--in', 'portal-center--behind-login');
+      flankLeft.classList.remove('portal-flank--in');
+      flankRight.classList.remove('portal-flank--in');
+      if (mobileSlogan) mobileSlogan.classList.remove('login-mobile-slogan--in');
+
+      // 尝试静音自动播放
+      video.muted = true;
+      video.play().catch(function(){});
+
+      /* ---------- 工具函数 ---------- */
+      function revealText(el) {
+        el.classList.add('visible');
+        requestAnimationFrame(function() {
+          requestAnimationFrame(function() {
+            el.classList.add('revealed');
+          });
+        });
+      }
+      function showLogin() {
+        if (skipped) return;
+        skipped = true;
+        portalCenter.classList.remove('portal-center--in');
+        portalCenter.classList.add('portal-center--behind-login');
+        loginCurtain.classList.add('active');
+        skipBtn.style.display = 'none';
+        video.classList.add('visible');
+        blackScreen.classList.add('fade-out');
+        text1.classList.add('fade-out');
+        text2.classList.add('fade-out');
+        if (isMobileView() && mobileSlogan) {
+          requestAnimationFrame(function() {
+            mobileSlogan.classList.add('login-mobile-slogan--in');
+          });
+        }
+      }
+
+      skipBtn.addEventListener('click', showLogin);
+
+      /* ---------- 精确动画时间线 ---------- */
+
+      // t=0s  文字1开始从左至右生成（3秒）
+      setTimeout(function() {
+        if (skipped) return;
+        revealText(text1);
+      }, 100);
+
+      // t=4.1s  文字1已完全显示，开始 0.5s 渐隐
+      setTimeout(function() {
+        if (skipped) return;
+        text1.classList.add('fade-out');
+      }, 4600);
+
+      // t=5.1s  文字1消失后停留 0.5s，文字2开始从左至右生成（3秒）
+      setTimeout(function() {
+        if (skipped) return;
+        text1.classList.remove('visible', 'revealed', 'fade-out');
+        revealText(text2);
+      }, 5600);
+
+      // t=9.1s  文字2已完全显示，开始 0.5s 渐隐
+      setTimeout(function() {
+        if (skipped) return;
+        text2.classList.add('fade-out');
+      }, 9100);
+
+      // t=9.6s  文字2消失，视频渐入
+      setTimeout(function() {
+        if (skipped) return;
+        text2.classList.remove('visible', 'revealed', 'fade-out');
+        blackScreen.classList.add('fade-out');
+        video.classList.add('visible');
+      }, 10100);
+
+      // 中央「中粮天下」渐显（卷帘展开前）
+      setTimeout(function() {
+        if (skipped) return;
+        portalCenter.classList.add('portal-center--in');
+      }, 10900);
+
+      // PC：左侧翼标语渐显
+      setTimeout(function() {
+        if (skipped) return;
+        if (!isMobileView()) flankLeft.classList.add('portal-flank--in');
+      }, 11700);
+
+      setTimeout(function() {
+        if (skipped) return;
+        if (!isMobileView()) flankRight.classList.add('portal-flank--in');
+      }, 12900);
+
+      setTimeout(function() {
+        if (skipped) return;
+        showLogin();
+      }, 20400);
+
+      // 延迟显示跳过按钮
+      setTimeout(function() {
+        skipBtn.classList.add('visible');
+      }, 800);
+
+      /* ---------- 表单交互 · 对齐后端会话（与 Vue 同源 localStorage） ---------- */
+      var AUTH_TOKEN_KEY = 'zhongliang_token';
+      var AUTH_USER_KEY = 'zhongliang_user';
+      var REM_NAME_KEY = 'zhongliang_remember_nickname';
+      var authEl = document.getElementById('auth-msg');
+
+      function showAuthErr(t) {
+        authEl.textContent = t || '';
+        authEl.className = 'auth-msg auth-msg--err visible';
+      }
+      function showAuthOk(t) {
+        authEl.textContent = t || '';
+        authEl.className = 'auth-msg auth-msg--ok visible';
+      }
+      function clearAuthMsg() {
+        authEl.textContent = '';
+        authEl.classList.remove('visible');
+        authEl.className = 'auth-msg auth-msg--err';
+      }
+
+      function safeRedirectPath(raw) {
+        if (!raw || typeof raw !== 'string') return '/steris/personal-home.html';
+        try {
+          raw = decodeURIComponent(raw.trim());
+        } catch (_) {
+          raw = '';
+        }
+        if (!raw.startsWith('/') || raw.startsWith('//')) return '/steris/personal-home.html';
+        return raw.slice(0, 512);
+      }
+
+      function goAfterAuth() {
+        var qs = new URLSearchParams(window.location.search);
+        window.location.href = safeRedirectPath(qs.get('redirect'));
+      }
+
+      function persistSession(token, userObj) {
+        localStorage.setItem(AUTH_TOKEN_KEY, token);
+        localStorage.setItem(AUTH_USER_KEY, JSON.stringify(userObj));
+      }
+
+      function apiPostJson(path, body) {
+        return fetch(path, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        }).then(function (res) {
+          return res.json().catch(function () { return {}; }).then(function (data) {
+            if (!res.ok) throw new Error((data && data.message) || '请求失败 ' + res.status);
+            return data;
+          });
+        });
+      }
+
+      var remembered = localStorage.getItem(REM_NAME_KEY);
+      if (remembered) {
+        document.getElementById('remember-me').checked = true;
+        document.getElementById('signin-nickname').value = remembered;
+      }
+
+      var authFormsSlider = document.getElementById('auth-forms-slider');
+      document.querySelectorAll('.form-toggle button').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          clearAuthMsg();
+          document.querySelectorAll('.form-toggle button').forEach(function(b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          var target = btn.getAttribute('data-target');
+          if (target === 'signup') {
+            authFormsSlider.classList.add('is-signup');
+            var paneSu = document.getElementById('pane-signup');
+            if (paneSu) paneSu.scrollTop = 0;
+          } else {
+            authFormsSlider.classList.remove('is-signup');
+            var paneSi = document.getElementById('pane-signin');
+            if (paneSi) paneSi.scrollTop = 0;
+          }
+        });
+      });
+
+      document.querySelectorAll('.toggle-pw').forEach(function(icon) {
+        icon.addEventListener('click', function() {
+          var input = document.getElementById(icon.dataset.target);
+          if (!input) return;
+          input.type = (input.type === 'password') ? 'text' : 'password';
+          icon.classList.toggle('fa-eye');
+          icon.classList.toggle('fa-eye-slash');
+        });
+      });
+
+      var signinForm = document.getElementById('signin-form');
+      signinForm.addEventListener('submit', function(ev) {
+        ev.preventDefault();
+        clearAuthMsg();
+        if (!signinForm.checkValidity()) {
+          signinForm.reportValidity();
+          return;
+        }
+        var nick = document.getElementById('signin-nickname').value.trim();
+        var pw = document.getElementById('pw-in').value;
+        document.getElementById('btn-login').disabled = true;
+        apiPostJson('/api/auth/login', { nickname: nick, password: pw })
+          .then(function (data) {
+            if (!data.success || !data.token || !data.user) throw new Error(data.message || '登录失败');
+            persistSession(data.token, data.user);
+            if (document.getElementById('remember-me').checked) localStorage.setItem(REM_NAME_KEY, nick);
+            else localStorage.removeItem(REM_NAME_KEY);
+            showAuthOk('登录成功，正在跳转…');
+            setTimeout(goAfterAuth, 200);
+          })
+          .catch(function (err) {
+            showAuthErr(err.message || String(err));
+          })
+          .finally(function () {
+            document.getElementById('btn-login').disabled = false;
+          });
+      });
+
+      document.getElementById('signup-form').addEventListener('submit', function(ev) {
+        ev.preventDefault();
+        clearAuthMsg();
+        var regForm = document.getElementById('signup-form');
+        if (!regForm.checkValidity()) {
+          regForm.reportValidity();
+          return;
+        }
+        var nickname = document.getElementById('reg-nickname').value.trim();
+        var password = document.getElementById('pw-up').value;
+        var passwordConfirm = document.getElementById('pw-up2').value;
+        var tradePw = document.getElementById('trade-pw').value;
+        var tradePw2 = document.getElementById('trade-pw2').value;
+        if (password !== passwordConfirm) {
+          showAuthErr('两次输入的登录密码不一致');
+          return;
+        }
+        if (tradePw !== tradePw2) {
+          showAuthErr('两次输入的交易密码不一致');
+          return;
+        }
+        document.getElementById('btn-register').disabled = true;
+        apiPostJson('/api/auth/register', {
+          nickname: nickname,
+          password: password,
+          passwordConfirm: passwordConfirm,
+          tradePassword: tradePw,
+        })
+          .then(function (data) {
+            if (!data.success || !data.token || !data.user) throw new Error(data.message || '注册失败');
+            persistSession(data.token, data.user);
+            showAuthOk('注册成功，正在进入…');
+            setTimeout(goAfterAuth, 280);
+          })
+          .catch(function (err) {
+            showAuthErr(err.message || String(err));
+          })
+          .finally(function () {
+            document.getElementById('btn-register').disabled = false;
+          });
+      });
+
+    })();
+  </script>
+</body>
+</html>

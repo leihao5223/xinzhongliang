@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>守护大国粮仓 - 中粮天下</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;list-style-type:none;}
+body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;color:#1a1a1a;line-height:1.8;overflow-x:hidden;}
+#sakura{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:0.35;pointer-events:none;}
+.article-wrapper{position:relative;z-index:1;min-height:100vh;padding:3rem 1rem;}
+.article-container{max-width:920px;margin:0 auto;background:rgba(255,255,255,0.72);border-radius:18px;padding:3rem 3.5rem;box-shadow:0 12px 50px rgba(0,0,0,0.15);}
+.back-link{display:inline-flex;align-items:center;gap:0.4rem;color:#0d6efd;text-decoration:none;font-weight:600;margin-bottom:1.5rem;font-size:0.95rem;}
+.back-link:hover{text-decoration:underline;}
+.article-header{text-align:center;margin-bottom:2.5rem;border-bottom:2px solid #e0e6f0;padding-bottom:1.8rem;}
+.article-header h1{font-size:2.3rem;color:#0f1f3d;margin-bottom:0.8rem;letter-spacing:2px;font-weight:700;}
+.article-meta{color:#789;font-size:0.9rem;}
+.article-body p{margin-bottom:1.3rem;text-indent:2em;font-size:1.06rem;color:#2a2a2a;}
+.article-body h2{font-size:1.55rem;color:#1a3a6e;margin:2.2rem 0 1.1rem;border-left:5px solid #c9302c;padding-left:0.9rem;font-weight:700;}
+.article-body h3{font-size:1.2rem;color:#2a4a7a;margin:1.6rem 0 0.8rem;font-weight:600;}
+.quote-box{background:#f4f7fb;border-left:4px solid #c9302c;padding:1.2rem 1.5rem;margin:1.5rem 0;border-radius:0 8px 8px 0;font-style:italic;color:#445;}
+@media(max-width:768px){.article-container{padding:2rem 1.6rem;}.article-header h1{font-size:1.7rem;}}
+</style>
+</head>
+<body>
+<canvas id="sakura"></canvas>
+<script id="sakura_point_vsh" type="x-shader/x_vertex">
+uniform mat4 uProjection;
+uniform mat4 uModelview;
+uniform vec3 uResolution;
+uniform vec3 uOffset;
+uniform vec3 uDOF;
+uniform vec3 uFade;
+attribute vec3 aPosition;
+attribute vec3 aEuler;
+attribute vec2 aMisc;
+varying vec3 pposition;
+varying float psize;
+varying float palpha;
+varying float pdist;
+varying vec3 normX;
+varying vec3 normY;
+varying vec3 normZ;
+varying vec3 normal;
+varying float diffuse;
+varying float specular;
+varying float rstop;
+varying float distancefade;
+void main(void) {
+    vec4 pos = uModelview * vec4(aPosition + uOffset, 1.0);
+    gl_Position = uProjection * pos;
+    gl_PointSize = aMisc.x * uProjection[1][1] / -pos.z * uResolution.y * 0.5;
+    pposition = pos.xyz;
+    psize = aMisc.x;
+    pdist = length(pos.xyz);
+    palpha = smoothstep(0.0, 1.0, (pdist - 0.1) / uFade.z);
+    vec3 elrsn = sin(aEuler);
+    vec3 elrcs = cos(aEuler);
+    mat3 rotx = mat3(1.0, 0.0, 0.0, 0.0, elrcs.x, elrsn.x, 0.0, -elrsn.x, elrcs.x);
+    mat3 roty = mat3(elrcs.y, 0.0, -elrsn.y, 0.0, 1.0, 0.0, elrsn.y, 0.0, elrcs.y);
+    mat3 rotz = mat3(elrcs.z, elrsn.z, 0.0, -elrsn.z, elrcs.z, 0.0, 0.0, 0.0, 1.0);
+    mat3 rotmat = rotx * roty * rotz;
+    normal = rotmat[2];
+    mat3 trrotm = mat3(rotmat[0][0], rotmat[1][0], rotmat[2][0], rotmat[0][1], rotmat[1][1], rotmat[2][1], rotmat[0][2], rotmat[1][2], rotmat[2][2]);
+    normX = trrotm[0]; normY = trrotm[1]; normZ = trrotm[2];
+    const vec3 lit = vec3(0.6917144638660746, 0.6917144638660746, -0.20751433915982237);
+    float tmpdfs = dot(lit, normal);
+    if(tmpdfs < 0.0) { normal = -normal; tmpdfs = dot(lit, normal); }
+    diffuse = 0.4 + tmpdfs;
+    vec3 eyev = normalize(-pos.xyz);
+    if(dot(eyev, normal) > 0.0) {
+        vec3 hv = normalize(eyev + lit);
+        specular = pow(max(dot(hv, normal), 0.0), 20.0);
+    } else { specular = 0.0; }
+    rstop = clamp((abs(pdist - uDOF.x) - uDOF.y) / uDOF.z, 0.0, 1.0);
+    rstop = pow(rstop, 0.5);
+    distancefade = min(1.0, exp((uFade.x - pdist) * 0.69315 / uFade.y));
+}
+</script>
+<script id="sakura_point_fsh" type="x-shader/x_fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+uniform vec3 uDOF;
+uniform vec3 uFade;
+const vec3 fadeCol = vec3(0.08, 0.03, 0.06);
+varying vec3 pposition;
+varying float psize;
+varying float palpha;
+varying float pdist;
+varying vec3 normX;
+varying vec3 normY;
+varying vec3 normZ;
+varying vec3 normal;
+varying float diffuse;
+varying float specular;
+varying float rstop;
+varying float distancefade;
+float ellipse(vec2 p, vec2 o, vec2 r) {
+    vec2 lp = (p - o) / r;
+    return length(lp) - 1.0;
+}
+void main(void) {
+    vec3 p = vec3(gl_PointCoord - vec2(0.5, 0.5), 0.0) * 2.0;
+    vec3 d = vec3(0.0, 0.0, -1.0);
+    float nd = normZ.z;
+    if(abs(nd) < 0.0001) discard;
+    float np = dot(normZ, p);
+    vec3 tp = p + d * np / nd;
+    vec2 coord = vec2(dot(normX, tp), dot(normY, tp));
+    const float flwrsn = 0.258819045102521;
+    const float flwrcs = 0.965925826289068;
+    mat2 flwrm = mat2(flwrcs, -flwrsn, flwrsn, flwrcs);
+    vec2 flwrp = vec2(abs(coord.x), coord.y) * flwrm;
+    float r;
+    if(flwrp.x < 0.0) {
+        r = ellipse(flwrp, vec2(0.065, 0.024) * 0.5, vec2(0.36, 0.96) * 0.5);
+    } else {
+        r = ellipse(flwrp, vec2(0.065, 0.024) * 0.5, vec2(0.58, 0.96) * 0.5);
+    }
+    if(r > rstop) discard;
+    vec3 col = mix(vec3(1.0, 0.8, 0.75), vec3(1.0, 0.9, 0.87), r);
+    float grady = mix(0.0, 1.0, pow(coord.y * 0.5 + 0.5, 0.35));
+    col *= vec3(1.0, grady, grady);
+    col *= mix(0.8, 1.0, pow(abs(coord.x), 0.3));
+    col = col * diffuse + specular;
+    col = mix(fadeCol, col, distancefade);
+    float alpha = (rstop > 0.001)? (0.5 - r / (rstop * 2.0)) : 1.0;
+    alpha = smoothstep(0.0, 1.0, alpha) * palpha;
+    gl_FragColor = vec4(col * 0.5, alpha);
+}
+</script>
+<script id="fx_common_vsh" type="x-shader/x_vertex">
+uniform vec3 uResolution;
+attribute vec2 aPosition;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    gl_Position = vec4(aPosition, 0.0, 1.0);
+    texCoord = aPosition.xy * 0.5 + vec2(0.5, 0.5);
+    screenCoord = aPosition.xy * vec2(uResolution.z, 1.0);
+}
+</script>
+<script id="bg_fsh" type="x-shader/x_fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+uniform vec2 uTimes;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    vec3 col;
+    float c;
+    vec2 tmpv = texCoord * vec2(0.8, 1.0) - vec2(0.95, 1.0);
+    c = exp(-pow(length(tmpv) * 1.8, 2.0));
+    col = mix(vec3(0.02, 0.0, 0.03), vec3(0.96, 0.98, 1.0) * 1.5, c);
+    gl_FragColor = vec4(col * 0.5, 1.0);
+}
+</script>
+<script id="fx_brightbuf_fsh" type="x-shader/x_fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+uniform sampler2D uSrc;
+uniform vec2 uDelta;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    vec4 col = texture2D(uSrc, texCoord);
+    gl_FragColor = vec4(col.rgb * 2.0 - vec3(0.5), 1.0);
+}
+</script>
+<script id="fx_dirblur_r4_fsh" type="x-shader/x_fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+uniform sampler2D uSrc;
+uniform vec2 uDelta;
+uniform vec4 uBlurDir;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    vec4 col = texture2D(uSrc, texCoord);
+    col = col + texture2D(uSrc, texCoord + uBlurDir.xy * uDelta);
+    col = col + texture2D(uSrc, texCoord - uBlurDir.xy * uDelta);
+    col = col + texture2D(uSrc, texCoord + (uBlurDir.xy + uBlurDir.zw) * uDelta);
+    col = col + texture2D(uSrc, texCoord - (uBlurDir.xy + uBlurDir.zw) * uDelta);
+    gl_FragColor = col / 5.0;
+}
+</script>
+<script id="pp_final_vsh" type="x-shader/x_vertex">
+uniform vec3 uResolution;
+attribute vec2 aPosition;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    gl_Position = vec4(aPosition, 0.0, 1.0);
+    texCoord = aPosition.xy * 0.5 + vec2(0.5, 0.5);
+    screenCoord = aPosition.xy * vec2(uResolution.z, 1.0);
+}
+</script>
+<script id="pp_final_fsh" type="x-shader/x_fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+uniform sampler2D uSrc;
+uniform sampler2D uBloom;
+uniform vec2 uDelta;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    vec4 srccol = texture2D(uSrc, texCoord) * 2.0;
+    vec4 bloomcol = texture2D(uBloom, texCoord);
+    vec4 col = srccol + bloomcol * (vec4(1.0) + srccol);
+    col *= smoothstep(1.0, 0.0, pow(length((texCoord - vec2(0.5)) * 2.0), 1.2) * 0.5);
+    col = pow(col, vec4(0.45454545454545));
+    gl_FragColor = vec4(col.rgb, 1.0);
+}
+</script>
+
+<div class="article-wrapper">
+  <div class="article-container">
+    <a href="index.html" class="back-link">&#8592; 返回首页</a>
+    <div class="article-header">
+      <h1>守护大国粮仓</h1>
+      <div class="article-meta">中粮集团 · 深度报道 · 粮食安全专栏</div>
+    </div>
+    <div class="article-body">
+      <p>粮食安全是"国之大者"。对一个拥有十四亿人口的大国而言，确保饭碗牢牢端在自己手中，是治国理政的头等大事。作为中央直属大型国有企业，中粮集团自成立之日起就肩负着服务国家粮食安全战略的神圣使命。从建国初期的粮食统购统销，到改革开放后的市场化经营，再到新时代背景下的全球布局与科技赋能，中粮始终站在保障国家粮食安全的第一线，以"守粮人"的担当筑牢大国粮仓的坚实根基。</p>
+
+      <h2>一、历史使命：从统购统销到现代粮仓</h2>
+      <p>中粮集团的前身可追溯至1949年成立的中国粮谷出口公司，彼时的主要任务是打破西方国家对新中国的经济封锁，通过出口农副产品换取宝贵的外汇和工业设备。在那个百废待兴的年代，中粮人肩挑背扛、风餐露宿，将一批批粮食、油脂、油料运往世界各地，为国家工业化建设积累了最初的资本。</p>
+
+      <p>改革开放后，中粮逐步从单一的进出口贸易公司转型为多元化经营的现代企业集团。1980年代，中粮率先开展粮食期货贸易，在伦敦、芝加哥等国际期货市场学习避险操作，为中国企业参与全球大宗商品定价积累了宝贵经验。1990年代，中粮开始在国内投资建设粮油加工基地，从贸易商向实业家转变，产业链条不断延伸。</p>
+
+      <p>进入新世纪，尤其是党的十八大以来，中粮迎来了全面深化改革、做强做优做大的关键时期。通过专业化重组、混合所有制改革、职业经理人制度等一系列创新举措，中粮建立了更加市场化的经营机制，企业的活力、竞争力和抗风险能力显著增强。如今的中粮，已发展成为资产过万亿、年经营量过亿吨的全球大粮商，但服务国家粮食安全的初心从未改变。</p>
+
+      <h2>二、储备体系：关键时刻的"稳定器"</h2>
+      <p>粮食储备是应对突发事件、平抑市场波动的"压舱石"。作为国家粮食宏观调控的重要执行主体，中粮承担着中央储备粮油的经营管理任务，在全国主要粮食产销区建设了一批现代化的储备粮库。</p>
+
+      <p>这些粮库采用了世界先进的储粮技术，包括低温储粮、氮气储粮、智能通风等，能够在不使用化学熏蒸剂的情况下，将粮食保质期延长至数年。粮库内布设了数千个温湿度传感器，数据实时上传至国家粮食和物资储备局监控平台，实现了"粮情"的可视化、可追溯管理。一旦发现异常，系统会自动报警并启动应急预案，确保储备粮食数量真实、质量良好、储存安全。</p>
+
+      <p>在应急保障方面，中粮建立了覆盖全国的粮油应急配送网络。当某地发生自然灾害或公共突发事件时，中粮能够在最短时间内从最近的储备库调运粮油物资，确保受灾群众和救援人员的口粮供应。2020年初新冠疫情暴发期间，正是这套应急体系发挥了关键作用，在全国交通大面积受阻的情况下，中粮保证了武汉等疫情严重地区的粮油不断供、价格不暴涨，有力支撑了抗疫大局。</p>
+
+      <div class="quote-box">"储备粮食宁可备而不用，不可用而无备。这是我们对国家的承诺，也是对人民的担当。" ——中粮集团储备管理部</div>
+
+      <h2>三、市场调控：保供稳价的主力军</h2>
+      <p>除了战略储备，中粮还承担着日常的市场调控职能。当市场出现价格异常波动时，国家会通过中粮等国有骨干企业投放储备粮油，增加市场供给，引导价格回归合理区间。这种"有形之手"与"无形之手"的协同配合，是中国粮食市场保持长期稳定的重要制度安排。</p>
+
+      <p>以大豆市场为例，由于国内产不足需，每年需进口大量大豆。国际大豆价格受南美天气、中美贸易关系、全球能源价格等多种因素影响，波动十分剧烈。当国际市场出现非理性上涨时，中粮会按照国家的统一部署，适时投放储备豆油，增加国内供应，稳定市场预期。同时，中粮通过期货市场进行套期保值操作，锁定采购成本，将价格波动风险控制在可承受范围内。</p>
+
+      <p>在小麦、稻谷等口粮品种上，中粮严格执行国家最低收购价政策，在收获季节以保护价敞开收购农民余粮，确保种粮农民的基本收益。收购来的粮食经过严格的质量检验后，一部分进入储备体系，一部分通过加工环节进入市场流通，形成"收购—储备—加工—销售"的良性循环。</p>
+
+      <h2>四、质量管控：从田间到餐桌的安全守护</h2>
+      <p>粮食安全不仅是数量安全，更是质量安全。中粮建立了覆盖全产业链的质量安全管控体系，从源头抓起，层层把关，确保消费者舌尖上的安全。</p>
+
+      <p>在种植环节，中粮通过订单农业模式，向合作农户提供统一的良种、标准化的种植技术规程和农资配供服务，从源头上控制农药、化肥的使用量，推广绿色防控技术。在收储环节，所有入库粮食必须经过严格的质量检测，包括水分、杂质、不完善粒、重金属、真菌毒素等指标，不合格粮食坚决不予入库。在加工环节，中粮引入HACCP、ISO22000等国际先进的食品安全管理体系，对生产过程中的关键控制点实行24小时监控。在流通环节，中粮建立了产品追溯系统，消费者通过扫描包装上的二维码，即可查询到产品的原料来源、加工工厂、质检报告等详细信息。</p>
+
+      <h2>五、全球视野：在开放合作中增强安全保障</h2>
+      <p>在经济全球化深入发展的今天，任何国家都不可能完全依靠自身资源满足所有粮食需求。中国适度进口粮食，不仅是资源禀赋决定的客观需要，也是主动参与国际分工、优化农业资源配置的理性选择。中粮作为中国最大的粮食贸易企业，在利用国际市场、国际资源服务国内需求方面发挥着不可替代的作用。</p>
+
+      <p>通过在全球范围内布局采购网络和物流设施，中粮能够根据国内外市场价差、汇率变化、航运成本等因素，灵活调整采购策略，以最优的成本获取所需的粮油资源。同时，中粮积极参与国际农业合作，在"一带一路"沿线国家投资农业基础设施、推广先进种植技术，帮助发展中国家提高粮食生产能力，既拓展了自身的业务空间，也为全球粮食安全作出了贡献。</p>
+
+      <p>展望未来，中粮将继续牢记"国之大者"，以更高的标准、更严的要求、更实的举措，守护好大国粮仓，为确保中国人的饭碗任何时候都牢牢端在自己手中、饭碗主要装中国粮，作出新的更大贡献。</p>
+    </div>
+  </div>
+</div>
+
+<script src="特效/飘雪/js/index.js"></script>
+
+<style>
+.latest-news-section {
+  position: relative;
+  z-index: 1;
+  padding: 4rem 1rem;
+  background: linear-gradient(180deg, #f0f4f8 0%, #e8eef5 100%);
+}
+.latest-news-section .news-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.latest-news-section .news-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+.latest-news-section .news-subtitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #c9302c;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+}
+.latest-news-section .news-subtitle span {
+  font-size: 0.5rem;
+}
+.latest-news-section .news-title {
+  font-size: 1.9rem;
+  color: #0f1f3d;
+  font-weight: 700;
+}
+.latest-news-section .news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+.latest-news-section .news-card {
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,0.65);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(31,38,80,0.08);
+  display: flex;
+  flex-direction: column;
+}
+.latest-news-section .news-card-image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+.latest-news-section .news-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.latest-news-section .news-card-body {
+  padding: 1.4rem 1.3rem 0.6rem;
+  flex: 1;
+}
+.latest-news-section .news-card-body h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a3a6e;
+  margin-bottom: 0.5rem;
+  line-height: 1.45;
+}
+.latest-news-section .news-card-body p {
+  font-size: 0.92rem;
+  color: #4a5568;
+  line-height: 1.7;
+  margin: 0;
+}
+.latest-news-section .news-card-footer {
+  padding: 0 1.3rem 1.1rem;
+  font-size: 0.85rem;
+  color: #8899aa;
+}
+@media(max-width:768px){
+  .latest-news-section .news-title { font-size: 1.5rem; }
+}
+</style>
+<section class="latest-news-section">
+  <div class="news-container">
+    <div class="news-header">
+      <div class="news-subtitle"><span>&#9679;</span> 行业前沿</div>
+      <h2 class="news-title">洞察粮农趋势，引领产业未来</h2>
+    </div>
+    <div class="news-grid">
+      <div class="news-card">
+        <div class="news-card-image"><img src="assets/images/blog-smart-agriculture-drone.jpg" alt="智慧农业"></div>
+        <div class="news-card-body">
+          <h3>数字农田：智慧农业重塑耕种方式</h3>
+          <p>无人机巡田、卫星遥感与物联网传感器的深度融合，让每一寸土地的管理都进入厘米级精准时代，产量与品质同步跃升。</p>
+        </div>
+        <div class="news-card-footer">2025年05月15日</div>
+      </div>
+      <div class="news-card">
+        <div class="news-card-image"><img src="assets/images/blog-quality-lab-inspection.jpg" alt="品质检测"></div>
+        <div class="news-card-body">
+          <h3>从田间到舌尖：全链路品质守护</h3>
+          <p>依托全球领先的检测实验室与标准化加工基地，建立覆盖原料采购、生产加工、仓储物流的全流程质量追溯网络。</p>
+        </div>
+        <div class="news-card-footer">2025年06月02日</div>
+      </div>
+      <div class="news-card">
+        <div class="news-card-image"><img src="assets/images/blog-green-eco-farm.jpg" alt="绿色农业"></div>
+        <div class="news-card-body">
+          <h3>绿色低碳：可持续农业的中国方案</h3>
+          <p>推进生态农业、循环农业与清洁能源应用，在保障粮食产量的同时守护碧水蓝天，为全球农业可持续发展贡献力量。</p>
+        </div>
+        <div class="news-card-footer">2025年07月18日</div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

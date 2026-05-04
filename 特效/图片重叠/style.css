@@ -1,0 +1,455 @@
+@import url('https://unpkg.com/normalize.css') layer(normalize);
+
+@layer normalize, base, prototype, responsive, instruction;
+
+@layer instruction {
+  .arrow {
+    display: inline-block;
+    position: absolute;
+    left: 55%;
+    font-size: 0.875rem;
+    opacity: 0.7;
+    font-family: 'Gloria Hallelujah', cursive;
+    transition: opacity 0.26s ease-out;
+    top: 30%;
+    rotate: -10deg;
+    translate: 20% -140%;
+    width: 60px;
+    z-index: 99999;
+    color: #fff;
+
+    @media(max-width: 500px) {
+      top: 95%;
+      rotate: 30deg;
+    }
+
+
+    span {
+      display: inline-block;
+      rotate: -24deg;
+      width: 160%;
+      translate: -20% 110%;
+    }
+    svg {
+      scale: 1 -1;
+      translate: 120% 30%;
+      rotate: -10deg;
+      left: 0%;
+      width: 80%;
+    }
+  }
+}
+
+@layer responsive {
+  @container (max-width: 500px) {
+    .slideshow-stack__tablist {
+      grid-template-columns: unset;
+      grid-template-rows: var(--active-tab);
+      button {
+        width: 100%;
+        height: var(--button-width);
+      }
+    }
+    .slideshow-stack__panels {
+      grid-template-columns: unset;
+      grid-template-rows: var(--active-tab);
+      container-type: size;
+    }
+
+    
+
+    [role="tabpanel"] {
+      width: 100%;
+      min-height: var(--button-width);
+    
+      &:nth-of-type(1) {
+        /* z-index: 3; */
+        .slideshow-stack__panel-content {
+          height: calc(var(--active-panel-height) + (var(--radius) * 0));
+        }
+      }
+      
+      .slideshow-stack__panel-content {
+        width: 100%;
+        top: unset;
+        right: 0;
+        padding-bottom: var(--panel-padding);
+        height: calc(var(--active-panel-height) + (var(--radius) * 2));
+      }
+
+      &:not(:nth-of-type(1)) .slideshow-stack__panel-content {
+        border-top: 0;
+      }
+      &:not(:nth-of-type(1)) .slide__content {
+        /* padding-bottom: calc(var(--button-width) + var(--panel-padding)); */
+        padding-left: var(--panel-padding);
+
+      }
+    }
+  }
+}
+@layer motion {
+  @media (prefers-reduced-motion: no-preference) {
+    :root:has([data-dragging]) * {
+      cursor: -webkit-grabbing !important;
+      cursor: grabbing !important;
+    }
+    [data-dragging] :is(.slideshow-stack__tablist, .slideshow-stack__panels) {
+      transition: none !important;
+    }
+    .slideshow-stack__panels, .slideshow-stack__tablist {
+      --ease: linear(
+        0 0%, 0.0036 9.62%, 0.0185 16.66%,
+        0.0489 23.03%, 0.0962 28.86%,
+        0.1705 34.93%, 0.269 40.66%,
+        0.3867 45.89%, 0.5833 52.95%,
+        0.683 57.05%, 0.7829 62.14%,
+        0.8621 67.46%, 0.8991 70.68%,
+        0.9299 74.03%, 0.9545 77.52%,
+        0.9735 81.21%, 0.9865 85%,
+        0.9949 89.15%, 1 100%
+      );
+      transition-property: grid-template-columns, grid-template-rows;
+      transition-property: grid-template-columns, grid-template-rows, -ms-grid-columns, -ms-grid-rows;
+      transition-duration: calc(var(--transition, 0.6) * 1s);
+      transition-timing-function: var(--ease);
+    }
+    .slide-text {
+      opacity: 0;
+      translate: 0 0.5lh;
+      transition-property: opacity, translate, scale;
+      transition-duration: calc(var(--transition, 0.6) * 0.8s);
+      transition-timing-function: var(--ease);
+    }
+    [role="tabpanel"]:not([inert]) .slide-text {
+      opacity: 1;
+      transition-delay: calc(var(--transition, 0.6) * 0.4s);
+      translate: 0 0;
+    }
+
+
+  }
+}
+
+@layer prototype {
+  .resizable {
+    padding: 2rem;
+    resize: both;
+    overflow: hidden;
+    width: 600px;
+    aspect-ratio: 16/9;
+    min-width: 360px;
+    max-width: 100vw;
+
+    @media (max-width: 500px) {
+      aspect-ratio: 9 / 16;
+      padding: 1rem;
+    }
+  }
+
+  slideshow-stack {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .slideshow-stack__container {
+    --radius: calc(var(--rad) * 1rem);
+    --button-width: calc(var(--size, 4) * 1rem);
+    --panel-padding: 2rem;
+    --border-width: 2px;
+    --border-color: light-dark(color-mix(in hsl, canvasText, canvas 50%), color-mix(in hsl, canvasText, canvas 75%));
+    
+    /* Calculated values for panel sizing */
+    --inactive-tabs-width: calc((var(--total-tabs) - 1) * var(--button-width));
+    --active-panel-width: calc(100cqi - var(--inactive-tabs-width));
+    --active-panel-height: calc(100cqh - var(--inactive-tabs-width));
+    
+    width: 100%;
+    height: 100%;
+    position: relative;
+    container-type: inline-size;
+    border-radius: var(--radius);
+    overflow: hidden;
+    touch-action: none;
+  }
+
+  .slideshow-stack__tablist {
+    display: grid;
+    grid-template-columns: var(--active-tab);
+    list-style: none;
+    padding: 0;
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+
+    button {
+      width: var(--button-width);
+      height: 100%;
+      pointer-events: all;
+      opacity: 0;
+      cursor: -webkit-grab;
+      cursor: grab;
+      
+      &[aria-selected="true"] {
+        cursor: default;
+      }
+    }
+  }
+
+  .slideshow-stack__panels {
+    display: grid;
+    grid-template-columns: var(--active-tab);
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .slide__content {
+    position: absolute;
+    inset: 0;
+    padding: var(--panel-padding);
+    display: flex;
+    align-items: flex-end;
+    background: linear-gradient(#0000, hsl(0 0% 0% / 0.6) 40%);
+    container-type: inline-size
+  }
+
+  .slide-text {
+    font-size: clamp(1.5rem, 5cqi, 3rem);
+    color: #fff;
+    letter-spacing: 0.2;
+    line-height: 1.2;
+    font-weight: 300;
+    max-width: 75%;
+    z-index: 2;
+    display: grid;
+    gap: 1rem;
+    
+    
+    p {
+      text-wrap: balance;
+      margin: 0;
+    }
+  }
+
+  .actions {
+    display: flex;
+    gap: 1rem;
+
+    a {
+      border-radius: 100px;
+      background: #0000;
+      padding: 0.625rem .875rem;
+      font-size: .875rem;
+      border: 2px solid #fff;
+      color: #fff;
+      text-decoration: none;
+      font-weight: normal;
+      white-space: nowrap;
+      font-size: .875rem;
+
+      &:is(:hover, :focus-visible) {
+        background: #fff;
+        color: #000;
+      }
+    }
+  }
+
+  [role="tabpanel"] {
+    position: relative;
+    height: 100%;
+    min-width: var(--button-width);
+    
+    border-radius: var(--radius);
+    z-index: calc(var(--total-tabs) - var(--index));
+    
+    
+    
+    &:nth-of-type(1) {
+      /* z-index: 3; */
+
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border: var(--border-width) solid var(--border-color);
+        border-radius: var(--radius);
+      }
+      
+      .slideshow-stack__panel-content {
+        width: calc(var(--active-panel-width) + (var(--radius) * 0));
+      }
+    }
+
+
+    &:not(:nth-of-type(1)) .slide__content {
+      padding-left: calc((var(--radius) * 2) + var(--panel-padding));
+    }
+
+
+    /* &:nth-of-type(2) {
+      z-index: 2;
+    }
+    &:nth-of-type(3) {
+      z-index: 1;
+    } */
+    
+  }
+  
+  .slideshow-stack__panel-content {
+    border: var(--border-width) solid var(--border-color);
+    border-radius: var(--radius);
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    overflow: hidden;
+    width: calc(var(--active-panel-width) + (var(--radius) * 2));
+
+    img {
+      position: absolute;
+      inset: 0;
+      -o-object-fit: cover;
+         object-fit: cover;
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+
+  body {
+    overflow-x: hidden;
+  }
+}
+
+
+
+@layer base {
+  :root {
+    --font-size-min: 16;
+    --font-size-max: 20;
+    --font-ratio-min: 1.2;
+    --font-ratio-max: 1.33;
+    --font-width-min: 375;
+    --font-width-max: 1500;
+  }
+
+  html {
+    color-scheme: light dark;
+  }
+
+  [data-theme='light'] {
+    color-scheme: light only;
+  }
+
+  [data-theme='dark'] {
+    color-scheme: dark only;
+  }
+
+  :where(.fluid) {
+    --fluid-min: calc(
+      var(--font-size-min) * pow(var(--font-ratio-min), var(--font-level, 0))
+    );
+    --fluid-max: calc(
+      var(--font-size-max) * pow(var(--font-ratio-max), var(--font-level, 0))
+    );
+    --fluid-preferred: calc(
+      (var(--fluid-max) - var(--fluid-min)) /
+        (var(--font-width-max) - var(--font-width-min))
+    );
+    --fluid-type: clamp(
+      (var(--fluid-min) / 16) * 1rem,
+      ((var(--fluid-min) / 16) * 1rem) -
+        (((var(--fluid-preferred) * var(--font-width-min)) / 16) * 1rem) +
+        (var(--fluid-preferred) * var(--variable-unit, 100vi)),
+      (var(--fluid-max) / 16) * 1rem
+    );
+    font-size: var(--fluid-type);
+  }
+
+  *,
+  *:after,
+  *:before {
+    box-sizing: border-box;
+  }
+
+  body {
+    background: light-dark(#fff, #000);
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    font-family: 'SF Pro Text', 'SF Pro Icons', 'AOS Icons', 'Helvetica Neue',
+      Helvetica, Arial, sans-serif, system-ui;
+  }
+
+  body::before {
+    --size: 45px;
+    --line: color-mix(in hsl, canvasText, transparent 80%);
+    content: '';
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    background: linear-gradient(
+          90deg,
+          var(--line) 1px,
+          transparent 1px var(--size)
+        )
+        calc(var(--size) * 0.36) 50% / var(--size) var(--size),
+      linear-gradient(var(--line) 1px, transparent 1px var(--size)) 0%
+        calc(var(--size) * 0.32) / var(--size) var(--size);
+    -webkit-mask: linear-gradient(-20deg, transparent 50%, white);
+            mask: linear-gradient(-20deg, transparent 50%, white);
+    top: 0;
+    transform-style: flat;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .bear-link {
+    color: canvasText;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    width: 48px;
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    opacity: 0.8;
+  }
+
+  :where(.x-link, .bear-link):is(:hover, :focus-visible) {
+    opacity: 1;
+  }
+
+  .bear-link svg {
+    width: 75%;
+  }
+
+  /* Utilities */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+}
+
+div.tp-dfwv {
+  width: 280px;
+  position: fixed;
+}
+
+
+div.tp-dfwv {
+  width: 256px;
+  z-index: 999999;
+  position: fixed;
+}

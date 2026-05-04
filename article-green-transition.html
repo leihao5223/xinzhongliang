@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>绿色低碳转型 - 中粮天下</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;list-style-type:none;}
+body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;color:#1a1a1a;line-height:1.8;overflow-x:hidden;}
+#sakura{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:0.35;pointer-events:none;}
+.article-wrapper{position:relative;z-index:1;min-height:100vh;padding:3rem 1rem;}
+.article-container{max-width:920px;margin:0 auto;background:rgba(255,255,255,0.72);border-radius:18px;padding:3rem 3.5rem;box-shadow:0 12px 50px rgba(0,0,0,0.15);}
+.back-link{display:inline-flex;align-items:center;gap:0.4rem;color:#0d6efd;text-decoration:none;font-weight:600;margin-bottom:1.5rem;font-size:0.95rem;}
+.back-link:hover{text-decoration:underline;}
+.article-header{text-align:center;margin-bottom:2.5rem;border-bottom:2px solid #e0e6f0;padding-bottom:1.8rem;}
+.article-header h1{font-size:2.3rem;color:#0f1f3d;margin-bottom:0.8rem;letter-spacing:2px;font-weight:700;}
+.article-meta{color:#789;font-size:0.9rem;}
+.article-body p{margin-bottom:1.3rem;text-indent:2em;font-size:1.06rem;color:#2a2a2a;}
+.article-body h2{font-size:1.55rem;color:#1a3a6e;margin:2.2rem 0 1.1rem;border-left:5px solid #c9302c;padding-left:0.9rem;font-weight:700;}
+.article-body h3{font-size:1.2rem;color:#2a4a7a;margin:1.6rem 0 0.8rem;font-weight:600;}
+.quote-box{background:#f4f7fb;border-left:4px solid #c9302c;padding:1.2rem 1.5rem;margin:1.5rem 0;border-radius:0 8px 8px 0;font-style:italic;color:#445;}
+@media(max-width:768px){.article-container{padding:2rem 1.6rem;}.article-header h1{font-size:1.7rem;}}
+</style>
+</head>
+<body>
+<canvas id="sakura"></canvas>
+<script id="sakura_point_vsh" type="x-shader/x_vertex">
+uniform mat4 uProjection;
+uniform mat4 uModelview;
+uniform vec3 uResolution;
+uniform vec3 uOffset;
+uniform vec3 uDOF;
+uniform vec3 uFade;
+attribute vec3 aPosition;
+attribute vec3 aEuler;
+attribute vec2 aMisc;
+varying vec3 pposition;
+varying float psize;
+varying float palpha;
+varying float pdist;
+varying vec3 normX;
+varying vec3 normY;
+varying vec3 normZ;
+varying vec3 normal;
+varying float diffuse;
+varying float specular;
+varying float rstop;
+varying float distancefade;
+void main(void) {
+    vec4 pos = uModelview * vec4(aPosition + uOffset, 1.0);
+    gl_Position = uProjection * pos;
+    gl_PointSize = aMisc.x * uProjection[1][1] / -pos.z * uResolution.y * 0.5;
+    pposition = pos.xyz;
+    psize = aMisc.x;
+    pdist = length(pos.xyz);
+    palpha = smoothstep(0.0, 1.0, (pdist - 0.1) / uFade.z);
+    vec3 elrsn = sin(aEuler);
+    vec3 elrcs = cos(aEuler);
+    mat3 rotx = mat3(1.0, 0.0, 0.0, 0.0, elrcs.x, elrsn.x, 0.0, -elrsn.x, elrcs.x);
+    mat3 roty = mat3(elrcs.y, 0.0, -elrsn.y, 0.0, 1.0, 0.0, elrsn.y, 0.0, elrcs.y);
+    mat3 rotz = mat3(elrcs.z, elrsn.z, 0.0, -elrsn.z, elrcs.z, 0.0, 0.0, 0.0, 1.0);
+    mat3 rotmat = rotx * roty * rotz;
+    normal = rotmat[2];
+    mat3 trrotm = mat3(rotmat[0][0], rotmat[1][0], rotmat[2][0], rotmat[0][1], rotmat[1][1], rotmat[2][1], rotmat[0][2], rotmat[1][2], rotmat[2][2]);
+    normX = trrotm[0]; normY = trrotm[1]; normZ = trrotm[2];
+    const vec3 lit = vec3(0.6917144638660746, 0.6917144638660746, -0.20751433915982237);
+    float tmpdfs = dot(lit, normal);
+    if(tmpdfs < 0.0) { normal = -normal; tmpdfs = dot(lit, normal); }
+    diffuse = 0.4 + tmpdfs;
+    vec3 eyev = normalize(-pos.xyz);
+    if(dot(eyev, normal) > 0.0) {
+        vec3 hv = normalize(eyev + lit);
+        specular = pow(max(dot(hv, normal), 0.0), 20.0);
+    } else { specular = 0.0; }
+    rstop = clamp((abs(pdist - uDOF.x) - uDOF.y) / uDOF.z, 0.0, 1.0);
+    rstop = pow(rstop, 0.5);
+    distancefade = min(1.0, exp((uFade.x - pdist) * 0.69315 / uFade.y));
+}
+</script>
+<script id="sakura_point_fsh" type="x-shader/x_fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+uniform vec3 uDOF;
+uniform vec3 uFade;
+const vec3 fadeCol = vec3(0.08, 0.03, 0.06);
+varying vec3 pposition;
+varying float psize;
+varying float palpha;
+varying float pdist;
+varying vec3 normX;
+varying vec3 normY;
+varying vec3 normZ;
+varying vec3 normal;
+varying float diffuse;
+varying float specular;
+varying float rstop;
+varying float distancefade;
+float ellipse(vec2 p, vec2 o, vec2 r) {
+    vec2 lp = (p - o) / r;
+    return length(lp) - 1.0;
+}
+void main(void) {
+    vec3 p = vec3(gl_PointCoord - vec2(0.5, 0.5), 0.0) * 2.0;
+    vec3 d = vec3(0.0, 0.0, -1.0);
+    float nd = normZ.z;
+    if(abs(nd) < 0.0001) discard;
+    float np = dot(normZ, p);
+    vec3 tp = p + d * np / nd;
+    vec2 coord = vec2(dot(normX, tp), dot(normY, tp));
+    const float flwrsn = 0.258819045102521;
+    const float flwrcs = 0.965925826289068;
+    mat2 flwrm = mat2(flwrcs, -flwrsn, flwrsn, flwrcs);
+    vec2 flwrp = vec2(abs(coord.x), coord.y) * flwrm;
+    float r;
+    if(flwrp.x < 0.0) {
+        r = ellipse(flwrp, vec2(0.065, 0.024) * 0.5, vec2(0.36, 0.96) * 0.5);
+    } else {
+        r = ellipse(flwrp, vec2(0.065, 0.024) * 0.5, vec2(0.58, 0.96) * 0.5);
+    }
+    if(r > rstop) discard;
+    vec3 col = mix(vec3(1.0, 0.8, 0.75), vec3(1.0, 0.9, 0.87), r);
+    float grady = mix(0.0, 1.0, pow(coord.y * 0.5 + 0.5, 0.35));
+    col *= vec3(1.0, grady, grady);
+    col *= mix(0.8, 1.0, pow(abs(coord.x), 0.3));
+    col = col * diffuse + specular;
+    col = mix(fadeCol, col, distancefade);
+    float alpha = (rstop > 0.001)? (0.5 - r / (rstop * 2.0)) : 1.0;
+    alpha = smoothstep(0.0, 1.0, alpha) * palpha;
+    gl_FragColor = vec4(col * 0.5, alpha);
+}
+</script>
+<script id="fx_common_vsh" type="x-shader/x_vertex">
+uniform vec3 uResolution;
+attribute vec2 aPosition;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    gl_Position = vec4(aPosition, 0.0, 1.0);
+    texCoord = aPosition.xy * 0.5 + vec2(0.5, 0.5);
+    screenCoord = aPosition.xy * vec2(uResolution.z, 1.0);
+}
+</script>
+<script id="bg_fsh" type="x-shader/x_fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+uniform vec2 uTimes;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    vec3 col;
+    float c;
+    vec2 tmpv = texCoord * vec2(0.8, 1.0) - vec2(0.95, 1.0);
+    c = exp(-pow(length(tmpv) * 1.8, 2.0));
+    col = mix(vec3(0.02, 0.0, 0.03), vec3(0.96, 0.98, 1.0) * 1.5, c);
+    gl_FragColor = vec4(col * 0.5, 1.0);
+}
+</script>
+<script id="fx_brightbuf_fsh" type="x-shader/x_fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+uniform sampler2D uSrc;
+uniform vec2 uDelta;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    vec4 col = texture2D(uSrc, texCoord);
+    gl_FragColor = vec4(col.rgb * 2.0 - vec3(0.5), 1.0);
+}
+</script>
+<script id="fx_dirblur_r4_fsh" type="x-shader/x_fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+uniform sampler2D uSrc;
+uniform vec2 uDelta;
+uniform vec4 uBlurDir;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    vec4 col = texture2D(uSrc, texCoord);
+    col = col + texture2D(uSrc, texCoord + uBlurDir.xy * uDelta);
+    col = col + texture2D(uSrc, texCoord - uBlurDir.xy * uDelta);
+    col = col + texture2D(uSrc, texCoord + (uBlurDir.xy + uBlurDir.zw) * uDelta);
+    col = col + texture2D(uSrc, texCoord - (uBlurDir.xy + uBlurDir.zw) * uDelta);
+    gl_FragColor = col / 5.0;
+}
+</script>
+<script id="pp_final_vsh" type="x-shader/x_vertex">
+uniform vec3 uResolution;
+attribute vec2 aPosition;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    gl_Position = vec4(aPosition, 0.0, 1.0);
+    texCoord = aPosition.xy * 0.5 + vec2(0.5, 0.5);
+    screenCoord = aPosition.xy * vec2(uResolution.z, 1.0);
+}
+</script>
+<script id="pp_final_fsh" type="x-shader/x_fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+uniform sampler2D uSrc;
+uniform sampler2D uBloom;
+uniform vec2 uDelta;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    vec4 srccol = texture2D(uSrc, texCoord) * 2.0;
+    vec4 bloomcol = texture2D(uBloom, texCoord);
+    vec4 col = srccol + bloomcol * (vec4(1.0) + srccol);
+    col *= smoothstep(1.0, 0.0, pow(length((texCoord - vec2(0.5)) * 2.0), 1.2) * 0.5);
+    col = pow(col, vec4(0.45454545454545));
+    gl_FragColor = vec4(col.rgb, 1.0);
+}
+</script>
+
+<div class="article-wrapper">
+  <div class="article-container">
+    <a href="index.html" class="back-link">&#8592; 返回首页</a>
+    <div class="article-header">
+      <h1>绿色低碳转型</h1>
+      <div class="article-meta">中粮集团 · 深度报道 · 可持续发展专题</div>
+    </div>
+    <div class="article-body">
+      <p>实现碳达峰、碳中和，是以习近平同志为核心的党中央统筹国内国际两个大局作出的重大战略决策，事关中华民族永续发展和构建人类命运共同体。作为关系国计民生的国有骨干企业，中粮集团深刻认识到，推动绿色低碳转型不仅是履行社会责任的需要，更是企业实现高质量发展的必由之路。面对日益严峻的资源环境约束和不断升级的消费者环保意识，中粮将绿色发展理念融入企业战略和日常运营，在节能减排、循环经济、生态保护等方面采取了一系列务实举措，努力成为农粮行业绿色转型的引领者。</p>
+
+      <h2>一、战略引领：将绿色发展刻入企业基因</h2>
+      <p>绿色发展不是权宜之计，而是需要长期坚持的战略方向。中粮集团将"绿色低碳"纳入企业整体发展战略，制定了明确的碳减排目标和行动计划。集团承诺，到2030年单位产值碳排放强度较2020年下降百分之三十以上，到2060年实现碳中和。为确保目标落地，中粮建立了从集团总部到基层企业的三级节能减排责任体系，将能耗和碳排放指标纳入各级管理人员的绩效考核，形成了"人人肩上有担子、个个身上有指标"的工作格局。</p>
+
+      <p>在投资决策环节，中粮严格执行环境影响评价制度，对新建、改建、扩建项目实施严格的环保准入审查。对于高耗能、高排放的项目，即使短期经济效益可观，也坚决不予批准。相反，对于采用节能环保新技术、新工艺的项目，中粮在资金安排、审批流程上给予优先支持。这一"绿色导向"的投资策略，从源头上控制了新增排放，推动产业结构向低能耗、低排放方向优化。</p>
+
+      <p>在企业文化建设方面，中粮将绿色发展理念融入员工培训、宣传教育和企业文化活动的方方面面。每年定期举办的"节能宣传周""低碳体验日"等活动，通过知识竞赛、技能比武、创意征集等形式，激发全体员工参与绿色行动的积极性和创造性。许多基层员工提出的"金点子"，如优化蒸汽管网、回收利用冷凝水、改用变频电机等，虽然单项改进看似微不足道，但积少成多，每年为企业节约能源成本数千万元。</p>
+
+      <div class="quote-box">"绿色发展不是成本，而是投资。今天对环保的投入，明天将转化为企业的竞争力和品牌溢价。" ——中粮集团安全环保管理部</div>
+
+      <h2>二、清洁生产：让工厂成为花园</h2>
+      <p>粮油加工是能源消耗和污染物排放相对集中的环节。中粮投入大量资金对下属工厂进行清洁生产改造，推广应用节能降耗、减污增效的新技术、新工艺、新设备，努力将传统的"黑烟工厂"转变为环境友好的"花园工厂"。</p>
+
+      <p>在节能减排方面，中粮的重点工厂普遍实施了电机系统节能改造、锅炉烟气余热回收、蒸汽管网优化、LED照明替换等项目。以某大型油脂加工厂为例，通过将传统的工频电机更换为永磁同步变频电机，并加装智能控制系统，根据生产负荷自动调节电机转速，年节约电力超过三百万千瓦时，相当于减少二氧化碳排放两千五百吨。该厂还将锅炉排放的烟气余热用于预热锅炉给水和加热生活用水，将排烟温度从一百八十摄氏度降低到一百摄氏度以下，锅炉热效率提高了五个百分点。</p>
+
+      <p>在污染治理方面，中粮严格执行国家环保排放标准，并主动对标国际先进水平，实施了多项提标改造工程。废水处理方面，中粮的加工厂普遍建设了二级甚至三级污水处理设施，采用厌氧发酵、好氧生物处理、膜过滤等组合工艺，将生产废水处理到优于国家排放标准的水平。部分处理后的中水还回用于厂区绿化、道路冲洗和冷却塔补水，实现了水资源的循环利用。废气治理方面，对于油脂加工过程中产生的异味气体，中粮采用了生物滤池、活性炭吸附、等离子净化等多种技术进行治理，有效解决了困扰行业多年的"臭气扰民"难题。</p>
+
+      <p>在固废利用方面，中粮积极探索粮油加工副产物的高值化利用途径。大豆加工产生的豆粕，是优质的蛋白饲料原料；米糠经过压榨和精炼，可以制得营养价值很高的米糠油；玉米加工产生的玉米芯、玉米皮，可以用于生产木糖醇、糠醛、生物质燃料等产品。通过发展循环经济，中粮将传统意义上的"废物"变成了"资源"，既减少了环境污染，又创造了经济效益。</p>
+
+      <h2>三、低碳农业：从田间开始减少碳足迹</h2>
+      <p>农业既是温室气体的排放源，也是重要的碳汇。据联合国粮农组织估计，全球农业部门的温室气体排放量占总排放量的约百分之十到百分之十二。因此，推动农业领域的绿色低碳转型，对于实现碳中和目标至关重要。中粮从种植端入手，通过推广节水灌溉、保护性耕作、精准施肥、生物防治等技术，帮助合作农户减少农业生产过程中的碳排放。</p>
+
+      <p>保护性耕作是一种颠覆传统农业耕作方式的新技术。它通过免耕或少耕、秸秆覆盖还田、轮作休耕等措施，减少土壤扰动，增加土壤有机质含量，从而提高土壤的固碳能力。研究表明，采用保护性耕作十年以上的农田，土壤有机碳含量可以提高百分之二十到百分之三十，相当于每亩每年固碳零点二到零点三吨。中粮在东北、华北等粮食主产区积极推广保护性耕作技术，为合作农户提供免耕播种机具补贴和技术培训服务，累计推广面积超过五百万亩。</p>
+
+      <p>在水稻种植领域，中粮推广了节水抗旱稻和旱直播技术。传统的水稻种植需要长期保持水层，不仅耗水量大，而且在淹水条件下还会产生大量的甲烷排放。节水抗旱稻具有根系发达、耐旱性强的特点，可以在旱地或轻度灌溉条件下生长，耗水量仅为传统水稻的三分之一到二分之一，甲烷排放也大幅降低。中粮在安徽、湖北等省份建立了节水抗旱稻示范基地，通过对比种植展示，让农民亲眼看到新技术的优势，带动了越来越多的农户主动采用。</p>
+
+      <h2>四、绿色包装：减少塑料污染</h2>
+      <p>粮油食品的包装废弃物，特别是塑料包装，是当前环境污染的重要来源之一。中粮积极响应国家"禁塑令"要求，在包装材料减量化、可循环、可降解方面进行了大量探索。</p>
+
+      <p>在减量化方面，中粮通过优化包装结构设计和采用高强度薄壁材料，在不降低包装保护性能的前提下，减少了塑料的使用量。例如，某款五升装食用油的塑料瓶，经过结构优化和材料升级，瓶身重量从一百二十克降低到九十五克，单瓶减塑百分之二十一，按年销量计算，全年可减少塑料使用上千吨。</p>
+
+      <p>在可循环方面，中粮与零售渠道合作，探索粮油产品的循环包装模式。在某城市的试点项目中，消费者在购买桶装油时可以选择支付押金租用可循环使用的标准油桶，用完后将空桶退回门店，即可取回押金。退回的油桶经过专业清洗、消毒、检测后再次灌装使用，理论上可以循环使用数十次。这种模式虽然增加了物流和管理的复杂性，但从全生命周期来看，大幅减少了一次性包装的资源消耗和废弃物产生。</p>
+
+      <p>在可降解方面，中粮与材料供应商合作，开发了以植物淀粉、纤维素等可再生资源为原料的生物基包装材料。这些材料在堆肥条件下可以在数月内完全降解为水和二氧化碳，不会像传统塑料那样在环境中长期残留。目前，中粮已经在部分小包装产品上试点应用了生物基塑料，未来随着材料成本的进一步下降，应用范围将逐步扩大。</p>
+
+      <h2>五、面向未来：绘制碳中和路线图</h2>
+      <p>实现碳中和是一场广泛而深刻的经济社会系统性变革，不可能一蹴而就，需要持之以恒、久久为功。中粮已经制定了面向2060年的碳中和路线图，明确了各阶段的减排重点和关键举措。</p>
+
+      <p>近期，中粮将重点推进现有产能的节能降碳改造，通过设备升级、工艺优化、能源管理精细化，进一步降低单位产值的能耗和碳排放强度。同时，中粮将大力发展清洁能源，在具备条件的工厂和粮库建设分布式光伏发电系统，利用厂房屋顶和粮库罩棚面积，实现"自发自用、余电上网"。</p>
+
+      <p>中期，中粮将深入推进产业结构优化，淘汰落后产能，发展高附加值、低能耗的新兴业务。生物基材料、功能性食品、精准营养等领域，既是市场需求增长的方向，也是低碳转型的重点。中粮还将积极布局碳捕集、利用与封存技术，探索在生物质能源生产过程中实现负排放的可能性。</p>
+
+      <p>远期，中粮将全面实现生产运营的电气化，以可再生能源电力替代化石能源，最终达成净零排放。同时，中粮还将通过参与林业碳汇项目、投资海洋碳汇等方式，抵消难以完全消除的残余排放，为实现国家碳中和目标贡献中粮力量。</p>
+
+      <p>绿水青山就是金山银山。中粮坚信，只有尊重自然、顺应自然、保护自然，才能实现企业的可持续发展，才能为子孙后代留下一个天蓝、地绿、水清的美丽家园。</p>
+    </div>
+  </div>
+</div>
+
+<script src="特效/飘雪/js/index.js"></script>
+
+<style>
+.latest-news-section {
+  position: relative;
+  z-index: 1;
+  padding: 4rem 1rem;
+  background: linear-gradient(180deg, #f0f4f8 0%, #e8eef5 100%);
+}
+.latest-news-section .news-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.latest-news-section .news-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+.latest-news-section .news-subtitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #c9302c;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+}
+.latest-news-section .news-subtitle span {
+  font-size: 0.5rem;
+}
+.latest-news-section .news-title {
+  font-size: 1.9rem;
+  color: #0f1f3d;
+  font-weight: 700;
+}
+.latest-news-section .news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+.latest-news-section .news-card {
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,0.65);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(31,38,80,0.08);
+  display: flex;
+  flex-direction: column;
+}
+.latest-news-section .news-card-image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+.latest-news-section .news-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.latest-news-section .news-card-body {
+  padding: 1.4rem 1.3rem 0.6rem;
+  flex: 1;
+}
+.latest-news-section .news-card-body h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a3a6e;
+  margin-bottom: 0.5rem;
+  line-height: 1.45;
+}
+.latest-news-section .news-card-body p {
+  font-size: 0.92rem;
+  color: #4a5568;
+  line-height: 1.7;
+  margin: 0;
+}
+.latest-news-section .news-card-footer {
+  padding: 0 1.3rem 1.1rem;
+  font-size: 0.85rem;
+  color: #8899aa;
+}
+@media(max-width:768px){
+  .latest-news-section .news-title { font-size: 1.5rem; }
+}
+</style>
+<section class="latest-news-section">
+  <div class="news-container">
+    <div class="news-header">
+      <div class="news-subtitle"><span>&#9679;</span> 行业前沿</div>
+      <h2 class="news-title">洞察粮农趋势，引领产业未来</h2>
+    </div>
+    <div class="news-grid">
+      <div class="news-card">
+        <div class="news-card-image"><img src="assets/images/blog-smart-agriculture-drone.jpg" alt="智慧农业"></div>
+        <div class="news-card-body">
+          <h3>数字农田：智慧农业重塑耕种方式</h3>
+          <p>无人机巡田、卫星遥感与物联网传感器的深度融合，让每一寸土地的管理都进入厘米级精准时代，产量与品质同步跃升。</p>
+        </div>
+        <div class="news-card-footer">2025年05月15日</div>
+      </div>
+      <div class="news-card">
+        <div class="news-card-image"><img src="assets/images/blog-quality-lab-inspection.jpg" alt="品质检测"></div>
+        <div class="news-card-body">
+          <h3>从田间到舌尖：全链路品质守护</h3>
+          <p>依托全球领先的检测实验室与标准化加工基地，建立覆盖原料采购、生产加工、仓储物流的全流程质量追溯网络。</p>
+        </div>
+        <div class="news-card-footer">2025年06月02日</div>
+      </div>
+      <div class="news-card">
+        <div class="news-card-image"><img src="assets/images/blog-green-eco-farm.jpg" alt="绿色农业"></div>
+        <div class="news-card-body">
+          <h3>绿色低碳：可持续农业的中国方案</h3>
+          <p>推进生态农业、循环农业与清洁能源应用，在保障粮食产量的同时守护碧水蓝天，为全球农业可持续发展贡献力量。</p>
+        </div>
+        <div class="news-card-footer">2025年07月18日</div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

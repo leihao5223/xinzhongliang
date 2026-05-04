@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文章详情 - 中粮天下</title>
+    <link rel="stylesheet" href="assets/css/main.css?v=zhongliang5">
+    <link rel="stylesheet" href="assets/css/responsive.css?v=zhongliang5">
+    <link rel="stylesheet" href="assets/css/steris-effects.css?v=18">
+    <link rel="icon" href="assets/images/zhongliang-favicon.svg?v=1" type="image/svg+xml">
+<style>
+    .banner-inner-video {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.75;
+    }
+    .banner-inner-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: linear-gradient(180deg, rgba(11,17,24,0.35) 0%, rgba(11,17,24,0.75) 100%);
+    }
+    .banner-inner .hero-container {
+      position: relative;
+      z-index: 2;
+    }
+    .banner-inner .effect-hud {
+      z-index: 3;
+    }
+    </style>
+</head>
+<body>
+    <!-- 全局顶部HUD扫描线 -->
+    <div class="effect-top-hud"></div>
+    <!-- Header Section（全局统一：与首页同构 + 全站「页面」入口） -->
+    <header>
+        <div class="header-container">
+
+            <!-- Header Info -->
+            <div class="header-info-wrapper">
+                <div class="hero-container">
+                    <div class="header-info-container">
+                        <div class="header-info">
+                            <div class="header-info-item">
+                                <i class="fa-solid fa-envelope accent-color"></i>
+                                <span class="header-info-text">ir@cofco.com</span>
+                            </div>
+                            <div class="header-info-item">
+                                <i class="fa-solid fa-phone accent-color"></i>
+                                <span class="header-info-text">+86-10-85006688</span>
+                            </div>
+                        </div>
+                        <div class="header-social">
+                            <a href="#" class="social-icon">
+                                <i class="fa-brands fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="social-icon">
+                                <i class="fa-brands fa-instagram"></i>
+                            </a>
+                            <a href="#" class="social-icon">
+                                <i class="fa-brands fa-twitter"></i>
+                            </a>
+                            <a href="#" class="social-icon">
+                                <i class="fa-brands fa-youtube"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Header Navbar -->
+            <div class="header-navbar-fixed index-glass-navbar">
+                <div class="hero-container">
+                    <nav class="navbar navbar-expand-lg">
+                        <div class="container-fluid p-0">
+                            <div class="logo-container header-logo">
+                                <a class="navbar-brand" href="index.html"><img src="assets/images/zhongliang-logo-light.svg" class="img-fluid" alt="中粮天下"></a>
+                            </div>
+                            <div class="nav-link-wrapper">
+                                <button class="btn nav-btn" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                                aria-controls="navbarNav" aria-expanded="false" aria-label="切换导航">
+                                    <i class="fa-solid fa-bars"></i>
+                                </button>
+                                <div class="collapse navbar-collapse" id="navbarNav">
+                                    <ul class="navbar-nav">
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="index.html">首页</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="about.html">公司介绍</a>
+                                        </li>
+                                        <li class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                                交易中心 <i class="fa-solid fa-angle-down"></i>
+                                            </a>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="product.html">交易中心</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                                资讯 <i class="fa-solid fa-angle-down"></i>
+                                            </a>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="blog.html">资讯列表</a></li>
+                                                <li><a class="dropdown-item" href="single-post.html">文章详情</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                                个人主页 <i class="fa-solid fa-angle-down"></i>
+                                            </a>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="personal-home.html">个人主页</a></li>
+                                                <li><a class="dropdown-item" href="contact.html">联系我们</a></li>
+                                                <li><a class="dropdown-item" href="case-studies.html">合作专题</a></li>
+                                                <li><a class="dropdown-item" href="faq.html">常见问题</a></li>
+                                                <li><a class="dropdown-item" href="team.html">团队介绍</a></li>
+                                                <li><a class="dropdown-item" href="admin-console.html">后台控台</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="navbar-cta-container d-flex flex-row align-items-center gspace-2">
+                                <a href="login.html" class="btn btn-nav-login-green">账号登录</a>
+                                <a href="contact.html" class="btn btn-animated btn-animated--post-3 btn-nav-contact">
+                                    <span>联系客服</span>
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar Section -->
+    <aside>
+        <div class="sidebar-overlay"></div>
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container sidebar-logo">
+                    <img src="assets/images/zhongliang-logo-dark.svg" alt="中粮天下" class="img-fluid">
+                </div>
+                <button class="close-btn btn-white-accent"><span>关</span></button>
+            </div>
+            <ul class="menu">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="about.html">公司介绍</a></li>
+                <li class="sidebar-dropdown">
+                    <div class="dropdown-header">
+                        <a href="#">交易中心</a>
+                        <button class="sidebar-dropdown-btn"><i class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                    <ul class="sidebar-dropdown-menu">
+                        <li><a href="product.html">交易中心</a></li>
+                    </ul>
+                </li>
+                <li class="sidebar-dropdown">
+                    <div class="dropdown-header">
+                        <a href="#">资讯</a>
+                        <button class="sidebar-dropdown-btn"><i class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                    <ul class="sidebar-dropdown-menu">
+                        <li><a href="blog.html">资讯列表</a></li>
+                        <li><a href="single-post.html">文章详情</a></li>
+                    </ul>
+                </li>
+                <li class="sidebar-dropdown">
+                    <div class="dropdown-header">
+                        <a href="#">个人主页</a>
+                        <button class="sidebar-dropdown-btn"><i class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                    <ul class="sidebar-dropdown-menu">
+                        <li><a href="personal-home.html">个人主页</a></li>
+                        <li><a href="contact.html">联系我们</a></li>
+                        <li><a href="case-studies.html">合作专题</a></li>
+                        <li><a href="faq.html">常见问题</a></li>
+                        <li><a href="team.html">团队介绍</a></li>
+                        <li><a href="admin-console.html">后台控台</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </aside>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Main Section -->
+    <main>
+        <section class="section banner-inner" style="position:relative;overflow:hidden;">
+        <video class="banner-inner-video" autoplay muted loop playsinline>
+            <source src="https://videos.pexels.com/video-files/2018463/2018463-hd_1920_1080_30fps.mp4" type="video/mp4">
+        </video>
+        <div class="banner-inner-overlay"></div>
+            <div class="effect-particles-bg" data-count="14" style="z-index:1;"></div>
+            <div class="effect-hud" aria-hidden="true" style="opacity:0.35;">
+                <div class="effect-hud__scanlines"></div>
+                <div class="effect-hud__corners"></div>
+                <div class="effect-hud__status" style="top:16px;left:18px;font-size:0.55rem;gap:1rem;">
+                    <span><span class="effect-hud__dot"></span>系统在线</span>
+                </div>
+            </div>
+            <div class="hero-container">
+                <div class="banner-inner-content">
+                    <h1 class="banner-inner-title effect-glow-text">资讯详情</h1>
+                    <p class="banner-inner-excerpt">洞察粮农趋势，引领产业未来。</p>
+                </div>
+            </div>
+        </section>
+
+        <style>
+        .article-glass-wrap {
+            background: linear-gradient(180deg, #0a0f1c 0%, #0d1b2a 50%, #0a0f1c 100%);
+            padding: 4rem 0 5rem;
+        }
+        .article-glass-card {
+            background: rgba(255,255,255,0.72);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255,255,255,0.65);
+            border-radius: 18px;
+            box-shadow: 0 10px 40px rgba(31,38,80,0.08);
+            overflow: hidden;
+        }
+        .article-glass-card .article-hero {
+            width: 100%;
+            aspect-ratio: 21/9;
+            overflow: hidden;
+            position: relative;
+            background: linear-gradient(135deg, #071523, #0f2741);
+        }
+        .article-glass-card .article-hero img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .article-glass-card .article-hero .article-hero-fallback {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            color: #eaf4ff;
+        }
+        .article-glass-card .article-hero .article-hero-fallback img {
+            width: auto;
+            height: 64px;
+            object-fit: contain;
+        }
+        .article-glass-card .article-hero .article-hero-fallback span {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+        }
+        .article-glass-body {
+            padding: 2.2rem 2.4rem 2.8rem;
+        }
+        .article-glass-body .article-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.9rem;
+            color: #556677;
+            text-decoration: none;
+            margin-bottom: 1.2rem;
+            transition: color 0.3s ease;
+        }
+        .article-glass-body .article-back:hover { color: #0f1f3d; }
+        .article-glass-body h1 {
+            font-size: 1.9rem;
+            color: #0f1f3d;
+            font-weight: 700;
+            margin: 0 0 0.8rem;
+            line-height: 1.35;
+        }
+        .article-glass-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: #8899aa;
+            margin-bottom: 1.8rem;
+        }
+        .article-glass-meta span { display: inline-flex; align-items: center; gap: 0.35rem; }
+        .article-glass-content {
+            font-size: 1.05rem;
+            color: #2a2a2a;
+            line-height: 1.8;
+        }
+        .article-glass-content p {
+            margin-bottom: 1.2rem;
+            text-indent: 2em;
+        }
+        .article-glass-content h2 {
+            font-size: 1.3rem;
+            color: #1a3a6e;
+            border-left: 4px solid #c9302c;
+            padding-left: 0.8rem;
+            margin: 1.8rem 0 1rem;
+            line-height: 1.4;
+        }
+        .article-glass-content ul {
+            margin: 1rem 0 1.5rem 1.5rem;
+            color: #2a2a2a;
+        }
+        .article-glass-content ul li { margin-bottom: 0.5rem; }
+        .article-glass-content strong { color: #0f1f3d; }
+        @media (max-width: 768px) {
+            .article-glass-body { padding: 1.4rem 1.2rem 1.8rem; }
+            .article-glass-body h1 { font-size: 1.5rem; }
+            .article-glass-card .article-hero { aspect-ratio: 16/9; }
+        }
+        </style>
+
+        <section class="section article-glass-wrap">
+            <div class="hero-container">
+                <div class="row row-cols-lg-3 row-cols-md-1 row-cols-1 grid-spacer-3">
+                    <div class="col col-lg-8">
+                        <article class="article-glass-card animate-box animated animate__animated" data-animate="animate__fadeInUp">
+                            <div class="article-hero" id="article-hero-img">
+                                <div class="article-hero-fallback">
+                                    <img src="assets/images/zhongliang-logo-light.svg" alt="中粮天下">
+                                    <span>中粮天下</span>
+                                </div>
+                            </div>
+                            <div class="article-glass-body">
+                                <a href="blog.html" class="article-back"><i class="fa-solid fa-arrow-left"></i> 返回资讯列表</a>
+                                <h1>保供稳价与民生保障的中粮实践</h1>
+                                <div class="article-glass-meta">
+                                    <span><i class="fa-solid fa-calendar accent-color"></i> 2025年06月02日</span>
+                                    <span><i class="fa-solid fa-user accent-color"></i> 中粮集团研究院</span>
+                                </div>
+                                <div class="article-glass-content">
+                                    <p>中粮集团始终把保障国家粮食安全放在首位，统筹推进国内农业增产与全球粮源拓展，增强我国粮食供应链韧性。作为国有骨干企业，中粮深刻认识到粮食安全是“国之大者”，在复杂多变的国际环境下，持续强化从田间到餐桌的全产业链布局。</p>
+                                    <h2>全产业链协同，筑牢稳价根基</h2>
+                                    <p>依托覆盖全球主要粮食产区的采购网络，中粮建立了“产地直采 + 战略储备 + 动态调运”的三级响应机制。当市场出现异常波动时，能够在72小时内完成关键品类的全国调拨，有效平抑区域性价格异动。</p>
+                                    <p>在加工端，中粮旗下米面油、肉制品、乳品等加工基地实行“产能弹性调度”，根据市场需求动态调整开机率，确保终端货架不断供、价格不异动。</p>
+                                    <h2>科技赋能，提升供给效率</h2>
+                                    <p>近年来，中粮持续加大农业科技投入，推动数字农业、智慧仓储与智能物流的深度融合。通过卫星遥感监测作物长势、物联网传感器实时采集仓储温湿度、区块链溯源系统记录全链路信息，实现了粮食流通的透明化与高效化。</p>
+                                    <ul>
+                                        <li>卫星遥感覆盖主产区面积超过 <strong>5000万亩</strong></li>
+                                        <li>智能仓储库容占比提升至 <strong>35%</strong></li>
+                                        <li>粮食品质检测自动化率超过 <strong>90%</strong></li>
+                                    </ul>
+                                    <h2>绿色转型，守护可持续未来</h2>
+                                    <p>在保障供给的同时，中粮积极推进绿色低碳转型。从推广节水灌溉技术、减少化肥农药使用，到优化物流线路降低碳排放，再到开发植物基食品等新兴品类，中粮致力于在粮食安全与生态保护之间找到最佳平衡点。</p>
+                                    <p>如需转载、引用或商务合作，请遵循中粮集团品牌与知识产权相关规定，并优先通过官方渠道确认信息准确性。</p>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                    <div class="col col-lg-4">
+                        <div class="d-flex flex-column gspace-3">
+                            <div class="card card-post animate-box animated animate__animated" data-animate="animate__fadeInUp">
+                                <h3>最新文章</h3>
+                                <div class="recent-blog-list">
+                                    <a href="single-post.html" class="recent-blog-item">
+                                        <img src="assets/images/blog-smart-agriculture-drone.jpg" alt="博客配图">
+                                        <div class="recent-blog-content">
+                                            <h6 class="recent-blog-heading">数字农田：智慧农业重塑耕种方式</h6>
+                                            <span class="recent-blog-date"><i class="fa-solid fa-calendar accent-color"></i> 2025年06月02日</span>
+                                        </div>
+                                    </a>
+                                    <a href="single-post.html" class="recent-blog-item">
+                                        <img src="assets/images/blog-quality-lab-inspection.jpg" alt="博客配图">
+                                        <div class="recent-blog-content">
+                                            <h6 class="recent-blog-heading">从田间到舌尖：全链路品质守护</h6>
+                                            <span class="recent-blog-date"><i class="fa-solid fa-calendar accent-color"></i> 2025年05月28日</span>
+                                        </div>
+                                    </a>
+                                    <a href="single-post.html" class="recent-blog-item">
+                                        <img src="assets/images/blog-green-eco-farm.jpg" alt="博客配图">
+                                        <div class="recent-blog-content">
+                                            <h6 class="recent-blog-heading">绿色低碳：可持续农业的中国方案</h6>
+                                            <span class="recent-blog-date"><i class="fa-solid fa-calendar accent-color"></i> 2025年05月20日</span>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="contact-cta-banner-small animate-box animated animate__animated" data-animate="animate__fadeInUp">
+                                <h3>与中粮合作</h3>
+                                <p class="secondary-accent">稳健、透明、可持续的全产业链合作。</p>
+                                <div><a href="contact.html" class="btn btn-animated btn-animated--post-3"><span>预约咨询</span><i class="fa-solid fa-chevron-right"></i></a></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script>
+    (function() {
+      var content = document.querySelector('.article-glass-content');
+      var hero = document.getElementById('article-hero-img');
+      if (content && hero) {
+        var imgs = content.querySelectorAll('img');
+        if (imgs.length > 0) {
+          var first = imgs[0];
+          var clone = document.createElement('img');
+          clone.src = first.src;
+          clone.alt = first.alt || '文章配图';
+          hero.innerHTML = '';
+          hero.appendChild(clone);
+        }
+      }
+    })();
+    </script>
+    <!-- Footer Section -->
+    <footer>
+        <div class="section-none bg-primary-accent">
+            <div class="d-flex flex-column gspace-0">
+                <div class="footer-container">
+
+                    <!-- Footer Content -->
+                     <div class="footer-content-wrapper">
+                        <div class="hero-container">
+                            <div class="footer-content-container">
+                                <div class="footer-contact-container">
+                                    <div class="contact-info-container">
+                                        <h5>致电我们</h5>
+                                        <div class="d-flex flex-row gspace-1 align-items-center">
+                                            <i class="fa-solid fa-phone contact-icon"></i>
+                                            <p class="footer-contact-text">+86-10-85006688</p>
+                                        </div>
+                                    </div>
+                                    <div class="contact-info-container">
+                                        <h5>电子邮箱</h5>
+                                        <div class="d-flex flex-row gspace-1 align-items-center">
+                                            <i class="fa-solid fa-envelope contact-icon"></i>
+                                            <p class="footer-contact-text">ir@cofco.com</p>
+                                        </div>
+                                    </div>
+                                    <div class="contact-info-container">
+                                        <h5>公司地址</h5>
+                                        <div class="d-flex flex-row gspace-1 align-items-center">
+                                            <i class="fa-solid fa-location-dot contact-icon"></i>
+                                            <p class="footer-contact-text">中国北京市朝阳区</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="footer-info-container">
+                                    <div class="image-container footer-logo">
+                                        <img src="assets/images/zhongliang-logo-light.svg" alt="中粮天下">
+                                    </div>
+                                    <p class="footer-info-text">中粮天下聚焦粮油食品与综合服务，与中粮集团品牌与业务协同。</p>
+                                    <div class="d-flex flex-row gspace-2 align-items-center flex-wrap justify-content-center">
+                                        <a href="about.html" class="footer-link">公司介绍</a>
+                                        <a href="product.html" class="footer-link">交易中心</a>
+                                        <a href="contact.html" class="footer-link">联系我们</a>
+                                        <a href="team.html" class="footer-link">团队介绍</a>
+                                    </div>
+                                    <div class="footer-divider"></div>
+                                    <div class="overflow-hidden">
+                                        <div class="swiper swiper-gallery">
+                                            <div class="swiper-wrapper">
+                                                <div class="swiper-slide">
+                                                    <div class="image-container gallery-image footer-gallery-img">
+                                                        <a href="assets/images/zhongliang-grain-silo.jpg" data-fslightbox="gallery">
+                                                            <img src="assets/images/zhongliang-grain-silo.jpg" alt="页脚图库" class="img-fluid">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="swiper-slide">
+                                                    <div class="image-container gallery-image footer-gallery-img">
+                                                        <a href="assets/images/zhongliang-port-containers.jpg" data-fslightbox="gallery">
+                                                            <img src="assets/images/zhongliang-port-containers.jpg" alt="页脚图库" class="img-fluid">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="swiper-slide">
+                                                    <div class="image-container gallery-image footer-gallery-img">
+                                                        <a href="assets/images/zhongliang-corporate-handshake.jpg" data-fslightbox="gallery">
+                                                            <img src="assets/images/zhongliang-corporate-handshake.jpg" alt="页脚图库" class="img-fluid">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="swiper-slide">
+                                                    <div class="image-container gallery-image footer-gallery-img">
+                                                        <a href="assets/images/advert/field-terraces.jpg" data-fslightbox="gallery">
+                                                            <img src="assets/images/advert/field-terraces.jpg" alt="页脚图库" class="img-fluid">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="swiper-slide">
+                                                    <div class="image-container gallery-image footer-gallery-img">
+                                                        <a href="assets/images/advert/village-aerial.jpg" data-fslightbox="gallery">
+                                                            <img src="assets/images/advert/village-aerial.jpg" alt="页脚图库" class="img-fluid">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="swiper-slide">
+                                                    <div class="image-container gallery-image footer-gallery-img">
+                                                        <a href="assets/images/advert/snow-mountain.jpg" data-fslightbox="gallery">
+                                                            <img src="assets/images/advert/snow-mountain.jpg" alt="页脚图库" class="img-fluid">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="swiper-slide">
+                                                    <div class="image-container gallery-image footer-gallery-img">
+                                                        <a href="assets/images/experienced-gray-haired-businessman-with-a-beard-i-2025-03-25-20-08-46-utc.jpg" data-fslightbox="gallery">
+                                                            <img src="assets/images/experienced-gray-haired-businessman-with-a-beard-i-2025-03-25-20-08-46-utc.jpg" alt="页脚图库" class="img-fluid">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="swiper-slide">
+                                                    <div class="image-container gallery-image footer-gallery-img">
+                                                        <a href="assets/images/confident-leader-2025-04-02-00-33-39-utc.jpg" data-fslightbox="gallery">
+                                                            <img src="assets/images/confident-leader-2025-04-02-00-33-39-utc.jpg" alt="页脚图库" class="img-fluid">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="footer-cta-container">
+                                    <h5>订阅电子报</h5>
+                                    <p class="secondary-accent">订阅邮件，获取首发折扣、动态与资讯。</p>
+                                    <form id="newsletter-form" action="./assets/php/newsletter-form.php" class="form">
+                                        <input type="email" name="newsletter" id="newsletter" placeholder="邮箱" required>
+                                        <button type="submit" class="btn btn-accent btn-accent--alt">订阅</button>
+                                    </form>
+                                    <div id="success-message-footer" class="alert success d-none">
+                                        <p class="form-validaton"><span class="fa-solid fa-check text-success"></span> 提交成功。</p>
+                                    </div>
+                                    <div id="error-message-footer" class="alert failed d-none">
+                                        <p class="form-validaton"><span class="fa-solid fa-times text-danger"></span> 提交失败，请稍后重试。</p>
+                                    </div>
+                                    <h5>关注我们</h5>
+                                    <div class="d-flex flex-row align-items-center gspace-1">
+                                        <a href="#" class="social-icon">
+                                            <i class="fa-brands fa-facebook-f"></i>
+                                        </a>
+                                        <a href="#" class="social-icon">
+                                            <i class="fa-brands fa-instagram"></i>
+                                        </a>
+                                        <a href="#" class="social-icon">
+                                            <i class="fa-brands fa-twitter"></i>
+                                        </a>
+                                        <a href="#" class="social-icon">
+                                            <i class="fa-brands fa-youtube"></i>
+                                        </a>
+                                        <a href="#" class="social-icon">
+                                            <i class="fa-brands fa-weixin"></i>
+                                        </a>
+                                        <a href="#" class="social-icon">
+                                            <i class="fa-brands fa-qq"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                     </div>
+
+                    <!-- Footer Copyright -->
+                    <div class="footer-copyright-wrapper">
+                        <div class="hero-container">
+                            <div class="footer-copyright-container">
+                                <p class="copyright-text">版权所有 © 2026 中粮天下。权威信息请以中粮集团有限公司官网为准。<a href="https://www.cofco.com/" target="_blank" rel="noopener noreferrer">中粮集团官网</a></p>
+                                <div class="legallink-container">
+                                    <a href="#" class="legallink">条款与条件</a>
+                                    <a href="#" class="legallink">隐私政策</a>
+                                    <a href="#" class="legallink">帮助与常见问题</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button type="button" class="zl-chat-fab" id="zl-chat-fab" aria-label="联系客服">
+            <i class="fa-solid fa-headset"></i>
+        </button>
+        <div class="zl-chat-panel" id="zl-chat-panel" aria-label="客服会话窗口">
+            <div class="zl-chat-head">
+                <strong>在线客服</strong>
+                <button type="button" id="zl-chat-close" aria-label="关闭客服会话">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="zl-chat-body">
+                <div id="zl-chat-list"></div>
+            </div>
+            <div class="zl-chat-actions">
+                <input type="text" id="zl-chat-input" placeholder="请输入咨询内容..." />
+                <input type="file" id="zl-chat-file" accept="image/*" style="display:none" />
+                <button type="button" id="zl-chat-file-btn">上传</button>
+                <button type="button" id="zl-chat-send">发送</button>
+            </div>
+        </div>
+        <script>
+        (function () {
+          var TOKEN_KEYS = ['zhongliang_token', 'zl_token', 'token'];
+          var token = TOKEN_KEYS.map(function (k) { return localStorage.getItem(k); }).find(function (v) { return v && String(v).trim(); }) || '';
+          var fab = document.getElementById('zl-chat-fab');
+          var panel = document.getElementById('zl-chat-panel');
+          var closeBtn = document.getElementById('zl-chat-close');
+          var listEl = document.getElementById('zl-chat-list');
+          var inputEl = document.getElementById('zl-chat-input');
+          var sendBtn = document.getElementById('zl-chat-send');
+          var fileInput = document.getElementById('zl-chat-file');
+          var fileBtn = document.getElementById('zl-chat-file-btn');
+          if (!fab || !panel) return;
+          var timer = null;
+          var sessionId = '';
+
+          function addBubble(text, role) {
+            if (!listEl) return;
+            var row = document.createElement('div');
+            row.style.marginBottom = '0.45rem';
+            row.style.display = 'flex';
+            row.style.justifyContent = role === 'user' ? 'flex-end' : 'flex-start';
+            row.innerHTML = '<span style="max-width:82%;display:inline-block;padding:.42rem .58rem;border-radius:10px;background:' +
+              (role === 'user' ? 'rgba(45,212,191,.22)' : 'rgba(148,211,255,.2)') +
+              ';color:#e7f4ff;font-size:.8rem;line-height:1.45;">' + text + '</span>';
+            listEl.appendChild(row);
+            listEl.scrollTop = listEl.scrollHeight;
+          }
+
+          async function api(url, opt) {
+            var headers = (opt && opt.headers) ? opt.headers : {};
+            if (token) headers.Authorization = 'Bearer ' + token;
+            var payload = { method: (opt && opt.method) || 'GET', headers: headers };
+            if (opt && opt.json) {
+              headers['Content-Type'] = 'application/json';
+              payload.body = JSON.stringify(opt.json);
+            }
+            var res = await fetch(url, payload);
+            var data = await res.json().catch(function () { return {}; });
+            if (!res.ok) throw new Error(data.message || ('请求失败(' + res.status + ')'));
+            return data;
+          }
+
+          async function openSession() {
+            if (!token) {
+              addBubble('请先登录后再发起实时客服会话。', 'agent');
+              return;
+            }
+            if (sessionId) return;
+            var opened = await api('/api/support/session/open', { method: 'POST', json: { source: 'steris' } });
+            sessionId = opened && opened.session && opened.session.id ? opened.session.id : '';
+            if (sessionId) {
+              addBubble('客服会话已建立，请输入你的问题。', 'agent');
+              await loadMessages();
+              if (timer) clearInterval(timer);
+              timer = setInterval(loadMessages, 3000);
+            }
+          }
+
+          async function loadMessages() {
+            if (!sessionId) return;
+            var data = await api('/api/support/messages?session_id=' + encodeURIComponent(sessionId));
+            if (!listEl) return;
+            listEl.innerHTML = '';
+            (data.list || []).forEach(function (m) {
+              var role = m.sender_role === 'user' ? 'user' : 'agent';
+              var txt = String(m.content || '');
+              addBubble(txt, role);
+            });
+            api('/api/support/messages/read', { method: 'POST', json: { session_id: sessionId } }).catch(function () {});
+          }
+
+          async function sendText() {
+            var val = inputEl && inputEl.value ? inputEl.value.trim() : '';
+            if (!val) return;
+            if (!sessionId) await openSession();
+            if (!sessionId) return;
+            inputEl.value = '';
+            await api('/api/support/messages/send', { method: 'POST', json: { session_id: sessionId, content: val } });
+            await loadMessages();
+          }
+
+          async function sendImage(file) {
+            if (!file) return;
+            if (!sessionId) await openSession();
+            if (!sessionId) return;
+            var reader = new FileReader();
+            reader.onload = async function () {
+              try {
+                var up = await api('/api/support/upload-image', { method: 'POST', json: { imageBase64: reader.result } });
+                var txt = '图片凭证：' + (up.url || '');
+                await api('/api/support/messages/send', { method: 'POST', json: { session_id: sessionId, content: txt } });
+                await loadMessages();
+              } catch (e) {
+                addBubble(e.message || '上传失败', 'agent');
+              }
+            };
+            reader.readAsDataURL(file);
+          }
+
+          function openPanel() { panel.classList.add('is-open'); }
+          function closePanel() {
+            panel.classList.remove('is-open');
+            if (timer) { clearInterval(timer); timer = null; }
+          }
+          fab.addEventListener('click', function () {
+            openPanel();
+            openSession().catch(function (e) { addBubble(e.message || '会话开启失败', 'agent'); });
+          });
+          if (closeBtn) closeBtn.addEventListener('click', closePanel);
+          if (sendBtn) sendBtn.addEventListener('click', function () { sendText().catch(function (e) { addBubble(e.message, 'agent'); }); });
+          if (inputEl) inputEl.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              sendText().catch(function (err) { addBubble(err.message, 'agent'); });
+            }
+          });
+          if (fileBtn && fileInput) fileBtn.addEventListener('click', function () { fileInput.click(); });
+          if (fileInput) fileInput.addEventListener('change', function () { sendImage(fileInput.files && fileInput.files[0]).catch(function (e) { addBubble(e.message, 'agent'); }); });
+          document.querySelectorAll('[data-open-chat]').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+              e.preventDefault();
+              openPanel();
+              openSession().catch(function (err) { addBubble(err.message, 'agent'); });
+            });
+          });
+
+          var dragging = false;
+          var startX = 0;
+          var startY = 0;
+          var originRight = 0;
+          var originBottom = 0;
+          fab.addEventListener('pointerdown', function (e) {
+            dragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            originRight = parseFloat(getComputedStyle(fab).right) || 0;
+            originBottom = parseFloat(getComputedStyle(fab).bottom) || 0;
+            fab.setPointerCapture(e.pointerId);
+          });
+          fab.addEventListener('pointermove', function (e) {
+            if (!dragging) return;
+            var dx = e.clientX - startX;
+            var dy = e.clientY - startY;
+            var nextRight = Math.max(8, originRight - dx);
+            var nextBottom = Math.max(8, originBottom - dy);
+            fab.style.right = nextRight + 'px';
+            fab.style.bottom = nextBottom + 'px';
+            panel.style.right = nextRight + 'px';
+            panel.style.bottom = (nextBottom + 68) + 'px';
+          });
+          fab.addEventListener('pointerup', function () { dragging = false; });
+        })();
+        </script>
+    </footer>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script src="assets/js/vendor/jquery.min.js"></script>
+    <script src="assets/js/vendor/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/vendor/swiper-bundle.min.js"></script>
+    <script src="assets/js/vendor/fslightbox.js"></script>
+    <script src="assets/js/script.js"></script>
+    <script src="assets/js/form-script.js"></script>
+    <script src="assets/js/swiper-script.js"></script>
+    <script src="assets/js/video_embedded.js"></script>
+
+    // Scroll reveal animation
+    (function() {
+      const reveals = document.querySelectorAll('.animate-box, .card, .image-container, .sub-heading, .about-stat-container, .chevron-circle-list, .whychooseus-icon, .whychooseus-feature h3, .whychooseus-feature p, .contact-cta-title, .contact-cta-description, .blog-link, .blog-cta, .blog-meta, .footer-link, .partner-image, .testimonial-avatar');
+      reveals.forEach((el, i) => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'all 0.8s cubic-bezier(0.22, 1, 0.36, 1)';
+        el.style.transitionDelay = (i % 4 * 0.08) + 's';
+      });
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      reveals.forEach(el => observer.observe(el));
+    })();
+
+    <script src="assets/js/zhongliang-animations.js"></script>
+</body>
+</html>

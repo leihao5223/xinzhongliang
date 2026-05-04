@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>全球港口与物流</title>
+  <link rel="stylesheet" href="port-logistics-overlap.css?v=5" />
+</head>
+<body class="port-logistics-embed">
+  <div class="pll-shell">
+    <div class="pll-video-bg pll-shell-backdrop" id="pll-shell-backdrop" aria-hidden="true">
+      <video id="pll-bg-video" class="pll-bg-video" muted loop playsinline preload="metadata">
+        <source id="pll-bg-source" src="" type="video/mp4" />
+      </video>
+      <div id="pll-bg-image" class="pll-bg-image" hidden></div>
+    </div>
+    <div class="pll-grid">
+      <section class="pll-copy">
+        <h2>全球港口与物流</h2>
+        <p>海内外物流与贸易网络协同，提升供应链韧性与交付效率。</p>
+      </section>
+      <div class="pll-overlap-wrap">
+        <div class="pll-carousel-wrap" id="pll-carousel-wrap">
+          <div class="pll-carousel" id="pll-carousel"></div>
+          <div class="pll-nav-arrows" role="group" aria-label="相册切换">
+            <button type="button" id="pll-prev" aria-label="上一张">&#10094;</button>
+            <button type="button" id="pll-next" aria-label="下一张">&#10095;</button>
+          </div>
+          <div class="pll-dots" id="pll-dots" role="tablist" aria-label="相册分页"></div>
+          <div class="pll-progress" id="pll-progress" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="port-logistics-overlap.mjs?v=5"></script>
+</body>
+</html>

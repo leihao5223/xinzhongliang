@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>账号登录 - 中粮天下</title>
+  <link rel="icon" href="assets/images/zhongliang-favicon.svg?v=1" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/vendor/fontawesome.css">
+  <link rel="stylesheet" href="assets/css/vendor/solid.css">
+  <link rel="stylesheet" href="assets/css/vendor/regular.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+    :root {
+      --primary: #1a7a3e;
+      --primary-light: #2ecc71;
+      --gold: #d4a843;
+      --gold-light: #ffd88a;
+      --dark: #1a2e1a;
+      --glass: rgba(255,255,255,0.72);
+      --glass-border: rgba(255,255,255,0.6);
+      --text: #1a2e1a;
+      --text-dim: #5a6b5a;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    html, body {
+      height: 100%;
+      font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+      overflow: hidden;
+      background: linear-gradient(135deg, #e8f5e9, #fff8e1, #f1f8e9, #e8f5e9);
+      background-size: 400% 400%;
+      animation: login-bg-flow 12s ease infinite;
+    }
+    @keyframes login-bg-flow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Video background */
+    .video-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .video-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      background: linear-gradient(135deg, rgba(26,46,26,0.25) 0%, rgba(212,168,67,0.15) 50%, rgba(26,122,62,0.2) 100%);
+      backdrop-filter: blur(2px);
+    }
+
+    /* Floating nature particles */
+    .nature-particles {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .nature-particle {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0;
+      animation: float-particle linear infinite;
+    }
+    @keyframes float-particle {
+      0% { opacity: 0; transform: translateY(100vh) scale(0); }
+      10% { opacity: 0.8; }
+      90% { opacity: 0.8; }
+      100% { opacity: 0; transform: translateY(-20vh) scale(1); }
+    }
+
+    /* Main layout */
+    .login-wrapper {
+      position: relative;
+      z-index: 10;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .login-container {
+      display: grid;
+      grid-template-columns: 1fr 460px;
+      max-width: 1120px;
+      width: 100%;
+      min-height: 600px;
+      background: rgba(255,255,255,0.78);
+      backdrop-filter: blur(20px) saturate(1.3);
+      -webkit-backdrop-filter: blur(20px) saturate(1.3);
+      border: 1px solid rgba(255,255,255,0.5);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow:
+        0 32px 80px rgba(0,0,0,0.15),
+        0 0 0 1px rgba(255,255,255,0.3),
+        inset 0 1px 0 rgba(255,255,255,0.6);
+      animation: card-enter 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes card-enter {
+      from { opacity: 0; transform: translateY(30px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Left panel - nature theme */
+    .login-left {
+      position: relative;
+      padding: 3.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background:
+        linear-gradient(160deg, rgba(26,122,62,0.06) 0%, rgba(212,168,67,0.08) 50%, rgba(26,46,26,0.04) 100%);
+    }
+
+    .login-logo { position: relative; z-index: 1; }
+    .login-logo img { height: 48px; width: auto; }
+
+    .login-hero { position: relative; z-index: 1; }
+    .login-hero h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #1a2e1a 30%, #1a7a3e 70%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .login-hero p {
+      color: var(--text-dim);
+      font-size: 0.95rem;
+      line-height: 1.8;
+      max-width: 380px;
+    }
+
+    .login-stats {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      gap: 2.5rem;
+    }
+    .login-stat { text-align: left; }
+    .login-stat .num {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1;
+    }
+    .login-stat .label {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-top: 0.4rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* Right panel - green form */
+    .login-right {
+      position: relative;
+      padding: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* Flow border effect for right panel */
+    .login-right::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 0 20px 20px 0;
+      padding: 2px;
+      background: linear-gradient(180deg, rgba(26,122,62,0.35), rgba(212,168,67,0.2) 40%, rgba(212,168,67,0.1) 60%, rgba(26,122,62,0.25));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .form-toggle {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.75rem;
+      background: rgba(26,122,62,0.06);
+      border-radius: 12px;
+      padding: 4px;
+    }
+    .form-toggle button {
+      flex: 1;
+      padding: 0.65rem;
+      border: none;
+      background: transparent;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      font-weight: 500;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+    .form-toggle button.active {
+      background: rgba(26,122,62,0.12);
+      color: var(--primary);
+      box-shadow: 0 2px 12px rgba(26,122,62,0.1);
+    }
+
+    .form-panel { display: none; }
+    .form-panel.active { display: block; animation: fadeInUp 0.5s ease; }
+    @keyframes fadeInUp {
+      from { opacity:0; transform: translateY(12px); }
+      to { opacity:1; transform: translateY(0); }
+    }
+
+    .form-group { margin-bottom: 1.1rem; }
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--primary);
+      margin-bottom: 0.35rem;
+      letter-spacing: 0.02em;
+    }
+    .input-wrap {
+      position: relative;
+    }
+    .input-wrap input,
+    .input-wrap textarea {
+      width: 100%;
+      padding: 0.9rem 2.8rem 0.9rem 1rem;
+      background: rgba(240,243,240,0.8);
+      border: 1px solid rgba(26,122,62,0.12);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    .input-wrap input:focus,
+    .input-wrap textarea:focus {
+      border-color: rgba(26,122,62,0.4);
+      background: rgba(255,255,255,0.95);
+      box-shadow: 0 0 0 3px rgba(26,122,62,0.08), 0 4px 12px rgba(26,122,62,0.06);
+    }
+    .input-wrap input::placeholder { color: rgba(90,107,90,0.45); }
+    .input-wrap i {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      pointer-events: none;
+    }
+    .input-wrap .toggle-pw {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      cursor: pointer;
+      pointer-events: auto;
+      transition: color 0.2s;
+    }
+    .input-wrap .toggle-pw:hover { color: var(--primary); }
+
+    .form-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      font-size: 0.8rem;
+    }
+    .form-options label {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--text-dim);
+      cursor: pointer;
+    }
+    .form-options input[type="checkbox"] {
+      width: 14px; height: 14px;
+      accent-color: var(--primary);
+    }
+    .form-options a {
+      color: var(--primary);
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .form-options a:hover { opacity: 0.8; }
+
+    .btn-nature {
+      width: 100%;
+      padding: 0.95rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: inherit;
+      color: #fff;
+      background: linear-gradient(135deg, #1a7a3e, #2ecc71);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 16px rgba(26,122,62,0.25);
+    }
+    .btn-nature:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 28px rgba(26,122,62,0.35);
+    }
+    .btn-nature::after {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+      transform: rotate(30deg) translateX(-100%);
+      transition: transform 0.6s;
+    }
+    .btn-nature:hover::after {
+      transform: rotate(30deg) translateX(100%);
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 1.25rem 0;
+      color: var(--text-dim);
+      font-size: 0.75rem;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(26,122,62,0.12);
+    }
+
+    .social-login {
+      display: flex;
+      gap: 0.75rem;
+    }
+    .social-login button {
+      flex: 1;
+      padding: 0.65rem;
+      background: rgba(240,243,240,0.6);
+      border: 1px solid rgba(26,122,62,0.1);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      font-family: inherit;
+    }
+    .social-login button:hover {
+      background: rgba(26,122,62,0.08);
+      border-color: rgba(26,122,62,0.2);
+      transform: translateY(-1px);
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 1.25rem;
+      font-size: 0.8rem;
+    }
+    .back-link a {
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .back-link a:hover { color: var(--primary); }
+
+    /* Data stream on card */
+    .data-stream {
+      position: absolute;
+      bottom: 18px;
+      left: 28px;
+      right: 28px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.6rem;
+      color: rgba(26,122,62,0.4);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 960px) {
+      .login-container { grid-template-columns: 1fr; min-height: auto; }
+      .login-left { display: none; }
+      .login-right::before { border-radius: 20px; }
+    }
+    @media (max-width: 480px) {
+      .login-wrapper { padding: 1rem; }
+      .login-right { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Nature video background -->
+  <video class="video-bg" autoplay muted loop playsinline poster="assets/images/zhongliang-wheat-field.jpg">
+    <source src="https://videos.pexels.com/video-files/2887908/2887908-uhd_2560_1440_25fps.mp4" type="video/mp4">
+  </video>
+  <div class="video-overlay"></div>
+
+  <!-- Floating nature particles -->
+  <div class="nature-particles" id="nature-particles"></div>
+
+  <!-- Login wrapper -->
+  <div class="login-wrapper">
+    <div class="login-container">
+      <div class="login-left">
+        <div class="login-logo">
+          <img src="assets/images/zhongliang-logo-dark.svg" alt="中粮天下">
+        </div>
+        <div class="login-hero">
+          <h1>忠于国计<br>良于民生</h1>
+          <p>中粮集团数字化产业服务平台，以全球视野与科技力量，守护国家粮食安全，服务人民美好生活。</p>
+        </div>
+        <div class="login-stats">
+          <div class="login-stat">
+            <div class="num">5000+</div>
+            <div class="label">全球协同节点</div>
+          </div>
+          <div class="login-stat">
+            <div class="num">25+</div>
+            <div class="label">年传承发展</div>
+          </div>
+          <div class="login-stat">
+            <div class="num">98%</div>
+            <div class="label">服务满意度</div>
+          </div>
+        </div>
+        <div class="data-stream">
+          <span>LAT 39.9042° N</span>
+          <span>COFCO DIGITAL PLATFORM v2.0</span>
+          <span>LON 116.4074° E</span>
+        </div>
+      </div>
+
+      <div class="login-right">
+        <div class="form-toggle">
+          <button class="active" data-target="signin">账号登录</button>
+          <button data-target="signup">注册账号</button>
+        </div>
+
+        <div class="form-panel active" id="signin">
+          <form onsubmit="event.preventDefault();">
+            <div class="form-group">
+              <label>账号 / 邮箱</label>
+              <div class="input-wrap">
+                <input type="text" placeholder="请输入账号或邮箱" required>
+                <i class="fa-regular fa-envelope"></i>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>密码</label>
+              <div class="input-wrap">
+                <input type="password" id="pw-in" placeholder="请输入密码" required>
+                <i class="fa-regular fa-eye toggle-pw" data-target="pw-in"></i>
+              </div>
+            </div>
+            <div class="form-options">
+              <label><input type="checkbox"> 记住我</label>
+              <a href="#">忘记密码？</a>
+            </div>
+            <button type="submit" class="btn-nature">立即登录</button>
+          </form>
+        </div>
+
+        <div class="form-panel" id="signup">
+          <form onsubmit="event.preventDefault();">
+            <div class="form-group">
+              <label>企业邮箱</label>
+              <div class="input-wrap">
+                <input type="email" placeholder="请输入企业邮箱" required>
+                <i class="fa-regular fa-envelope"></i>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>设置密码</label>
+              <div class="input-wrap">
+                <input type="password" id="pw-up" placeholder="至少8位字符" required>
+                <i class="fa-regular fa-eye toggle-pw" data-target="pw-up"></i>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>确认密码</label>
+              <div class="input-wrap">
+                <input type="password" id="pw-up2" placeholder="再次输入密码" required>
+                <i class="fa-regular fa-eye toggle-pw" data-target="pw-up2"></i>
+              </div>
+            </div>
+            <div class="form-options">
+              <label><input type="checkbox"> 同意服务条款</label>
+            </div>
+            <button type="submit" class="btn-nature">注册账号</button>
+          </form>
+        </div>
+
+        <div class="divider">或通过以下方式</div>
+        <div class="social-login">
+          <button><i class="fa-brands fa-weixin"></i> 微信</button>
+          <button><i class="fa-brands fa-alipay"></i> 支付宝</button>
+          <button><i class="fa-brands fa-apple"></i> Apple</button>
+        </div>
+
+        <div class="back-link">
+          <a href="index.html"><i class="fa-solid fa-arrow-left"></i> 返回首页</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Form toggle
+    document.querySelectorAll('.form-toggle button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.form-toggle button').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.target).classList.add('active');
+      });
+    });
+
+    // Password toggle
+    document.querySelectorAll('.toggle-pw').forEach(icon => {
+      icon.addEventListener('click', () => {
+        const input = document.getElementById(icon.dataset.target);
+        input.type = input.type === 'password' ? 'text' : 'password';
+        icon.classList.toggle('fa-eye');
+        icon.classList.toggle('fa-eye-slash');
+      });
+    });
+
+    // Generate floating nature particles
+    const particlesContainer = document.getElementById('nature-particles');
+    const colors = ['rgba(212,168,67,0.5)', 'rgba(46,204,113,0.4)', 'rgba(255,216,136,0.5)', 'rgba(26,122,62,0.35)'];
+    for (let i = 0; i < 40; i++) {
+      const p = document.createElement('div');
+      p.className = 'nature-particle';
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.width = (3 + Math.random() * 5) + 'px';
+      p.style.height = p.style.width;
+      p.style.background = colors[Math.floor(Math.random() * colors.length)];
+      p.style.boxShadow = `0 0 ${8 + Math.random() * 12}px ${p.style.background}`;
+      p.style.animationDuration = (10 + Math.random() * 15) + 's';
+      p.style.animationDelay = (Math.random() * 12) + 's';
+      particlesContainer.appendChild(p);
+    }
+  </script>
+  <script>
+    // Scroll reveal animation
+    (function() {
+      const reveals = document.querySelectorAll('.animate-box, .card, .image-container, .sub-heading, .about-stat-container, .chevron-circle-list, .whychooseus-icon, .whychooseus-feature h3, .whychooseus-feature p, .contact-cta-title, .contact-cta-description, .blog-link, .blog-cta, .blog-meta, .footer-link, .partner-image, .testimonial-avatar');
+      reveals.forEach((el, i) => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'all 0.8s cubic-bezier(0.22, 1, 0.36, 1)';
+        el.style.transitionDelay = (i % 4 * 0.08) + 's';
+      });
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      reveals.forEach(el => observer.observe(el));
+    })();
+  </script>
+  <script src="assets/js/zhongliang-animations.js"></script>
+</body>
+</html>

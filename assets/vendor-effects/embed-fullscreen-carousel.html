@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>精选轮播</title>
+  <link rel="stylesheet" href="./fullscreen-carousel/css/main.css" />
+  <link rel="stylesheet" href="./fullscreen-carousel/css/demo.css" />
+</head>
+<body class="light">
+  <div class="container">
+    <main>
+      <ul class="slider">
+        <li class="item" style="background-image: url('../images/advert/field-terraces.jpg')">
+          <div class="content">
+            <h2 class="title">大国粮商 · 粮源协同</h2>
+            <p class="description">从田间到餐桌的全产业链布局，服务国家粮食安全与民生消费升级。</p>
+            <button type="button">了解更多</button>
+          </div>
+        </li>
+        <li class="item" style="background-image: url('../images/zhongliang-port-containers.jpg')">
+          <div class="content">
+            <h2 class="title">全球港口与物流</h2>
+            <p class="description">海内外物流与贸易网络协同，提升供应链韧性与交付效率。</p>
+            <button type="button">了解更多</button>
+          </div>
+        </li>
+        <li class="item" style="background-image: url('../images/zhongliang-grain-silo.jpg')">
+          <div class="content">
+            <h2 class="title">储备与精深加工</h2>
+            <p class="description">粮油糖棉肉乳等主业高质量发展，质量与可追溯体系建设。</p>
+            <button type="button">了解更多</button>
+          </div>
+        </li>
+        <li class="item" style="background-image: url('../images/zhongliang-supermarket-grocery.jpg')">
+          <div class="content">
+            <h2 class="title">民生消费与渠道</h2>
+            <p class="description">以可靠品牌矩阵服务美好生活，稳价保供与乡村振兴协同。</p>
+            <button type="button">了解更多</button>
+          </div>
+        </li>
+      </ul>
+      <nav class="nav">
+        <ion-icon class="btn prev" name="arrow-back-outline"></ion-icon>
+        <ion-icon class="btn next" name="arrow-forward-outline"></ion-icon>
+      </nav>
+    </main>
+  </div>
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  <script>
+    const slider = document.querySelector(".slider");
+    function activate(e) {
+      const items = document.querySelectorAll(".item");
+      e.target.matches(".next") && slider.append(items[0]);
+      e.target.matches(".prev") && slider.prepend(items[items.length - 1]);
+    }
+    document.addEventListener("click", activate, false);
+  </script>
+</body>
+</html>

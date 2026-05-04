@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>中粮天下 - 品牌广告</title>
+  <link rel="icon" href="assets/images/zhongliang-favicon.svg?v=1" type="image/svg+xml">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@300;400;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: #000;
+      overflow: hidden;
+      font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+    }
+
+    /* ========== 顶部：完整视频播放（与首页区分，使用站内 intro 片源） ========== */
+    .advert-top-play {
+      position: fixed;
+      top: 1.1rem;
+      right: 1.1rem;
+      z-index: 120;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      background: rgba(0, 0, 0, 0.45);
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      backdrop-filter: blur(8px);
+      transition: background 0.25s ease, transform 0.2s ease, border-color 0.2s ease;
+    }
+    .advert-top-play:hover {
+      background: rgba(26, 122, 62, 0.55);
+      border-color: rgba(255, 255, 255, 0.65);
+      transform: scale(1.06);
+    }
+    .advert-fullscreen-video-wrap {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0, 0, 0, 0.92);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1rem 1rem;
+    }
+    .advert-fullscreen-video-wrap.is-open {
+      display: flex;
+    }
+    .advert-fullscreen-video-wrap video {
+      width: 100%;
+      max-width: min(1200px, 96vw);
+      max-height: min(85vh, 900px);
+      border-radius: 10px;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+    }
+    .advert-fullscreen-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      z-index: 201;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-size: 1.5rem;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s ease;
+    }
+    .advert-fullscreen-close:hover {
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    /* ========== 开场黑幕 ========== */
+    .black-open {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .black-open.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .black-open img {
+      height: clamp(70px, 12vh, 140px);
+      width: auto;
+      opacity: 0;
+      transform: scale(0.85);
+      animation: logoBreath 3s ease forwards;
+    }
+    @keyframes logoBreath {
+      0%   { opacity: 0; transform: scale(0.85); }
+      40%  { opacity: 1; transform: scale(1); }
+      100% { opacity: 0.85; transform: scale(1); }
+    }
+
+    /* ========== 场景容器 ========== */
+    .scene {
+      position: fixed;
+      inset: 0;
+      width: 100%; height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 2s cubic-bezier(0.22, 1, 0.36, 1);
+      z-index: 1;
+    }
+    .scene.active {
+      opacity: 1;
+      z-index: 2;
+    }
+
+    /* 背景媒体 */
+    .scene video.scene-media {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+    .scene .scene-media.img {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      background-size: cover;
+      background-position: center;
+      transition: transform 10s ease;
+      z-index: 0;
+    }
+    .scene.active .scene-media.img {
+      transform: scale(1.1);
+    }
+
+    /* 暗化遮罩 */
+    .scene-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 1;
+    }
+    .scene-overlay.dark {
+      background: rgba(0,0,0,0.58);
+    }
+
+    /* ========== 文案层 ========== */
+    .scene-text {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      color: #fff;
+      max-width: 85vw;
+      padding: 2rem;
+    }
+
+    .scene-text .line-main {
+      font-size: clamp(2.2rem, 5.5vw, 5rem);
+      font-family: 'Ma Shan Zheng', cursive, 'Noto Sans SC', sans-serif;
+      font-weight: 400;
+      letter-spacing: 0.18em;
+      line-height: 1.5;
+      text-shadow:
+        0 4px 30px rgba(0,0,0,0.7),
+        0 0 80px rgba(0,0,0,0.5),
+        0 0 120px rgba(0,0,0,0.2);
+      opacity: 0;
+      transform: translateY(40px);
+      transition: all 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .scene-text .line-sub {
+      font-size: clamp(1rem, 2.2vw, 1.6rem);
+      font-family: 'Noto Sans SC', sans-serif;
+      font-weight: 300;
+      letter-spacing: 0.3em;
+      line-height: 1.8;
+      margin-top: 1.2rem;
+      color: rgba(255,255,255,0.85);
+      text-shadow: 0 2px 16px rgba(0,0,0,0.6);
+      opacity: 0;
+      transform: translateY(25px);
+      transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.3s;
+    }
+    .scene.active .line-main.visible,
+    .scene.active .line-sub.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* LOGO 容器 */
+    .logo-wrap {
+      position: relative;
+      z-index: 2;
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      transform: scale(0.9) translateY(20px);
+      transition: all 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .scene.active .logo-wrap.visible {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+    .logo-wrap img {
+      height: clamp(55px, 9vh, 110px);
+      width: auto;
+      filter: drop-shadow(0 4px 20px rgba(0,0,0,0.5));
+    }
+
+    /* ========== 结尾特殊样式 ========== */
+    .ending-slogan {
+      font-size: clamp(3.5rem, 9vw, 8rem);
+      font-family: 'Ma Shan Zheng', cursive;
+      letter-spacing: 0.35em;
+      text-shadow:
+        0 6px 50px rgba(0,0,0,0.85),
+        0 0 120px rgba(0,0,0,0.5),
+        0 0 200px rgba(255,255,255,0.06);
+      opacity: 0;
+      transform: translateY(50px) scale(0.95);
+      transition: all 2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .ending-sub {
+      font-size: clamp(1rem, 2.5vw, 1.8rem);
+      font-family: 'Noto Sans SC', sans-serif;
+      font-weight: 300;
+      letter-spacing: 0.6em;
+      margin-top: 1.8rem;
+      color: rgba(255,255,255,0.75);
+      text-shadow: 0 2px 20px rgba(0,0,0,0.6);
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 1.5s cubic-bezier(0.22, 1, 0.36, 1) 0.5s;
+    }
+    .scene.active .ending-slogan.visible,
+    .scene.active .ending-sub.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    /* ========== 装饰 ========== */
+    .divider-line {
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+      margin: 1.5rem auto;
+      opacity: 0;
+      transition: opacity 1s ease 0.6s;
+    }
+    .scene.active .divider-line.visible {
+      opacity: 1;
+    }
+
+    /* ========== 进度条 ========== */
+    .progress-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #1a7a3e, #2ecc71, #1a7a3e);
+      background-size: 200% 100%;
+      z-index: 50;
+      transition: width 0.3s linear;
+      box-shadow: 0 0 12px rgba(26,122,62,0.4);
+      animation: progressShine 3s linear infinite;
+    }
+    @keyframes progressShine {
+      0% { background-position: 0% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    /* ========== 控制按钮 ========== */
+    .controls {
+      position: fixed;
+      bottom: 1.8rem;
+      right: 1.8rem;
+      z-index: 50;
+      display: flex;
+      gap: 0.6rem;
+    }
+    .controls button {
+      padding: 0.45rem 1rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: rgba(255,255,255,0.7);
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.78rem;
+      letter-spacing: 0.05em;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(4px);
+    }
+    .controls button:hover {
+      background: rgba(255,255,255,0.18);
+      color: #fff;
+      border-color: rgba(255,255,255,0.35);
+    }
+
+    /* ========== 配音文案面板 ========== */
+    .script-panel {
+      position: fixed;
+      bottom: 1.8rem;
+      left: 1.8rem;
+      z-index: 50;
+      max-width: 320px;
+    }
+    .script-toggle {
+      padding: 0.4rem 0.9rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.5);
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(4px);
+    }
+    .script-toggle:hover {
+      background: rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.8);
+    }
+    .script-content {
+      display: none;
+      margin-top: 0.6rem;
+      padding: 1rem 1.2rem;
+      background: rgba(0,0,0,0.75);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      backdrop-filter: blur(12px);
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.8;
+      max-height: 220px;
+      overflow-y: auto;
+      letter-spacing: 0.02em;
+    }
+    .script-content.show {
+      display: block;
+      animation: fadeUp 0.4s ease;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .script-content strong {
+      color: rgba(255,255,255,0.9);
+      font-weight: 500;
+    }
+    .script-content em {
+      color: rgba(26,122,62,0.9);
+      font-style: normal;
+    }
+
+    /* ========== 颗粒感叠加 ========== */
+    .grain {
+      position: fixed;
+      inset: 0;
+      z-index: 49;
+      opacity: 0.035;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* ========== 光晕装饰 ========== */
+    .glow-orb {
+      position: absolute;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(26,122,62,0.08) 0%, transparent 70%);
+      z-index: 1;
+      pointer-events: none;
+      animation: orbFloat 8s ease-in-out infinite alternate;
+    }
+    @keyframes orbFloat {
+      0%   { transform: translate(-30%, -20%) scale(1); }
+      100% { transform: translate(30%, 20%) scale(1.2); }
+    }
+
+    /* ========== 响应式 ========== */
+    @media (max-width: 768px) {
+      .scene-text .line-main {
+        font-size: clamp(1.6rem, 7vw, 2.8rem);
+        letter-spacing: 0.1em;
+      }
+      .scene-text .line-sub {
+        font-size: clamp(0.85rem, 3.5vw, 1.1rem);
+        letter-spacing: 0.15em;
+      }
+      .ending-slogan {
+        font-size: clamp(2.5rem, 12vw, 4rem);
+        letter-spacing: 0.2em;
+      }
+      .controls {
+        bottom: 1rem;
+        right: 1rem;
+      }
+      .script-panel {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <button type="button" class="advert-top-play" id="advert-top-play" aria-label="播放完整宣传视频" title="完整视频">▶</button>
+  <div class="advert-fullscreen-video-wrap" id="advert-fullscreen-video-wrap" role="dialog" aria-modal="true" aria-label="宣传视频全屏播放">
+    <button type="button" class="advert-fullscreen-close" id="advert-fullscreen-close" aria-label="关闭视频">×</button>
+    <video id="advert-fullscreen-video" controls playsinline preload="metadata" src="assets/videos/intro.mp4"></video>
+  </div>
+
+  <!-- ===== 开场黑幕 ===== -->
+  <div class="black-open" id="black-open">
+    <div style="text-align:center;">
+      <img src="assets/images/zhongliang-logo-light.svg" alt="中粮天下">
+      <div style="margin-top:1.5rem;color:rgba(255,255,255,0.35);font-size:0.8rem;letter-spacing:0.4em;font-family:'Noto Sans SC',sans-serif;">品牌广告</div>
+    </div>
+  </div>
+
+  <!-- 颗粒纹理 -->
+  <div class="grain"></div>
+
+  <!-- ===== 场景一：自然广袤 ===== -->
+  <div class="scene" id="scene-0">
+    <video class="scene-media" id="vid-0" autoplay muted loop playsinline>
+      <source src="assets/videos/intro.mp4" type="video/mp4">
+    </video>
+    <div class="scene-overlay"></div>
+    <div class="glow-orb" style="top:20%;left:50%;"></div>
+    <div class="scene-text">
+      <div class="logo-wrap" id="logo-0">
+        <img src="assets/images/zhongliang-logo-light.svg" alt="中粮天下">
+      </div>
+      <div class="line-main" id="line-0-0">从广袤田野，到巍峨雪山</div>
+      <div class="divider-line" id="div-0"></div>
+      <div class="line-sub" id="line-0-1">每一寸土地，都承载着生命的希望</div>
+    </div>
+  </div>
+
+  <!-- ===== 场景二：耕耘守望 ===== -->
+  <div class="scene" id="scene-1">
+    <div class="scene-media img" style="background-image:url('assets/images/advert/field-terraces.jpg');"></div>
+    <div class="scene-overlay"></div>
+    <div class="scene-text">
+      <div class="line-main" id="line-1-0">七十七载春秋</div>
+      <div class="divider-line" id="div-1"></div>
+      <div class="line-sub" id="line-1-1">我们扎根土地，守望丰收</div>
+    </div>
+  </div>
+
+  <!-- ===== 场景三：央企担当 ===== -->
+  <div class="scene" id="scene-2">
+    <div class="scene-media img" style="background-image:url('assets/images/advert/flag-building.jpg');"></div>
+    <div class="scene-overlay dark"></div>
+    <div class="scene-text">
+      <div class="line-main" id="line-2-0" style="font-size:clamp(3rem,7vw,6rem);letter-spacing:0.25em;">忠于国计</div>
+      <div class="divider-line" id="div-2"></div>
+      <div class="line-sub" id="line-2-1">守护大国粮仓，服务国家战略</div>
+    </div>
+  </div>
+
+  <!-- ===== 场景四：民生福祉 ===== -->
+  <div class="scene" id="scene-3">
+    <div class="scene-media img" style="background-image:url('assets/images/advert/rice-field.jpg');"></div>
+    <div class="scene-overlay"></div>
+    <div class="scene-text">
+      <div class="line-main" id="line-3-0" style="font-size:clamp(3rem,7vw,6rem);letter-spacing:0.25em;">良于民生</div>
+      <div class="divider-line" id="div-3"></div>
+      <div class="line-sub" id="line-3-1">从田间到餐桌，全产业链品质守护</div>
+    </div>
+  </div>
+
+  <!-- ===== 场景五：美好生活 ===== -->
+  <div class="scene" id="scene-4">
+    <video class="scene-media" id="vid-4" autoplay muted loop playsinline>
+      <source src="../../4475800-hd_1920_1080_30fps.mp4" type="video/mp4">
+    </video>
+    <div class="scene-overlay"></div>
+    <div class="scene-text">
+      <div class="line-main" id="line-4-0">高标准服务人民美好生活</div>
+      <div class="divider-line" id="div-4"></div>
+      <div class="line-sub" id="line-4-1">奉献营养健康好食品</div>
+    </div>
+  </div>
+
+  <!-- ===== 场景六：山河家园 ===== -->
+  <div class="scene" id="scene-5">
+    <div class="scene-media img" style="background-image:url('assets/images/advert/village-aerial.jpg');"></div>
+    <div class="scene-overlay"></div>
+    <div class="scene-text">
+      <div class="line-main" id="line-5-0">守护亿万家庭的餐桌</div>
+      <div class="divider-line" id="div-5"></div>
+      <div class="line-sub" id="line-5-1">让每一餐都充满幸福的味道</div>
+    </div>
+  </div>
+
+  <!-- ===== 场景七：品牌结尾 ===== -->
+  <div class="scene" id="scene-6">
+    <video class="scene-media" id="vid-6" autoplay muted loop playsinline>
+      <source src="../../4460023-hd_1920_1080_30fps.mp4" type="video/mp4">
+    </video>
+    <div class="scene-overlay dark"></div>
+    <div class="glow-orb" style="top:40%;left:50%;width:600px;height:600px;background:radial-gradient(circle, rgba(26,122,62,0.1) 0%, transparent 70%);"></div>
+    <div class="scene-text">
+      <div class="ending-slogan" id="ending-slogan">中粮天下</div>
+      <div class="ending-sub" id="ending-sub">忠于国计 · 良于民生</div>
+      <div class="logo-wrap" id="logo-end" style="margin-top:3rem;">
+        <img src="assets/images/zhongliang-logo-light.svg" alt="中粮天下">
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 进度条 ===== -->
+  <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+
+  <!-- ===== 控制按钮 ===== -->
+  <div class="controls">
+    <button onclick="toggleMusic()" id="music-btn">音乐: 开</button>
+    <button onclick="replayAd()">重播</button>
+    <button onclick="skipAd()">跳过</button>
+  </div>
+
+  <!-- ===== 配音文案面板 ===== -->
+  <div class="script-panel">
+    <button class="script-toggle" onclick="toggleScript()">配音文案</button>
+    <div class="script-content" id="script-content">
+      <strong>【中粮天下】品牌广告 · 配音稿</strong><br><br>
+      <em>[音乐起，低沉弦乐渐入]</em><br><br>
+      <strong>场景一：</strong>从广袤田野，到巍峨雪山。每一寸土地，都承载着生命的希望。<br><br>
+      <strong>场景二：</strong>七十七载春秋，我们扎根土地，守望丰收。<br><br>
+      <strong>场景三：</strong>忠于国计。守护大国粮仓，服务国家战略。<br><br>
+      <strong>场景四：</strong>良于民生。从田间到餐桌，全产业链品质守护。<br><br>
+      <strong>场景五：</strong>高标准服务人民美好生活，奉献营养健康好食品。<br><br>
+      <strong>场景六：</strong>守护亿万家庭的餐桌，让每一餐都充满幸福的味道。<br><br>
+      <strong>结尾：</strong>中粮天下——忠于国计，良于民生。<br><br>
+      <em>[音乐渐强后缓缓收束]</em>
+    </div>
+  </div>
+
+  <!-- ===== 背景音乐 ===== -->
+  <audio id="bg-music" loop>
+    <source src="assets/music/epic-bg.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    (function() {
+      /* ========== 场景配置 ========== */
+      const scenes = [
+        { id: 'scene-0', lines: ['logo-0','line-0-0','div-0','line-0-1'], duration: 9000 },
+        { id: 'scene-1', lines: ['line-1-0','div-1','line-1-1'], duration: 8000 },
+        { id: 'scene-2', lines: ['line-2-0','div-2','line-2-1'], duration: 8000 },
+        { id: 'scene-3', lines: ['line-3-0','div-3','line-3-1'], duration: 8000 },
+        { id: 'scene-4', lines: ['line-4-0','div-4','line-4-1'], duration: 9000 },
+        { id: 'scene-5', lines: ['line-5-0','div-5','line-5-1'], duration: 8000 },
+        { id: 'scene-6', lines: ['ending-slogan','ending-sub','logo-end'], duration: 8000, ending: true }
+      ];
+
+      let currentScene = -1;
+      let bgMusic = document.getElementById('bg-music');
+      let blackOpen = document.getElementById('black-open');
+      let progressBar = document.getElementById('progress-bar');
+      let openDuration = 3000;
+      let totalDuration = openDuration + scenes.reduce((a,b)=>a+b.duration, 0);
+
+      /* ========== 启动广告 ========== */
+      function startAd() {
+        bgMusic.volume = 0;
+        bgMusic.play().then(function() {
+          // 音乐渐入
+          let vol = 0;
+          let fadeIn = setInterval(function() {
+            vol += 0.015;
+            if (vol >= 0.45) { vol = 0.45; clearInterval(fadeIn); }
+            bgMusic.volume = vol;
+          }, 100);
+        }).catch(function() {
+          console.log('音乐自动播放被浏览器阻止');
+          document.getElementById('music-btn').textContent = '音乐: 关';
+        });
+
+        // 黑屏3秒后淡出
+        setTimeout(function() {
+          blackOpen.classList.add('fade-out');
+          nextScene();
+        }, openDuration);
+      }
+
+      /* ========== 切换场景 ========== */
+      function nextScene() {
+        if (currentScene >= 0) {
+          document.getElementById(scenes[currentScene].id).classList.remove('active');
+        }
+
+        currentScene++;
+        if (currentScene >= scenes.length) {
+          updateProgress();
+          return;
+        }
+
+        var scene = scenes[currentScene];
+        var el = document.getElementById(scene.id);
+        el.classList.add('active');
+
+        // 播放视频
+        var video = el.querySelector('video');
+        if (video) {
+          video.currentTime = 0;
+          video.play().catch(function(){});
+        }
+
+        // 文案依次出现
+        scene.lines.forEach(function(lineId, i) {
+          setTimeout(function() {
+            var lineEl = document.getElementById(lineId);
+            if (lineEl) lineEl.classList.add('visible');
+          }, 600 + i * 500);
+        });
+
+        updateProgress();
+        setTimeout(nextScene, scene.duration);
+      }
+
+      /* ========== 更新进度条 ========== */
+      function updateProgress() {
+        var elapsed = openDuration;
+        for (var i = 0; i < currentScene && i < scenes.length; i++) {
+          elapsed += scenes[i].duration;
+        }
+        if (currentScene >= scenes.length) elapsed = totalDuration;
+        var pct = Math.min(100, (elapsed / totalDuration) * 100);
+        progressBar.style.width = pct + '%';
+      }
+
+      /* ========== 控制函数 ========== */
+      window.toggleMusic = function() {
+        if (bgMusic.paused) {
+          bgMusic.play();
+          document.getElementById('music-btn').textContent = '音乐: 开';
+        } else {
+          bgMusic.pause();
+          document.getElementById('music-btn').textContent = '音乐: 关';
+        }
+      };
+
+      window.replayAd = function() {
+        location.reload();
+      };
+
+      window.skipAd = function() {
+        scenes.forEach(function(s) {
+          document.getElementById(s.id).classList.remove('active');
+        });
+        currentScene = scenes.length;
+        var last = document.getElementById('scene-6');
+        last.classList.add('active');
+        ['ending-slogan','ending-sub','logo-end'].forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) el.classList.add('visible');
+        });
+        var v = last.querySelector('video');
+        if (v) { v.currentTime = 0; v.play().catch(function(){}); }
+        updateProgress();
+      };
+
+      window.toggleScript = function() {
+        document.getElementById('script-content').classList.toggle('show');
+      };
+
+      /* ========== 顶部播放：全屏 intro.mp4 ========== */
+      (function setupTopPlay() {
+        var wrap = document.getElementById('advert-fullscreen-video-wrap');
+        var video = document.getElementById('advert-fullscreen-video');
+        var btn = document.getElementById('advert-top-play');
+        var closeBtn = document.getElementById('advert-fullscreen-close');
+        if (!wrap || !video || !btn) return;
+
+        function openOverlay() {
+          wrap.classList.add('is-open');
+          try {
+            bgMusic.pause();
+          } catch (e) {}
+          document.querySelectorAll('.scene video.scene-media').forEach(function (v) {
+            v.pause();
+          });
+          video.currentTime = 0;
+          video.play().catch(function () {});
+        }
+
+        function closeOverlay() {
+          wrap.classList.remove('is-open');
+          video.pause();
+          document.querySelectorAll('.scene.active video.scene-media').forEach(function (v) {
+            v.play().catch(function () {});
+          });
+        }
+
+        btn.addEventListener('click', function () {
+          openOverlay();
+        });
+        closeBtn.addEventListener('click', function () {
+          closeOverlay();
+        });
+        wrap.addEventListener('click', function (e) {
+          if (e.target === wrap) closeOverlay();
+        });
+        document.addEventListener('keydown', function (e) {
+          if (e.code === 'Escape' && wrap.classList.contains('is-open')) {
+            e.preventDefault();
+            closeOverlay();
+          }
+        });
+      })();
+
+      /* ========== 页面加载后启动 ========== */
+      window.addEventListener('load', function() {
+        setTimeout(startAd, 300);
+      });
+
+      /* ========== 键盘控制 ========== */
+      document.addEventListener('keydown', function(e) {
+        if (e.code === 'Space') {
+          e.preventDefault();
+          toggleMusic();
+        }
+        if (e.code === 'KeyR') {
+          replayAd();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

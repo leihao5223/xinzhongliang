@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>服务民生福祉 - 中粮天下</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;list-style-type:none;}
+body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;color:#1a1a1a;line-height:1.8;overflow-x:hidden;}
+#sakura{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:0.35;pointer-events:none;}
+.article-wrapper{position:relative;z-index:1;min-height:100vh;padding:3rem 1rem;}
+.article-container{max-width:920px;margin:0 auto;background:rgba(255,255,255,0.72);border-radius:18px;padding:3rem 3.5rem;box-shadow:0 12px 50px rgba(0,0,0,0.15);}
+.back-link{display:inline-flex;align-items:center;gap:0.4rem;color:#0d6efd;text-decoration:none;font-weight:600;margin-bottom:1.5rem;font-size:0.95rem;}
+.back-link:hover{text-decoration:underline;}
+.article-header{text-align:center;margin-bottom:2.5rem;border-bottom:2px solid #e0e6f0;padding-bottom:1.8rem;}
+.article-header h1{font-size:2.3rem;color:#0f1f3d;margin-bottom:0.8rem;letter-spacing:2px;font-weight:700;}
+.article-meta{color:#789;font-size:0.9rem;}
+.article-body p{margin-bottom:1.3rem;text-indent:2em;font-size:1.06rem;color:#2a2a2a;}
+.article-body h2{font-size:1.55rem;color:#1a3a6e;margin:2.2rem 0 1.1rem;border-left:5px solid #c9302c;padding-left:0.9rem;font-weight:700;}
+.article-body h3{font-size:1.2rem;color:#2a4a7a;margin:1.6rem 0 0.8rem;font-weight:600;}
+.quote-box{background:#f4f7fb;border-left:4px solid #c9302c;padding:1.2rem 1.5rem;margin:1.5rem 0;border-radius:0 8px 8px 0;font-style:italic;color:#445;}
+@media(max-width:768px){.article-container{padding:2rem 1.6rem;}.article-header h1{font-size:1.7rem;}}
+</style>
+</head>
+<body>
+<canvas id="sakura"></canvas>
+<script id="sakura_point_vsh" type="x-shader/x_vertex">
+uniform mat4 uProjection;
+uniform mat4 uModelview;
+uniform vec3 uResolution;
+uniform vec3 uOffset;
+uniform vec3 uDOF;
+uniform vec3 uFade;
+attribute vec3 aPosition;
+attribute vec3 aEuler;
+attribute vec2 aMisc;
+varying vec3 pposition;
+varying float psize;
+varying float palpha;
+varying float pdist;
+varying vec3 normX;
+varying vec3 normY;
+varying vec3 normZ;
+varying vec3 normal;
+varying float diffuse;
+varying float specular;
+varying float rstop;
+varying float distancefade;
+void main(void) {
+    vec4 pos = uModelview * vec4(aPosition + uOffset, 1.0);
+    gl_Position = uProjection * pos;
+    gl_PointSize = aMisc.x * uProjection[1][1] / -pos.z * uResolution.y * 0.5;
+    pposition = pos.xyz;
+    psize = aMisc.x;
+    pdist = length(pos.xyz);
+    palpha = smoothstep(0.0, 1.0, (pdist - 0.1) / uFade.z);
+    vec3 elrsn = sin(aEuler);
+    vec3 elrcs = cos(aEuler);
+    mat3 rotx = mat3(1.0, 0.0, 0.0, 0.0, elrcs.x, elrsn.x, 0.0, -elrsn.x, elrcs.x);
+    mat3 roty = mat3(elrcs.y, 0.0, -elrsn.y, 0.0, 1.0, 0.0, elrsn.y, 0.0, elrcs.y);
+    mat3 rotz = mat3(elrcs.z, elrsn.z, 0.0, -elrsn.z, elrcs.z, 0.0, 0.0, 0.0, 1.0);
+    mat3 rotmat = rotx * roty * rotz;
+    normal = rotmat[2];
+    mat3 trrotm = mat3(rotmat[0][0], rotmat[1][0], rotmat[2][0], rotmat[0][1], rotmat[1][1], rotmat[2][1], rotmat[0][2], rotmat[1][2], rotmat[2][2]);
+    normX = trrotm[0]; normY = trrotm[1]; normZ = trrotm[2];
+    const vec3 lit = vec3(0.6917144638660746, 0.6917144638660746, -0.20751433915982237);
+    float tmpdfs = dot(lit, normal);
+    if(tmpdfs < 0.0) { normal = -normal; tmpdfs = dot(lit, normal); }
+    diffuse = 0.4 + tmpdfs;
+    vec3 eyev = normalize(-pos.xyz);
+    if(dot(eyev, normal) > 0.0) {
+        vec3 hv = normalize(eyev + lit);
+        specular = pow(max(dot(hv, normal), 0.0), 20.0);
+    } else { specular = 0.0; }
+    rstop = clamp((abs(pdist - uDOF.x) - uDOF.y) / uDOF.z, 0.0, 1.0);
+    rstop = pow(rstop, 0.5);
+    distancefade = min(1.0, exp((uFade.x - pdist) * 0.69315 / uFade.y));
+}
+</script>
+<script id="sakura_point_fsh" type="x-shader/x_fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+uniform vec3 uDOF;
+uniform vec3 uFade;
+const vec3 fadeCol = vec3(0.08, 0.03, 0.06);
+varying vec3 pposition;
+varying float psize;
+varying float palpha;
+varying float pdist;
+varying vec3 normX;
+varying vec3 normY;
+varying vec3 normZ;
+varying vec3 normal;
+varying float diffuse;
+varying float specular;
+varying float rstop;
+varying float distancefade;
+float ellipse(vec2 p, vec2 o, vec2 r) {
+    vec2 lp = (p - o) / r;
+    return length(lp) - 1.0;
+}
+void main(void) {
+    vec3 p = vec3(gl_PointCoord - vec2(0.5, 0.5), 0.0) * 2.0;
+    vec3 d = vec3(0.0, 0.0, -1.0);
+    float nd = normZ.z;
+    if(abs(nd) < 0.0001) discard;
+    float np = dot(normZ, p);
+    vec3 tp = p + d * np / nd;
+    vec2 coord = vec2(dot(normX, tp), dot(normY, tp));
+    const float flwrsn = 0.258819045102521;
+    const float flwrcs = 0.965925826289068;
+    mat2 flwrm = mat2(flwrcs, -flwrsn, flwrsn, flwrcs);
+    vec2 flwrp = vec2(abs(coord.x), coord.y) * flwrm;
+    float r;
+    if(flwrp.x < 0.0) {
+        r = ellipse(flwrp, vec2(0.065, 0.024) * 0.5, vec2(0.36, 0.96) * 0.5);
+    } else {
+        r = ellipse(flwrp, vec2(0.065, 0.024) * 0.5, vec2(0.58, 0.96) * 0.5);
+    }
+    if(r > rstop) discard;
+    vec3 col = mix(vec3(1.0, 0.8, 0.75), vec3(1.0, 0.9, 0.87), r);
+    float grady = mix(0.0, 1.0, pow(coord.y * 0.5 + 0.5, 0.35));
+    col *= vec3(1.0, grady, grady);
+    col *= mix(0.8, 1.0, pow(abs(coord.x), 0.3));
+    col = col * diffuse + specular;
+    col = mix(fadeCol, col, distancefade);
+    float alpha = (rstop > 0.001)? (0.5 - r / (rstop * 2.0)) : 1.0;
+    alpha = smoothstep(0.0, 1.0, alpha) * palpha;
+    gl_FragColor = vec4(col * 0.5, alpha);
+}
+</script>
+<script id="fx_common_vsh" type="x-shader/x_vertex">
+uniform vec3 uResolution;
+attribute vec2 aPosition;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    gl_Position = vec4(aPosition, 0.0, 1.0);
+    texCoord = aPosition.xy * 0.5 + vec2(0.5, 0.5);
+    screenCoord = aPosition.xy * vec2(uResolution.z, 1.0);
+}
+</script>
+<script id="bg_fsh" type="x-shader/x_fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+uniform vec2 uTimes;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    vec3 col;
+    float c;
+    vec2 tmpv = texCoord * vec2(0.8, 1.0) - vec2(0.95, 1.0);
+    c = exp(-pow(length(tmpv) * 1.8, 2.0));
+    col = mix(vec3(0.02, 0.0, 0.03), vec3(0.96, 0.98, 1.0) * 1.5, c);
+    gl_FragColor = vec4(col * 0.5, 1.0);
+}
+</script>
+<script id="fx_brightbuf_fsh" type="x-shader/x_fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+uniform sampler2D uSrc;
+uniform vec2 uDelta;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    vec4 col = texture2D(uSrc, texCoord);
+    gl_FragColor = vec4(col.rgb * 2.0 - vec3(0.5), 1.0);
+}
+</script>
+<script id="fx_dirblur_r4_fsh" type="x-shader/x_fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+uniform sampler2D uSrc;
+uniform vec2 uDelta;
+uniform vec4 uBlurDir;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    vec4 col = texture2D(uSrc, texCoord);
+    col = col + texture2D(uSrc, texCoord + uBlurDir.xy * uDelta);
+    col = col + texture2D(uSrc, texCoord - uBlurDir.xy * uDelta);
+    col = col + texture2D(uSrc, texCoord + (uBlurDir.xy + uBlurDir.zw) * uDelta);
+    col = col + texture2D(uSrc, texCoord - (uBlurDir.xy + uBlurDir.zw) * uDelta);
+    gl_FragColor = col / 5.0;
+}
+</script>
+<script id="pp_final_vsh" type="x-shader/x_vertex">
+uniform vec3 uResolution;
+attribute vec2 aPosition;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    gl_Position = vec4(aPosition, 0.0, 1.0);
+    texCoord = aPosition.xy * 0.5 + vec2(0.5, 0.5);
+    screenCoord = aPosition.xy * vec2(uResolution.z, 1.0);
+}
+</script>
+<script id="pp_final_fsh" type="x-shader/x_fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+uniform sampler2D uSrc;
+uniform sampler2D uBloom;
+uniform vec2 uDelta;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    vec4 srccol = texture2D(uSrc, texCoord) * 2.0;
+    vec4 bloomcol = texture2D(uBloom, texCoord);
+    vec4 col = srccol + bloomcol * (vec4(1.0) + srccol);
+    col *= smoothstep(1.0, 0.0, pow(length((texCoord - vec2(0.5)) * 2.0), 1.2) * 0.5);
+    col = pow(col, vec4(0.45454545454545));
+    gl_FragColor = vec4(col.rgb, 1.0);
+}
+</script>
+
+<div class="article-wrapper">
+  <div class="article-container">
+    <a href="index.html" class="back-link">&#8592; 返回首页</a>
+    <div class="article-header">
+      <h1>服务民生福祉</h1>
+      <div class="article-meta">中粮集团 · 深度报道 · 民生服务专栏</div>
+    </div>
+    <div class="article-body">
+      <p>民以食为天，食以安为先。粮油食品是老百姓一日三餐不可或缺的基础消费品，其价格、品质和安全状况，直接关系到亿万家庭的幸福感和获得感。作为国有骨干企业，中粮集团始终把服务民生福祉作为出发点和落脚点，坚持以人民为中心的发展思想，通过保供稳价、提质增效、丰富供给、精准帮扶等举措，努力让人民群众吃得放心、吃得健康、吃得实惠，在实现企业经济效益的同时，切实履行好社会责任，做人民群众值得信赖的"米袋子""菜篮子""油瓶子"。</p>
+
+      <h2>一、保供稳价：关键时刻显担当</h2>
+      <p>粮食价格的稳定是社会稳定的重要基础。中粮作为国家粮食宏观调控的重要执行主体，在日常经营中自觉承担社会责任，在关键时刻挺身而出，为保障市场供应、稳定价格预期发挥了"稳定器"和"压舱石"的作用。</p>
+
+      <p>每年春节、中秋等传统节日，是粮油消费的高峰期。为保障节日市场供应，中粮提前数月制定保供方案，组织下属工厂开足马力生产，协调物流运输企业加大运力投入，确保产品及时配送至全国各地的超市、农贸市场。在2020年初新冠肺炎疫情暴发的特殊时期，全国多个城市实施封闭管理，居民集中采购导致局部地区出现粮油抢购现象。面对严峻形势，中粮迅速启动应急保供机制，数千名员工放弃春节假期，坚守岗位，确保了全国市场的粮油供应不断档、不脱销、不涨价。据统计，疫情期间中粮累计向市场供应粮油产品超过五百万吨，有力支撑了疫情防控和复工复产大局。</p>
+
+      <p>在国际市场大幅波动的年份，中粮严格执行国家粮食进出口调控政策，适时增加或减少进口，平衡国内市场供求。当国际粮价大幅上涨、国内面临输入性通胀压力时，中粮加大储备粮油投放力度，增加市场供给，引导价格理性回归。当国际粮价大幅下跌、国内农民卖粮难时，中粮严格执行国家最低收购价政策，敞开收购农民余粮，保护种粮农民利益。这种"逆周期"调节的操作，虽然短期内可能增加企业的经营风险，但从长远看，维护了市场的健康运行，也赢得了农民和消费者的信任。</p>
+
+      <div class="quote-box">"老百姓关心什么、期盼什么，我们就抓住什么、推进什么。让人民过上好日子，是我们一切工作的根本目的。" ——中粮集团党组</div>
+
+      <h2>二、品质升级：满足美好生活新期待</h2>
+      <p>随着我国经济社会发展和人民生活水平提高，消费者对粮油食品的需求正在发生深刻变化。从"吃饱"到"吃好"，从"吃得安全"到"吃得健康"，消费升级的大趋势对粮油企业提出了更高要求。中粮敏锐把握这一趋势，持续加大产品研发投入，推出了一系列符合健康消费潮流的新产品。</p>
+
+      <p>在食用油领域，中粮顺应消费者对健康饮食的追求，推出了低芥酸菜籽油、高油酸花生油、亚麻籽油、核桃油、橄榄油等高端油品。这些产品富含不饱和脂肪酸、维生素E、植物甾醇等有益成分，对心血管健康具有保护作用。特别是针对注重健身和体重管理的年轻消费群体，中粮开发了喷雾式食用油，通过特殊的喷头设计，每次按压仅喷出约一毫升油，方便消费者精准控制用油量，减少油脂摄入。</p>
+
+      <p>在大米领域，中粮推出了胚芽米、发芽糙米、低GI大米等功能性产品。胚芽米保留了米粒中富含营养的胚芽部分，维生素B族、维生素E和矿物质含量远高于普通精白米。发芽糙米经过发芽处理，其中的GABA等活性物质含量显著增加，具有改善睡眠、调节血压等保健功能。低GI大米则通过特殊的品种选育和加工工艺，降低了米饭的升糖指数，适合糖尿病患者和控糖人群食用。</p>
+
+      <p>在方便食品领域，中粮开发了非油炸方便面、自热米饭、预制菜等新产品，满足了都市快节奏生活下消费者对便捷、美味、营养的多重需求。特别是预制菜产品，由中粮旗下专业厨师团队研发配方，采用先进的速冻锁鲜技术，消费者只需简单加热，就能在家享受到餐厅级别的美味佳肴，既节省了时间，又保证了品质。</p>
+
+      <h2>三、食品安全：守护舌尖上的安全</h2>
+      <p>食品安全是民生工程、民心工程，也是企业生存发展的生命线。中粮建立了覆盖全产业链的食品安全管理体系，从田间到餐桌的每一个环节都严格把控，确保消费者买得放心、吃得安心。</p>
+
+      <p>在源头管控方面，中粮推行标准化种植和养殖，向合作农户提供经过严格筛选的优质种子、饲料和农药，禁止使用高毒、高残留农药和非法添加剂。在收购环节，所有原料必须经过严格的检验检测，重金属、农药残留、真菌毒素等指标不合格的坚决拒收。在加工环节，中粮引入国际先进的食品安全管理体系，对生产环境、设备清洁、人员卫生、工艺参数等进行全方位监控。关键控制点安装了在线检测仪器，一旦发现异常，系统会自动报警并停止生产。</p>
+
+      <p>在流通环节，中粮建立了完善的产品追溯系统。消费者通过扫描产品包装上的二维码，可以追溯到该产品的原料产地、加工工厂、生产日期、质检报告、物流路径等详细信息。这种透明化的管理方式，让消费者对产品信息一目了然，也倒逼供应链各环节的合作伙伴严格遵守质量标准。</p>
+
+      <p>此外，中粮还积极参与国家食品安全标准的制修订工作，将企业在实践中积累的先进经验和技术成果转化为行业标准，带动全行业的食品安全水平提升。中粮下属多家检测实验室获得了国家认证认可，具备为社会提供第三方检测服务的能力。</p>
+
+      <h2>四、精准扶贫：用产业带动脱贫</h2>
+      <p>脱贫攻坚是全面建成小康社会的标志性工程。中粮集团充分发挥自身产业优势，通过在贫困地区建设产业基地、发展订单农业、培训农民技能、采购特色农产品等方式，帮助贫困地区增强内生发展动力，实现稳定脱贫和可持续发展。</p>
+
+      <p>在产业布局方面，中粮在多个国家级贫困县投资建设了粮油加工工厂和养殖基地。这些项目不仅直接吸纳了数百名当地贫困群众就业，还通过上下游的带动效应，促进了当地运输、包装、维修等相关产业的发展。更重要的是，工厂的建立为当地农产品提供了稳定的销售渠道，解决了"卖难"问题，让农民的劳动成果能够转化为实实在在的收入。</p>
+
+      <p>在技能扶贫方面，中粮定期组织农业技术专家和致富带头人，到贫困地区开展种植养殖技术培训。培训内容既有理论讲解，也有田间地头的实操指导，帮助贫困农民掌握一技之长。许多参加培训的学员，回去后将所学知识应用到生产中，当年就实现了增产增收。部分优秀学员还被中粮聘为技术示范户，带动更多邻居一起发展。</p>
+
+      <p>在消费扶贫方面，中粮利用自身的销售渠道优势，帮助贫困地区的特色农产品进入城市市场。通过在中粮的电商平台、线下门店设置扶贫产品专区，举办扶贫产品推介会等方式，让更多消费者认识和购买来自贫困地区的优质农产品。新疆的核桃、红枣，云南的普洱茶、咖啡，西藏的牦牛肉、青稞制品等，都通过中粮的渠道走出了大山，走进了城市家庭。</p>
+
+      <h2>五、社区关怀：做有温度的企业公民</h2>
+      <p>企业的价值不仅体现在财务报表上，更体现在对社会的贡献中。中粮积极参与社区建设和社会公益事业，在扶老助残、捐资助学、灾害救助、环境保护等领域开展了大量公益活动，努力成为有温度、有责任感的企业公民。</p>
+
+      <p>在教育公益方面，中粮设立了专项教育基金，长期资助贫困地区的优秀学生完成学业。从中学到大学，从助学金到奖学金，从硬件设施捐赠到师资力量培训，中粮的教育公益覆盖了多个层面。许多受到资助的学生，毕业后选择回到家乡，用知识改变家乡的面貌，形成了爱心传递的良性循环。</p>
+
+      <p>在灾害救助方面，每当国内发生重大自然灾害，中粮总是在第一时间响应。无论是地震、洪水还是暴雪，中粮都会迅速调集灾区急需的粮油物资，组织车队星夜驰援。在灾害恢复重建阶段，中粮还会持续跟进，帮助灾区恢复农业生产，重建家园。</p>
+
+      <p>在关爱特殊群体方面，中粮定期组织志愿者到敬老院、福利院、特殊教育学校开展慰问活动，为孤寡老人、残障儿童送去粮油食品和生活用品。春节期间，中粮还会为坚守岗位的环卫工人、快递小哥、公交司机等户外工作者送去慰问品，感谢他们为城市运转付出的辛勤劳动。</p>
+
+      <p>展望未来，中粮将继续坚守"忠于国计、良于民生"的初心使命，以更优质的产品、更贴心的服务、更务实的行动，守护亿万家庭的美好生活，在服务民生福祉的大道上不断前行。</p>
+    </div>
+  </div>
+</div>
+
+<script src="特效/飘雪/js/index.js"></script>
+
+<style>
+.latest-news-section {
+  position: relative;
+  z-index: 1;
+  padding: 4rem 1rem;
+  background: linear-gradient(180deg, #f0f4f8 0%, #e8eef5 100%);
+}
+.latest-news-section .news-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.latest-news-section .news-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+.latest-news-section .news-subtitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #c9302c;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+}
+.latest-news-section .news-subtitle span {
+  font-size: 0.5rem;
+}
+.latest-news-section .news-title {
+  font-size: 1.9rem;
+  color: #0f1f3d;
+  font-weight: 700;
+}
+.latest-news-section .news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+.latest-news-section .news-card {
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,0.65);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(31,38,80,0.08);
+  display: flex;
+  flex-direction: column;
+}
+.latest-news-section .news-card-image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+.latest-news-section .news-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.latest-news-section .news-card-body {
+  padding: 1.4rem 1.3rem 0.6rem;
+  flex: 1;
+}
+.latest-news-section .news-card-body h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a3a6e;
+  margin-bottom: 0.5rem;
+  line-height: 1.45;
+}
+.latest-news-section .news-card-body p {
+  font-size: 0.92rem;
+  color: #4a5568;
+  line-height: 1.7;
+  margin: 0;
+}
+.latest-news-section .news-card-footer {
+  padding: 0 1.3rem 1.1rem;
+  font-size: 0.85rem;
+  color: #8899aa;
+}
+@media(max-width:768px){
+  .latest-news-section .news-title { font-size: 1.5rem; }
+}
+</style>
+<section class="latest-news-section">
+  <div class="news-container">
+    <div class="news-header">
+      <div class="news-subtitle"><span>&#9679;</span> 行业前沿</div>
+      <h2 class="news-title">洞察粮农趋势，引领产业未来</h2>
+    </div>
+    <div class="news-grid">
+      <div class="news-card">
+        <div class="news-card-image"><img src="assets/images/blog-smart-agriculture-drone.jpg" alt="智慧农业"></div>
+        <div class="news-card-body">
+          <h3>数字农田：智慧农业重塑耕种方式</h3>
+          <p>无人机巡田、卫星遥感与物联网传感器的深度融合，让每一寸土地的管理都进入厘米级精准时代，产量与品质同步跃升。</p>
+        </div>
+        <div class="news-card-footer">2025年05月15日</div>
+      </div>
+      <div class="news-card">
+        <div class="news-card-image"><img src="assets/images/blog-quality-lab-inspection.jpg" alt="品质检测"></div>
+        <div class="news-card-body">
+          <h3>从田间到舌尖：全链路品质守护</h3>
+          <p>依托全球领先的检测实验室与标准化加工基地，建立覆盖原料采购、生产加工、仓储物流的全流程质量追溯网络。</p>
+        </div>
+        <div class="news-card-footer">2025年06月02日</div>
+      </div>
+      <div class="news-card">
+        <div class="news-card-image"><img src="assets/images/blog-green-eco-farm.jpg" alt="绿色农业"></div>
+        <div class="news-card-body">
+          <h3>绿色低碳：可持续农业的中国方案</h3>
+          <p>推进生态农业、循环农业与清洁能源应用，在保障粮食产量的同时守护碧水蓝天，为全球农业可持续发展贡献力量。</p>
+        </div>
+        <div class="news-card-footer">2025年07月18日</div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

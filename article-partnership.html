@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>合作共赢生态 - 中粮天下</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;list-style-type:none;}
+body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;color:#1a1a1a;line-height:1.8;overflow-x:hidden;}
+#sakura{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:0.35;pointer-events:none;}
+.article-wrapper{position:relative;z-index:1;min-height:100vh;padding:3rem 1rem;}
+.article-container{max-width:920px;margin:0 auto;background:rgba(255,255,255,0.72);border-radius:18px;padding:3rem 3.5rem;box-shadow:0 12px 50px rgba(0,0,0,0.15);}
+.back-link{display:inline-flex;align-items:center;gap:0.4rem;color:#0d6efd;text-decoration:none;font-weight:600;margin-bottom:1.5rem;font-size:0.95rem;}
+.back-link:hover{text-decoration:underline;}
+.article-header{text-align:center;margin-bottom:2.5rem;border-bottom:2px solid #e0e6f0;padding-bottom:1.8rem;}
+.article-header h1{font-size:2.3rem;color:#0f1f3d;margin-bottom:0.8rem;letter-spacing:2px;font-weight:700;}
+.article-meta{color:#789;font-size:0.9rem;}
+.article-body p{margin-bottom:1.3rem;text-indent:2em;font-size:1.06rem;color:#2a2a2a;}
+.article-body h2{font-size:1.55rem;color:#1a3a6e;margin:2.2rem 0 1.1rem;border-left:5px solid #c9302c;padding-left:0.9rem;font-weight:700;}
+.article-body h3{font-size:1.2rem;color:#2a4a7a;margin:1.6rem 0 0.8rem;font-weight:600;}
+.quote-box{background:#f4f7fb;border-left:4px solid #c9302c;padding:1.2rem 1.5rem;margin:1.5rem 0;border-radius:0 8px 8px 0;font-style:italic;color:#445;}
+@media(max-width:768px){.article-container{padding:2rem 1.6rem;}.article-header h1{font-size:1.7rem;}}
+</style>
+</head>
+<body>
+<canvas id="sakura"></canvas>
+<script id="sakura_point_vsh" type="x-shader/x_vertex">
+uniform mat4 uProjection;
+uniform mat4 uModelview;
+uniform vec3 uResolution;
+uniform vec3 uOffset;
+uniform vec3 uDOF;
+uniform vec3 uFade;
+attribute vec3 aPosition;
+attribute vec3 aEuler;
+attribute vec2 aMisc;
+varying vec3 pposition;
+varying float psize;
+varying float palpha;
+varying float pdist;
+varying vec3 normX;
+varying vec3 normY;
+varying vec3 normZ;
+varying vec3 normal;
+varying float diffuse;
+varying float specular;
+varying float rstop;
+varying float distancefade;
+void main(void) {
+    vec4 pos = uModelview * vec4(aPosition + uOffset, 1.0);
+    gl_Position = uProjection * pos;
+    gl_PointSize = aMisc.x * uProjection[1][1] / -pos.z * uResolution.y * 0.5;
+    pposition = pos.xyz;
+    psize = aMisc.x;
+    pdist = length(pos.xyz);
+    palpha = smoothstep(0.0, 1.0, (pdist - 0.1) / uFade.z);
+    vec3 elrsn = sin(aEuler);
+    vec3 elrcs = cos(aEuler);
+    mat3 rotx = mat3(1.0, 0.0, 0.0, 0.0, elrcs.x, elrsn.x, 0.0, -elrsn.x, elrcs.x);
+    mat3 roty = mat3(elrcs.y, 0.0, -elrsn.y, 0.0, 1.0, 0.0, elrsn.y, 0.0, elrcs.y);
+    mat3 rotz = mat3(elrcs.z, elrsn.z, 0.0, -elrsn.z, elrcs.z, 0.0, 0.0, 0.0, 1.0);
+    mat3 rotmat = rotx * roty * rotz;
+    normal = rotmat[2];
+    mat3 trrotm = mat3(rotmat[0][0], rotmat[1][0], rotmat[2][0], rotmat[0][1], rotmat[1][1], rotmat[2][1], rotmat[0][2], rotmat[1][2], rotmat[2][2]);
+    normX = trrotm[0]; normY = trrotm[1]; normZ = trrotm[2];
+    const vec3 lit = vec3(0.6917144638660746, 0.6917144638660746, -0.20751433915982237);
+    float tmpdfs = dot(lit, normal);
+    if(tmpdfs < 0.0) { normal = -normal; tmpdfs = dot(lit, normal); }
+    diffuse = 0.4 + tmpdfs;
+    vec3 eyev = normalize(-pos.xyz);
+    if(dot(eyev, normal) > 0.0) {
+        vec3 hv = normalize(eyev + lit);
+        specular = pow(max(dot(hv, normal), 0.0), 20.0);
+    } else { specular = 0.0; }
+    rstop = clamp((abs(pdist - uDOF.x) - uDOF.y) / uDOF.z, 0.0, 1.0);
+    rstop = pow(rstop, 0.5);
+    distancefade = min(1.0, exp((uFade.x - pdist) * 0.69315 / uFade.y));
+}
+</script>
+<script id="sakura_point_fsh" type="x-shader/x_fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+uniform vec3 uDOF;
+uniform vec3 uFade;
+const vec3 fadeCol = vec3(0.08, 0.03, 0.06);
+varying vec3 pposition;
+varying float psize;
+varying float palpha;
+varying float pdist;
+varying vec3 normX;
+varying vec3 normY;
+varying vec3 normZ;
+varying vec3 normal;
+varying float diffuse;
+varying float specular;
+varying float rstop;
+varying float distancefade;
+float ellipse(vec2 p, vec2 o, vec2 r) {
+    vec2 lp = (p - o) / r;
+    return length(lp) - 1.0;
+}
+void main(void) {
+    vec3 p = vec3(gl_PointCoord - vec2(0.5, 0.5), 0.0) * 2.0;
+    vec3 d = vec3(0.0, 0.0, -1.0);
+    float nd = normZ.z;
+    if(abs(nd) < 0.0001) discard;
+    float np = dot(normZ, p);
+    vec3 tp = p + d * np / nd;
+    vec2 coord = vec2(dot(normX, tp), dot(normY, tp));
+    const float flwrsn = 0.258819045102521;
+    const float flwrcs = 0.965925826289068;
+    mat2 flwrm = mat2(flwrcs, -flwrsn, flwrsn, flwrcs);
+    vec2 flwrp = vec2(abs(coord.x), coord.y) * flwrm;
+    float r;
+    if(flwrp.x < 0.0) {
+        r = ellipse(flwrp, vec2(0.065, 0.024) * 0.5, vec2(0.36, 0.96) * 0.5);
+    } else {
+        r = ellipse(flwrp, vec2(0.065, 0.024) * 0.5, vec2(0.58, 0.96) * 0.5);
+    }
+    if(r > rstop) discard;
+    vec3 col = mix(vec3(1.0, 0.8, 0.75), vec3(1.0, 0.9, 0.87), r);
+    float grady = mix(0.0, 1.0, pow(coord.y * 0.5 + 0.5, 0.35));
+    col *= vec3(1.0, grady, grady);
+    col *= mix(0.8, 1.0, pow(abs(coord.x), 0.3));
+    col = col * diffuse + specular;
+    col = mix(fadeCol, col, distancefade);
+    float alpha = (rstop > 0.001)? (0.5 - r / (rstop * 2.0)) : 1.0;
+    alpha = smoothstep(0.0, 1.0, alpha) * palpha;
+    gl_FragColor = vec4(col * 0.5, alpha);
+}
+</script>
+<script id="fx_common_vsh" type="x-shader/x_vertex">
+uniform vec3 uResolution;
+attribute vec2 aPosition;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    gl_Position = vec4(aPosition, 0.0, 1.0);
+    texCoord = aPosition.xy * 0.5 + vec2(0.5, 0.5);
+    screenCoord = aPosition.xy * vec2(uResolution.z, 1.0);
+}
+</script>
+<script id="bg_fsh" type="x-shader/x_fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+uniform vec2 uTimes;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    vec3 col;
+    float c;
+    vec2 tmpv = texCoord * vec2(0.8, 1.0) - vec2(0.95, 1.0);
+    c = exp(-pow(length(tmpv) * 1.8, 2.0));
+    col = mix(vec3(0.02, 0.0, 0.03), vec3(0.96, 0.98, 1.0) * 1.5, c);
+    gl_FragColor = vec4(col * 0.5, 1.0);
+}
+</script>
+<script id="fx_brightbuf_fsh" type="x-shader/x_fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+uniform sampler2D uSrc;
+uniform vec2 uDelta;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    vec4 col = texture2D(uSrc, texCoord);
+    gl_FragColor = vec4(col.rgb * 2.0 - vec3(0.5), 1.0);
+}
+</script>
+<script id="fx_dirblur_r4_fsh" type="x-shader/x_fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+uniform sampler2D uSrc;
+uniform vec2 uDelta;
+uniform vec4 uBlurDir;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    vec4 col = texture2D(uSrc, texCoord);
+    col = col + texture2D(uSrc, texCoord + uBlurDir.xy * uDelta);
+    col = col + texture2D(uSrc, texCoord - uBlurDir.xy * uDelta);
+    col = col + texture2D(uSrc, texCoord + (uBlurDir.xy + uBlurDir.zw) * uDelta);
+    col = col + texture2D(uSrc, texCoord - (uBlurDir.xy + uBlurDir.zw) * uDelta);
+    gl_FragColor = col / 5.0;
+}
+</script>
+<script id="pp_final_vsh" type="x-shader/x_vertex">
+uniform vec3 uResolution;
+attribute vec2 aPosition;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    gl_Position = vec4(aPosition, 0.0, 1.0);
+    texCoord = aPosition.xy * 0.5 + vec2(0.5, 0.5);
+    screenCoord = aPosition.xy * vec2(uResolution.z, 1.0);
+}
+</script>
+<script id="pp_final_fsh" type="x-shader/x_fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+uniform sampler2D uSrc;
+uniform sampler2D uBloom;
+uniform vec2 uDelta;
+varying vec2 texCoord;
+varying vec2 screenCoord;
+void main(void) {
+    vec4 srccol = texture2D(uSrc, texCoord) * 2.0;
+    vec4 bloomcol = texture2D(uBloom, texCoord);
+    vec4 col = srccol + bloomcol * (vec4(1.0) + srccol);
+    col *= smoothstep(1.0, 0.0, pow(length((texCoord - vec2(0.5)) * 2.0), 1.2) * 0.5);
+    col = pow(col, vec4(0.45454545454545));
+    gl_FragColor = vec4(col.rgb, 1.0);
+}
+</script>
+
+<div class="article-wrapper">
+  <div class="article-container">
+    <a href="index.html" class="back-link">&#8592; 返回首页</a>
+    <div class="article-header">
+      <h1>合作共赢生态</h1>
+      <div class="article-meta">中粮集团 · 深度报道 · 合作发展专栏</div>
+    </div>
+    <div class="article-body">
+      <p>在当今高度分工的现代经济体系中，没有任何一家企业能够凭一己之力包打天下。粮油食品产业链条长、环节多、涉及面广，从种子研发、农资供应、田间种植，到收购仓储、物流运输、加工制造，再到品牌营销、渠道分销、终端零售，每一个环节都需要专业能力的支撑。中粮集团深刻认识到，唯有秉持开放包容的心态，与产业链上下游的合作伙伴建立互利共赢的合作关系，才能打造一个健康、稳定、可持续的产业生态，实现共同发展、共同繁荣。</p>
+
+      <h2>一、农户合作：让种地成为有奔头的产业</h2>
+      <p>农民是粮食生产的主体，也是中粮产业链的起点。如何让农民愿意种地、种好地，并且能够从中获得合理的收益，是中粮在构建产业生态时首先考虑的问题。为此，中粮大力推广订单农业模式，与数百万农户建立了紧密的合作关系。</p>
+
+      <p>所谓订单农业，就是中粮在播种前与农户签订收购合同，约定种植面积、品种要求、质量标准、收购价格等条款。农户按照中粮的要求进行标准化种植，收获的粮食由中粮按照合同价格统一收购。这种模式给农民带来了多重好处：一是销路有保障，不用担心丰收了却卖不出去；二是价格可预期，提前锁定收益，规避市场价格波动风险；三是可以获得中粮提供的良种、化肥、农药、技术指导等配套服务，降低生产成本，提高单产和品质。</p>
+
+      <p>在东北某大豆主产区，农民老张与中粮签订了五百亩的大豆订单。中粮为他提供了高蛋白大豆良种和专用的生物菌肥，派技术员定期到田间指导播种和田间管理。秋收时，老张的大豆蛋白含量达到了四十一个百分点，比当地平均水平高出三个百分点，按照合同中的优质优价条款，每公斤收购价高出市场价一角钱，仅此一项就增收两万多元。尝到甜头的老张，第二年将订单面积扩大到了一千亩，还带动了周边十几户邻居一起加入。</p>
+
+      <p>为了帮助农民解决资金周转难题，中粮还与金融机构合作，推出了基于订单的供应链金融服务。农户凭与中粮签订的订单合同，就可以向合作银行申请低息贷款，用于购买农资和支付人工费用。待到粮食交售后，银行直接从粮款中扣除贷款本息，既方便了农民，也降低了银行的信贷风险。</p>
+
+      <div class="quote-box">"农民是我们的合作伙伴，更是我们的衣食父母。帮助农民致富，就是帮助我们自己成长。" ——中粮集团乡村振兴办公室</div>
+
+      <h2>二、供应商协同：打造透明高效的供应链</h2>
+      <p>一个现代化的粮油加工企业，每年需要采购数量庞大的原粮、辅料、包装材料、能源和物流服务。这些物资和服务的供应商，是中粮产业生态的重要组成部分。中粮致力于与供应商建立长期、稳定、互信的合作关系，而不是简单的买卖关系。</p>
+
+      <p>在供应商准入环节，中粮建立了严格的资质审查和现场审核制度，从质量管理、生产能力、财务状况、社会责任等多个维度对供应商进行综合评估。只有通过审核的供应商，才能进入中粮的合格供应商名录。对于关键原材料的供应商，中粮还会定期进行飞行检查，确保其生产过程持续符合中粮的标准要求。</p>
+
+      <p>在合作过程中，中粮注重与供应商的信息共享和协同计划。通过供应商门户系统，供应商可以实时查看中粮的采购订单、库存水平和生产计划，据此安排自己的生产和发货，减少信息不对称造成的牛鞭效应。对于长期合作的战略供应商，中粮还会邀请其参与新产品开发的前期讨论，利用供应商的专业技术优势，共同解决技术难题，缩短产品开发周期。</p>
+
+      <p>在付款政策上，中粮坚持诚信履约，严格按照合同约定的账期支付货款，从不无故拖欠。在新冠疫情等特殊时期，即使中粮自身的现金流也面临压力，仍然优先保障对中小供应商的付款，帮助它们渡过难关。这种负责任的态度，赢得了供应商的广泛信任和尊重。</p>
+
+      <h2>三、经销商赋能：共同成长的市场伙伴</h2>
+      <p>中粮旗下拥有福临门、长城葡萄酒、蒙牛等多个知名品牌，产品通过遍布全国的经销商网络进入千家万户。经销商是中粮连接终端消费者的桥梁，也是中粮最重要的市场合作伙伴之一。</p>
+
+      <p>与传统的"厂家压货、经销商卖货"模式不同，中粮倡导与经销商建立"厂商一体化"的伙伴关系。中粮投入大量资源为经销商提供赋能支持，包括：系统的业务培训，帮助经销商团队提升销售技巧、库存管理和客户服务能力；专业的市场推广支持，联合经销商开展终端陈列、试吃试用、节日促销等活动；数字化工具赋能，为经销商提供门店管理系统、销售数据分析工具，帮助其提高经营效率；金融服务支持，为有资金需求的经销商提供保理、存货融资等供应链金融产品。</p>
+
+      <p>某中部省份的粮油经销商李先生，与中粮合作已有十五年。他回忆道："刚开始做的时候，我只有一辆小货车，两个人，一年销售额不到一百万。是中粮的业务员手把手教我怎么做市场陈列、怎么拜访客户、怎么管理库存。现在我的公司已经有三十多辆配送车、八十多名员工，年销售额突破两个亿。没有中粮的支持，我不可能有今天。"像李先生这样的经销商，在中粮的合作伙伴中比比皆是。</p>
+
+      <p>为了激励优秀经销商，中粮设立了年度优秀经销商评选和返利奖励制度。对于业绩突出、市场表现优异的经销商，不仅给予丰厚的物质奖励，还邀请其参加公司组织的国内外考察学习活动，拓展视野、增进交流。</p>
+
+      <h2>四、跨界合作：拓展产业生态的边界</h2>
+      <p>在巩固粮油食品主业的同时，中粮还积极探索与不同行业领先企业的跨界合作，拓展产业生态的边界，为消费者创造更多价值。</p>
+
+      <p>在餐饮渠道，中粮与众多知名连锁餐饮企业建立了战略合作关系。针对连锁餐饮对食材标准化、稳定供应的苛刻要求，中粮开发了专业的餐饮定制化产品线，从专用面粉、定制油品到预制菜原料，为餐饮企业提供一站式解决方案。通过深度合作，中粮能够及时捕捉餐饮市场的最新趋势，快速响应客户需求，而餐饮企业则获得了稳定可靠的食材供应保障。</p>
+
+      <p>在零售渠道，中粮与各大电商平台、连锁超市、便利店系统开展了形式多样的合作。除了传统的供货关系，双方还在联合营销、会员互通、数据共享等方面进行了深度探索。例如，中粮与某头部电商平台合作，基于平台的消费大数据，共同开发了专供线上渠道的定制产品，精准匹配目标客群的偏好，上线首月即成为品类销量冠军。</p>
+
+      <p>在国际合作方面，中粮积极践行"一带一路"倡议，与沿线国家的农业企业、科研机构、政府部门开展了广泛的合作。通过投资建设农业产业园区、输出先进种植和加工技术、培养当地农业人才，中粮帮助合作国提升了农业综合生产能力，同时也为自身的国际化发展开拓了新的空间。这种互利共赢的合作模式，得到了当地政府和民众的广泛欢迎，树立了中国企业的良好形象。</p>
+
+      <h2>五、共享未来：构建命运与共的产业共同体</h2>
+      <p>展望未来，中粮将继续秉持"合作共赢"的理念，进一步完善产业生态体系，让每一位参与者都能从中获得公平合理的回报。</p>
+
+      <p>对农户，中粮将持续加大订单农业的推广力度，扩大服务覆盖范围，提高服务专业水平，让更多农民分享产业链增值的收益。对供应商，中粮将推进供应链的数字化、透明化，建立更加公平、高效的协作机制。对经销商，中粮将深化厂商一体化战略，打造利益共享、风险共担的事业共同体。对消费者，中粮将坚持品质至上，以安全、健康、美味的产品回馈社会信任。</p>
+
+      <p>独行快，众行远。中粮坚信，只有携手合作伙伴，共建共享、共生共荣，才能在激烈的市场竞争中立于不败之地，才能为中国的粮食安全和乡村振兴作出更大贡献。</p>
+    </div>
+  </div>
+</div>
+
+<script src="特效/飘雪/js/index.js"></script>
+
+<style>
+.latest-news-section {
+  position: relative;
+  z-index: 1;
+  padding: 4rem 1rem;
+  background: linear-gradient(180deg, #f0f4f8 0%, #e8eef5 100%);
+}
+.latest-news-section .news-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.latest-news-section .news-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+.latest-news-section .news-subtitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #c9302c;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+}
+.latest-news-section .news-subtitle span {
+  font-size: 0.5rem;
+}
+.latest-news-section .news-title {
+  font-size: 1.9rem;
+  color: #0f1f3d;
+  font-weight: 700;
+}
+.latest-news-section .news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+.latest-news-section .news-card {
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,0.65);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(31,38,80,0.08);
+  display: flex;
+  flex-direction: column;
+}
+.latest-news-section .news-card-image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+.latest-news-section .news-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.latest-news-section .news-card-body {
+  padding: 1.4rem 1.3rem 0.6rem;
+  flex: 1;
+}
+.latest-news-section .news-card-body h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a3a6e;
+  margin-bottom: 0.5rem;
+  line-height: 1.45;
+}
+.latest-news-section .news-card-body p {
+  font-size: 0.92rem;
+  color: #4a5568;
+  line-height: 1.7;
+  margin: 0;
+}
+.latest-news-section .news-card-footer {
+  padding: 0 1.3rem 1.1rem;
+  font-size: 0.85rem;
+  color: #8899aa;
+}
+@media(max-width:768px){
+  .latest-news-section .news-title { font-size: 1.5rem; }
+}
+</style>
+<section class="latest-news-section">
+  <div class="news-container">
+    <div class="news-header">
+      <div class="news-subtitle"><span>&#9679;</span> 行业前沿</div>
+      <h2 class="news-title">洞察粮农趋势，引领产业未来</h2>
+    </div>
+    <div class="news-grid">
+      <div class="news-card">
+        <div class="news-card-image"><img src="assets/images/blog-smart-agriculture-drone.jpg" alt="智慧农业"></div>
+        <div class="news-card-body">
+          <h3>数字农田：智慧农业重塑耕种方式</h3>
+          <p>无人机巡田、卫星遥感与物联网传感器的深度融合，让每一寸土地的管理都进入厘米级精准时代，产量与品质同步跃升。</p>
+        </div>
+        <div class="news-card-footer">2025年05月15日</div>
+      </div>
+      <div class="news-card">
+        <div class="news-card-image"><img src="assets/images/blog-quality-lab-inspection.jpg" alt="品质检测"></div>
+        <div class="news-card-body">
+          <h3>从田间到舌尖：全链路品质守护</h3>
+          <p>依托全球领先的检测实验室与标准化加工基地，建立覆盖原料采购、生产加工、仓储物流的全流程质量追溯网络。</p>
+        </div>
+        <div class="news-card-footer">2025年06月02日</div>
+      </div>
+      <div class="news-card">
+        <div class="news-card-image"><img src="assets/images/blog-green-eco-farm.jpg" alt="绿色农业"></div>
+        <div class="news-card-body">
+          <h3>绿色低碳：可持续农业的中国方案</h3>
+          <p>推进生态农业、循环农业与清洁能源应用，在保障粮食产量的同时守护碧水蓝天，为全球农业可持续发展贡献力量。</p>
+        </div>
+        <div class="news-card-footer">2025年07月18日</div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>
