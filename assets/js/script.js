@@ -150,6 +150,9 @@ function initMobileVideoAutoplay() {
             try {
                 v.muted = true;
                 v.setAttribute('muted', 'muted');
+                v.setAttribute('playsinline', 'playsinline');
+                v.setAttribute('webkit-playsinline', 'webkit-playsinline');
+                if (typeof v.load === 'function') v.load();
                 var p = v.play && v.play();
                 if (p && typeof p.catch === 'function') p.catch(function () {});
             } catch (_) {}
