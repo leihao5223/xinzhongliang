@@ -1,0 +1,413 @@
+/* ====================================
+   全局白色主题覆盖 + 浅绿色玻璃拟态
+   ==================================== */
+
+/* ---------- 根变量覆盖 ---------- */
+:root {
+  --primary: #1a1a1a;
+  --secondary: #ffffff;
+  --text-color: #4a4a4a;
+}
+
+/* ---------- Body & HTML ---------- */
+body {
+  background-color: #ffffff !important;
+  color: #1a1a1a !important;
+}
+
+/* ---------- 各页面内联 body 背景重置 ---------- */
+body.personal-home-page {
+  background-color: #ffffff !important;
+}
+
+/* ---------- Section 基础背景 ---------- */
+section {
+  background-color: #ffffff;
+}
+
+/* ---------- 首页关键区块 ---------- */
+.about-showcase-section {
+  background: #ffffff !important;
+}
+.about-section-title {
+  color: #1a1a1a !important;
+}
+.about-section-desc {
+  color: #555555 !important;
+}
+
+/* 玻璃卡片：浅绿色拟态 */
+.glass-card {
+  background: rgba(232, 245, 233, 0.88) !important;
+  border: 1px solid rgba(129, 199, 132, 0.35) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
+}
+.glass-card:hover {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1) !important;
+  border-color: rgba(129, 199, 132, 0.5) !important;
+}
+.glass-card-body h3 {
+  color: #1a1a1a !important;
+}
+.glass-card-body p {
+  color: #555555 !important;
+}
+.glass-card-link {
+  color: #00796b !important;
+}
+.glass-card:hover .glass-card-link {
+  color: #00a896 !important;
+}
+
+.service-section-header h2 {
+  color: #1a1a1a !important;
+}
+.service-glass-card {
+  background: rgba(232, 245, 233, 0.88) !important;
+  border: 1px solid rgba(129, 199, 132, 0.35) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
+}
+.service-glass-card:hover {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1) !important;
+  border-color: rgba(129, 199, 132, 0.5) !important;
+}
+.service-glass-body h5 {
+  color: #1a1a1a !important;
+}
+.service-glass-body p {
+  color: #555555 !important;
+}
+
+.whychoose-glass-card {
+  background: rgba(232, 245, 233, 0.88) !important;
+  border: 1px solid rgba(129, 199, 132, 0.35) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
+}
+.whychoose-glass-card:hover {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1) !important;
+  border-color: rgba(129, 199, 132, 0.5) !important;
+}
+.whychoose-glass-card h3 {
+  color: #1a1a1a !important;
+}
+.whychoose-glass-card p {
+  color: #555555 !important;
+}
+.whychoose-glass-card .whychooseus-icon {
+  background: rgba(0, 121, 107, 0.08) !important;
+  border-color: rgba(0, 121, 107, 0.15) !important;
+  color: #00796b !important;
+}
+
+.coop-glass-section .case-content-background {
+  background-color: rgba(220, 237, 221, 0.6) !important;
+  border: 1px solid rgba(129, 199, 132, 0.25) !important;
+}
+.coop-glass-section .case-desc p {
+  color: #555555 !important;
+}
+.coop-glass-section .case-tag {
+  color: #00796b !important;
+  border-color: rgba(0, 121, 107, 0.3) !important;
+  background: rgba(0, 121, 107, 0.06) !important;
+}
+
+/* ---------- 数据中心板块 ---------- */
+.data-comparison-section--dark-glass {
+  background: rgba(220, 237, 221, 0.5) !important;
+}
+.data-comparison-section--dark-glass h2 {
+  color: #1a1a1a !important;
+}
+.dc-glass-panel {
+  background: rgba(232, 245, 233, 0.88) !important;
+  border: 1px solid rgba(129, 199, 132, 0.35) !important;
+}
+.dc-trend-title {
+  color: #1a1a1a !important;
+}
+.comparison-table-title {
+  color: #1a1a1a !important;
+}
+.comparison-table--on-glass thead th {
+  color: #1a1a1a !important;
+  background: rgba(220, 237, 221, 0.7) !important;
+}
+.comparison-table--on-glass tbody td {
+  color: #333333 !important;
+  border-color: rgba(129, 199, 132, 0.2) !important;
+}
+.dc-glass-footnote {
+  color: #888888 !important;
+}
+.dc-proj-name {
+  color: #1a1a1a !important;
+}
+.dc-proj-desc {
+  color: #555555 !important;
+}
+.dc-ratio-label {
+  color: #666666 !important;
+}
+.dc-ratio-val {
+  color: #444444 !important;
+}
+.dc-ratio-track2 {
+  background: rgba(129, 199, 132, 0.2) !important;
+}
+
+/* ---------- 公司概览 ---------- */
+.company-overview__content h2 {
+  color: #1a1a1a !important;
+}
+.company-overview__stat {
+  color: #1a1a1a !important;
+}
+.company-overview-card {
+  background: rgba(232, 245, 233, 0.88) !important;
+  border: 1px solid rgba(129, 199, 132, 0.35) !important;
+}
+.company-overview-card h6 {
+  color: #555555 !important;
+}
+
+/* ---------- 为何选择我们 ---------- */
+.whychooseus-title-container h2 {
+  color: #1a1a1a !important;
+}
+.whychooseus-title-container p {
+  color: #555555 !important;
+}
+.whychooseus-feature h3 {
+  color: #1a1a1a !important;
+}
+.whychooseus-feature p {
+  color: #555555 !important;
+}
+
+/* ---------- 联系我们 CTA ---------- */
+.contact-cta-banner {
+  background: rgba(220, 237, 221, 0.5) !important;
+}
+.contact-cta-title {
+  color: #1a1a1a !important;
+}
+.contact-cta-description {
+  color: #555555 !important;
+}
+
+/* ---------- Footer ---------- */
+.footer-container {
+  background: rgba(220, 237, 221, 0.5) !important;
+}
+.footer-info-text {
+  color: #555555 !important;
+}
+.footer-contact-text {
+  color: #333333 !important;
+}
+.footer-link {
+  color: #555555 !important;
+}
+.footer-link:hover {
+  color: #00796b !important;
+}
+.copyright-text {
+  color: #777777 !important;
+}
+.copyright-text a {
+  color: #00796b !important;
+}
+.legallink {
+  color: #777777 !important;
+}
+
+/* ---------- Header / Nav ---------- */
+.index-glass-navbar {
+  background: rgba(232, 245, 233, 0.96) !important;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06) !important;
+}
+.header-container.scrolled .header-navbar-fixed {
+  background-color: rgba(232, 245, 233, 0.98) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08) !important;
+}
+.nav-link {
+  color: #333333 !important;
+}
+.nav-link:hover {
+  color: #00796b !important;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  background: rgba(232, 245, 233, 0.95) !important;
+}
+.sidebar .menu a {
+  color: #333333 !important;
+}
+.sidebar-dropdown-menu {
+  background: rgba(220, 237, 221, 0.9) !important;
+}
+
+/* ---------- 产品页（交易中心）---------- */
+.tc-list-panel,
+.tc-detail-panel {
+  background: rgba(232, 245, 233, 0.88) !important;
+  border: 1px solid rgba(129, 199, 132, 0.35) !important;
+}
+.tc-product-desc {
+  color: #555555 !important;
+}
+.dc-proj-block {
+  background: rgba(232, 245, 233, 0.88) !important;
+  border: 1px solid rgba(129, 199, 132, 0.35) !important;
+}
+.dc-proj-block:hover {
+  background: rgba(220, 237, 221, 0.95) !important;
+  border-color: rgba(129, 199, 132, 0.5) !important;
+}
+.dc-proj-block.is-active {
+  background: rgba(210, 230, 212, 0.95) !important;
+  border-color: rgba(129, 199, 132, 0.6) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+}
+.tc-action-bar button[data-order-kind="entrust"] {
+  background: linear-gradient(135deg, #1565c0, #2563eb, #38bdf8) !important;
+}
+.tc-trade-dialog {
+  background: rgba(232, 245, 233, 0.95) !important;
+  border-color: rgba(129, 199, 132, 0.4) !important;
+}
+.tc-trade-dialog h3 {
+  color: #1a1a1a !important;
+}
+.tc-balance {
+  color: #555555 !important;
+}
+.tc-form input {
+  background: #ffffff !important;
+  color: #1a1a1a !important;
+  border-color: rgba(129, 199, 132, 0.4) !important;
+}
+.tc-quick-amounts button {
+  background: rgba(220, 237, 221, 0.8) !important;
+  color: #333333 !important;
+  border-color: rgba(129, 199, 132, 0.3) !important;
+}
+.tc-order-entry {
+  background: rgba(220, 237, 221, 0.8) !important;
+  color: #333333 !important;
+  border-color: rgba(129, 199, 132, 0.35) !important;
+}
+.tc-orders-dialog {
+  background: rgba(232, 245, 233, 0.95) !important;
+}
+.tc-order-item {
+  background: rgba(232, 245, 233, 0.9) !important;
+  border-color: rgba(129, 199, 132, 0.3) !important;
+}
+.tc-order-item h4 {
+  color: #1a1a1a !important;
+}
+.tc-order-item p {
+  color: #555555 !important;
+}
+
+/* ---------- About / 公司介绍页 ---------- */
+.banner-inner-content h1 {
+  color: #ffffff !important;
+}
+.banner-inner-excerpt {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+.about-showcase-lead {
+  color: #333333 !important;
+}
+.about-stat--showcase {
+  color: #1a1a1a !important;
+}
+.chevron-circle-list--glass li {
+  color: #333333 !important;
+}
+.about-glass-card {
+  background: linear-gradient(145deg, rgba(232, 245, 233, 0.82) 0%, rgba(220, 237, 221, 0.55) 100%) !important;
+  border: 1px solid rgba(129, 199, 132, 0.4) !important;
+}
+
+/* ---------- 合作专题 / 生态伙伴 ---------- */
+.section-eco-partners {
+  background: #ffffff !important;
+}
+.partnership-title {
+  color: #1a1a1a !important;
+}
+.eco-partners-intro {
+  color: #555555 !important;
+}
+.eco-partner-card {
+  background: rgba(232, 245, 233, 0.88) !important;
+  border: 1px solid rgba(129, 199, 132, 0.35) !important;
+}
+.eco-partner-name {
+  color: #333333 !important;
+}
+
+/* ---------- 通用动画 reveal 文字 ---------- */
+[data-animate] {
+  color: inherit;
+}
+
+/* ---------- 聊天面板 ---------- */
+.zl-chat-panel {
+  background: rgba(232, 245, 233, 0.92) !important;
+  border: 1px solid rgba(129, 199, 132, 0.35) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+}
+.zl-chat-head {
+  background: rgba(220, 237, 221, 0.9) !important;
+  color: #1a1a1a !important;
+  border-bottom: 1px solid rgba(129, 199, 132, 0.25) !important;
+}
+.zl-chat-body {
+  background: rgba(232, 245, 233, 0.85) !important;
+}
+.zl-chat-actions {
+  background: rgba(220, 237, 221, 0.9) !important;
+  border-top: 1px solid rgba(129, 199, 132, 0.25) !important;
+}
+.zl-chat-actions input {
+  background: #ffffff !important;
+  color: #1a1a1a !important;
+  border-color: rgba(129, 199, 132, 0.4) !important;
+}
+.zl-chat-fab {
+  background: #00796b !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* ---------- 博客 / 文章 ---------- */
+.blog-meta,
+.blog-link,
+.blog-cta {
+  color: #555555 !important;
+}
+
+/* ---------- 移动端菜单按钮 ---------- */
+.nav-btn {
+  color: #ffffff !important;
+  background-color: #00796b !important;
+}
+
+/* ---------- Login 页面保持深色（其本身为沉浸式登录页） ---------- */
+html:has(.video-bg),
+body:has(.video-bg) {
+  background: #000 !important;
+}
+
+/* ---------- 响应式微调 ---------- */
+@media (max-width: 768px) {
+  .index-glass-navbar {
+    background: rgba(232, 245, 233, 0.98) !important;
+  }
+}

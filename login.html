@@ -35,6 +35,16 @@
     }
 
     /* ========== 视频背景 ========== */
+    .video-bg-fallback {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      background: url('assets/images/zhongliang-wheat-field.jpg') center/cover no-repeat;
+      filter: brightness(0.4);
+    }
     .video-bg {
       position: fixed;
       inset: 0;
@@ -781,8 +791,10 @@
 </head>
 <body>
 
-  <!-- 视频背景 -->
-  <video class="video-bg" id="intro-video" autoplay muted loop playsinline>
+  <!-- 静态图片兜底背景（比视频更轻量，Vercel 不卡顿） -->
+  <div class="video-bg-fallback" aria-hidden="true"></div>
+  <!-- 视频背景（加载完成后覆盖在图片之上） -->
+  <video class="video-bg" id="intro-video" autoplay muted loop playsinline poster="assets/images/zhongliang-wheat-field.jpg">
     <source src="assets/videos/intro.mp4" type="video/mp4">
     <source src="/steris/assets/videos/intro.mp4" type="video/mp4">
   </video>

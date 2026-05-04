@@ -182,23 +182,35 @@ function syncHeroBackdrop(slide) {
     return;
   }
 
+  // 视频：若 source 未改变且已就绪，避免重复 reload 导致闪烁
+  const srcEl = video.querySelector('source');
+  const nextSrc = normalizeSlideUrl(slide.url);
+  const currentSrc = srcEl ? normalizeSlideUrl(srcEl.src) : '';
+  if (currentSrc === nextSrc && video.classList.contains('is-ready')) {
+    // 同一段视频，只需确保继续播放
+    video.muted = true;
+    video.play().catch(() => {});
+    return;
+  }
+
   cover.classList.remove('is-visible');
   cover.style.backgroundImage = '';
-  const srcEl = video.querySelector('source');
-  if (srcEl) srcEl.src = normalizeSlideUrl(slide.url);
+  if (srcEl) srcEl.src = nextSrc;
   video.load();
   video.muted = true;
   video.play().catch(() => {});
   video.classList.remove('is-ready');
   video.style.opacity = '0';
-  video.addEventListener(
-    'canplay',
-    function () {
-      video.classList.add('is-ready');
-      video.style.opacity = '1';
-    },
-    { once: true },
-  );
+
+  // 清除旧的 canplay 监听器，防止堆积
+  if (video._bannerCanplayHandler) {
+    video.removeEventListener('canplay', video._bannerCanplayHandler);
+  }
+  video._bannerCanplayHandler = function () {
+    video.classList.add('is-ready');
+    video.style.opacity = '1';
+  };
+  video.addEventListener('canplay', video._bannerCanplayHandler, { once: true });
 }
 
 function revealDefaultHeroVideo() {

@@ -42,8 +42,59 @@
       const seed = Number(p.id || 1) * 997;
       const base = 10 + (seed % 500);
       const change = ((seed * 13) % 1000) / 100 - 5;
-      return { ...p, livePrice: base, changePct: change };
+      return { ...p, livePrice: base, changePct: change, _base: base };
     });
+  }
+
+  function tickPrice(p) {
+    // 随机游走：每秒在 [-0.08, +0.08] 之间波动，保留两位小数
+    const delta = (Math.random() - 0.5) * 0.16;
+    let next = Number(p.livePrice) + delta;
+    // 围绕基准价做有界波动，防止漂移太远
+    const min = p._base * 0.92;
+    const max = p._base * 1.08;
+    if (next < min) next = min + Math.random() * 0.05;
+    if (next > max) next = max - Math.random() * 0.05;
+    p.livePrice = next;
+    // 同步微调涨跌幅
+    const drift = ((next - p._base) / p._base) * 100;
+    p.changePct = Number((drift + (Math.random() - 0.5) * 0.3).toFixed(2));
+    return p;
+  }
+
+  function startLiveTicks() {
+    setInterval(() => {
+      if (!products.length) return;
+      products.forEach(tickPrice);
+      // 更新列表中各卡片的价格与涨跌幅
+      listRoot.querySelectorAll('.dc-proj-block').forEach((el) => {
+        const idx = Number(el.getAttribute('data-idx'));
+        const p = products[idx];
+        if (!p) return;
+        const liveEl = el.querySelector('.dc-proj-live');
+        const pctEl = el.querySelector('.dc-proj-pct');
+        if (liveEl) liveEl.textContent = formatNum(p.livePrice);
+        if (pctEl) {
+          const pctStr = (p.changePct >= 0 ? '+' : '') + p.changePct.toFixed(2) + '%';
+          pctEl.textContent = pctStr;
+          pctEl.className = p.changePct >= 0 ? 'dc-proj-pct is-up' : 'dc-proj-pct is-down';
+        }
+      });
+      // 更新详情面板的价格描述
+      if (active && descEl) {
+        descEl.textContent = `${active.summary || ''} · 最新价 ${formatNum(active.livePrice)}，涨跌幅 ${(active.changePct >= 0 ? '+' : '') + active.changePct.toFixed(2)}%`;
+      }
+      // 每 3 秒刷新一次走势图 iframe，避免每秒刷新造成闪烁与性能问题
+      if (active && Date.now() - (window._lastChartRefresh || 0) > 3000) {
+        window._lastChartRefresh = Date.now();
+        const t = String(active.chartSourceType || 'tradingview').toLowerCase();
+        const web = String(active.chartWebsiteUrl || '').trim();
+        const newSrc = t === 'website' && web ? web : tvEmbedUrl(active.marketSymbol);
+        // 加随机参数强制刷新
+        const separator = newSrc.includes('?') ? '&' : '?';
+        iframe.src = newSrc + separator + '_t=' + Date.now();
+      }
+    }, 1000);
   }
 
   function upDownSplit(p) {
@@ -156,36 +207,36 @@
 
   const style = document.createElement('style');
   style.textContent = `
-    .tc-trade-modal{position:fixed;inset:0;background:rgba(3,8,16,.72);display:none;align-items:center;justify-content:center;z-index:60;padding:1rem}
+    .tc-trade-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:60;padding:1rem}
     .tc-trade-modal.is-open{display:flex}
-    .tc-trade-dialog{position:relative;width:min(460px,100%);background:#e8f9eb;border-radius:14px;padding:1rem 1rem 1.1rem;border:1px solid rgba(26,122,62,.25)}
-    .tc-trade-dialog h3{font-size:1.05rem;margin:0 0 .4rem;color:#123a2b}
-    .tc-balance{margin:0 0 .7rem;color:#1f5d46;font-size:.84rem}
-    .tc-modal-close{position:absolute;right:.6rem;top:.5rem;border:0;background:transparent;font-size:1.6rem;line-height:1;color:#194f39;cursor:pointer}
+    .tc-trade-dialog{position:relative;width:min(460px,100%);background:#ffffff;border-radius:14px;padding:1rem 1rem 1.1rem;border:1px solid rgba(0,0,0,.1);box-shadow:0 8px 32px rgba(0,0,0,.12)}
+    .tc-trade-dialog h3{font-size:1.05rem;margin:0 0 .4rem;color:#1a1a1a}
+    .tc-balance{margin:0 0 .7rem;color:#555555;font-size:.84rem}
+    .tc-modal-close{position:absolute;right:.6rem;top:.5rem;border:0;background:transparent;font-size:1.6rem;line-height:1;color:#777777;cursor:pointer}
     .tc-form{display:flex;flex-direction:column;gap:.55rem}
     .tc-quick-amounts{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem}
-    .tc-quick-amounts button{border:1px solid rgba(148,211,255,.3);background:rgba(4,22,42,.45);color:#d7ebff;border-radius:10px;padding:.45rem;font-size:.8rem;cursor:pointer}
-    .tc-form input{background:#fff;color:#163323;border:1px solid rgba(26,122,62,.25);border-radius:10px;padding:.55rem}
+    .tc-quick-amounts button{border:1px solid rgba(0,0,0,.1);background:#f0f0f0;color:#333333;border-radius:10px;padding:.45rem;font-size:.8rem;cursor:pointer}
+    .tc-form input{background:#ffffff;color:#1a1a1a;border:1px solid rgba(0,0,0,.15);border-radius:10px;padding:.55rem}
     .tc-form button{border:0;border-radius:10px;padding:.6rem;color:#fff;background:linear-gradient(135deg,#0d5c2e,#1a7a3e,#2ecc71);cursor:pointer}
-    .tc-msg{margin:.55rem 0 0;color:#1f5d46;font-size:.82rem}
-    .tc-order-entry{border:1px solid rgba(148,211,255,.45);background:rgba(15,23,42,.5);color:#dce9ff;border-radius:999px;padding:.42rem .9rem;font-size:.82rem;cursor:pointer}
+    .tc-msg{margin:.55rem 0 0;color:#555555;font-size:.82rem}
+    .tc-order-entry{border:1px solid rgba(0,0,0,.15);background:#f0f0f0;color:#333333;border-radius:999px;padding:.42rem .9rem;font-size:.82rem;cursor:pointer}
     .tc-grid{display:grid;grid-template-columns:minmax(240px,1fr) minmax(420px,1.9fr);gap:1rem}
-    .tc-list-panel,.tc-detail-panel{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:.95rem}
+    .tc-list-panel,.tc-detail-panel{background:#ffffff;border:1px solid rgba(0,0,0,.08);border-radius:16px;padding:.95rem;box-shadow:0 2px 8px rgba(0,0,0,.04)}
     .tc-list-panel{max-height:620px;overflow:auto}
-    .tc-product-desc{margin:0 0 .8rem;color:#9db3cf;font-size:.88rem}
-    .dc-proj-block{position:relative;padding:.85rem .9rem;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);margin-bottom:.7rem;cursor:pointer;transition:all .35s ease}
-    .dc-proj-block:hover{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.1)}
-    .dc-proj-block.is-active{border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.12);box-shadow:0 12px 40px rgba(0,0,0,.25)}
+    .tc-product-desc{margin:0 0 .8rem;color:#555555;font-size:.88rem}
+    .dc-proj-block{position:relative;padding:.85rem .9rem;border-radius:14px;background:#ffffff;border:1px solid rgba(0,0,0,.08);margin-bottom:.7rem;cursor:pointer;transition:all .35s ease}
+    .dc-proj-block:hover{border-color:rgba(0,0,0,.15);background:#fafafa}
+    .dc-proj-block.is-active{border-color:rgba(0,0,0,.2);background:#f5f5f5;box-shadow:0 4px 16px rgba(0,0,0,.08)}
     .dc-proj-title{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin:0 0 .25rem}
-    .dc-proj-name{font-size:.95rem;color:#f0f4f8;font-weight:600}
-    .dc-proj-live{font-size:.9rem;color:#90d9ff;font-weight:700}
+    .dc-proj-name{font-size:.95rem;color:#1a1a1a;font-weight:600}
+    .dc-proj-live{font-size:.9rem;color:#00796b;font-weight:700}
     .dc-proj-pct{font-size:.82rem;font-weight:700;margin-left:auto}
-    .dc-proj-pct.is-up{color:#34d399}
-    .dc-proj-pct.is-down{color:#f87171}
-    .dc-proj-desc{font-size:.82rem;color:#9ab;margin:0 0 .5rem}
+    .dc-proj-pct.is-up{color:#22c55e}
+    .dc-proj-pct.is-down{color:#ef4444}
+    .dc-proj-desc{font-size:.82rem;color:#555555;margin:0 0 .5rem}
     .dc-proj-ratios{display:flex;flex-direction:column;gap:.35rem}
-    .dc-ratio-head{display:flex;justify-content:space-between;font-size:.75rem;color:#cbd5e1}
-    .dc-ratio-track2{height:4px;border-radius:2px;background:rgba(255,255,255,.12);overflow:hidden}
+    .dc-ratio-head{display:flex;justify-content:space-between;font-size:.75rem;color:#666666}
+    .dc-ratio-track2{height:4px;border-radius:2px;background:rgba(0,0,0,.08);overflow:hidden}
     .dc-ratio-fill2{display:block;height:100%;border-radius:2px}
     .dc-ratio-fill2--green{background:linear-gradient(90deg,#34d399,#22c55e)}
     .dc-ratio-fill2--red{background:linear-gradient(90deg,#f87171,#ef4444)}
@@ -193,28 +244,28 @@
     .tc-card-actions button{border:0;border-radius:999px;padding:.35rem .8rem;font-size:.76rem;color:#fff;cursor:pointer}
     .tc-card-actions .tc-open-detail{background:linear-gradient(135deg,#1d4ed8,#2563eb,#38bdf8)}
     .tc-card-actions .tc-open-buy{background:linear-gradient(135deg,#0d5c2e,#1a7a3e,#2ecc71)}
-    .tc-card-pop{margin-top:.6rem;border:1px solid rgba(148,211,255,.3);background:rgba(8,20,37,.92);border-radius:12px;padding:.55rem}
-    .tc-card-pop .dc-chart-shell{border:1px solid rgba(148,211,255,.22);border-radius:10px;overflow:hidden}
+    .tc-card-pop{margin-top:.6rem;border:1px solid rgba(0,0,0,.1);background:#f8f9fa;border-radius:12px;padding:.55rem}
+    .tc-card-pop .dc-chart-shell{border:1px solid rgba(0,0,0,.08);border-radius:10px;overflow:hidden}
     .tc-card-pop .dc-chart-frame{height:180px}
     .tc-card-pop .tc-open-detail{display:block;margin-top:.55rem;width:100%}
-    .tc-detail-sheet{position:fixed;inset:0;background:rgba(3,8,16,.82);display:none;z-index:58;align-items:flex-end}
+    .tc-detail-sheet{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:58;align-items:flex-end}
     .tc-detail-sheet.is-open{display:flex}
-    .tc-detail-body{width:100%;max-height:92vh;overflow:auto;background:#101d31;border-top-left-radius:18px;border-top-right-radius:18px;padding:1rem}
-    .tc-detail-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;color:#e8f2ff}
-    .tc-detail-head button{border:0;background:transparent;color:#9fb8d8}
+    .tc-detail-body{width:100%;max-height:92vh;overflow:auto;background:#ffffff;border-top-left-radius:18px;border-top-right-radius:18px;padding:1rem;box-shadow:0 -4px 24px rgba(0,0,0,.12)}
+    .tc-detail-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;color:#1a1a1a}
+    .tc-detail-head button{border:0;background:transparent;color:#777777}
     .tc-action-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem;margin-top:.85rem}
     .tc-action-bar button{border:0;border-radius:999px;padding:.52rem .6rem;font-size:.82rem;color:#fff;cursor:pointer}
     .tc-action-bar button[data-direction="long"][data-order-kind="market"]{background:linear-gradient(135deg,#0d5c2e,#1a7a3e,#2ecc71)}
     .tc-action-bar button[data-direction="short"]{background:linear-gradient(135deg,#6b1f1f,#ef4444,#f97316)}
     .tc-action-bar button[data-order-kind="entrust"]{background:linear-gradient(135deg,#164f8b,#2563eb,#38bdf8)}
-    .tc-orders-dialog{width:min(620px,100%);background:#f5f7fb}
+    .tc-orders-dialog{width:min(620px,100%);background:#ffffff}
     .tc-orders-tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem;margin:.7rem 0}
     .tc-orders-tabs button{border:1px solid #c6ced9;background:#fff;color:#4a5d75;border-radius:14px;padding:.52rem}
     .tc-orders-tabs button.is-active{border-color:#b98a1f;color:#b98a1f;background:#f6efe0}
     .tc-orders-list{max-height:56vh;overflow:auto;display:flex;flex-direction:column;gap:.6rem}
     .tc-order-item{background:#fff;border:1px solid #dbe2eb;border-radius:14px;padding:.65rem .8rem}
-    .tc-order-item h4{margin:0 0 .2rem;font-size:.95rem;color:#20374f}
-    .tc-order-item p{margin:0;color:#5c6f87;font-size:.8rem;line-height:1.5}
+    .tc-order-item h4{margin:0 0 .2rem;font-size:.95rem;color:#1a1a1a}
+    .tc-order-item p{margin:0;color:#555555;font-size:.8rem;line-height:1.5}
     .tc-order-item .tc-order-pnl{font-size:1.08rem;font-weight:700;margin-top:.32rem}
     .tc-order-item .tc-order-pnl.is-win{color:#22c55e}
     .tc-order-item .tc-order-pnl.is-loss{color:#ef4444}
@@ -506,6 +557,7 @@
       renderList(products);
       if (active) setChartForProduct(active);
       if (token) refreshOrders();
+      startLiveTicks();
     } catch (err) {
       if (listRoot) listRoot.innerHTML = `<p style="color:#ffd6d6;padding:1rem;">${esc(err.message)}</p>`;
     }
