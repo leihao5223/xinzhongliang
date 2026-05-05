@@ -331,28 +331,15 @@
         </div>
     </aside>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     <!-- Main Section -->
     <main>
         <!-- Banner 首页 Section -->
         <section class="section banner-home">
             <!-- 底：与 wheat 海报解耦；顶栏背景由相册 postMessage 或首段视频驱动 -->
             <div class="banner-home__media-base" aria-hidden="true"></div>
-            <video id="banner-hero-video" class="banner-home__video-bg is-ready" autoplay muted loop playsinline preload="metadata">
-                <source src="assets/videos/intro.mp4" type="video/mp4">
+            <!-- ★★★ 视频标签：src 留空，由下面的 JS 动态设置 ★★★ -->
+            <video id="banner-hero-video" class="banner-home__video-bg is-ready" autoplay muted playsinline preload="metadata">
+                <source src="" type="video/mp4">
             </video>
             <div id="banner-sync-cover" class="banner-home__sync-cover" aria-hidden="true"></div>
             <div class="banner-home__video-overlay"></div>
@@ -1743,20 +1730,6 @@
         </script>
     </footer>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     <script type="module" src="assets/js/banner-media-carousel.mjs?v=18"></script>
     <script src="assets/js/vendor/jquery.min.js"></script>
     <script src="assets/js/vendor/bootstrap.bundle.min.js"></script>
@@ -1804,7 +1777,6 @@
       }, { threshold: 0.12 });
       reveals.forEach(el => observer.observe(el));
 
-      // Dedicated glass-card stagger animation
       const glassCards = document.querySelectorAll('.glass-card');
       glassCards.forEach((el, i) => {
         el.style.opacity = '0';
@@ -1869,5 +1841,55 @@
     <script src="assets/data/grain-products-fallback.js?v=1"></script>
     <script src="assets/js/dc-heritage-core.js?v=4"></script>
     <script src="assets/js/zhongliang-animations.js"></script>
+
+    <!-- ==================== 视频循环播放器 ==================== -->
+    <script>
+    (function() {
+        const videoEl = document.getElementById('banner-hero-video');
+        if (!videoEl) return;
+
+        // ==========================================
+        // ★★★ 修改视频链接请只修改下面这个数组 ★★★
+        // ==========================================
+        const VIDEO_LIST = [
+            'https://www.pexels.com/download/video/33372326/',
+            // 添加更多视频链接，例如：
+            // 'https://videos.pexels.com/video-files/.../你的视频.mp4',
+        ];
+        // ==========================================
+
+        let currentIndex = 0;
+        videoEl.removeAttribute('loop');
+
+        function loadVideo(index) {
+            if (index >= VIDEO_LIST.length) index = 0;
+            currentIndex = index;
+            const url = VIDEO_LIST[index];
+            const ext = url.split('.').pop().split('?')[0].toLowerCase();
+            const mimeMap = { 'mp4': 'video/mp4', 'webm': 'video/webm', 'ogg': 'video/ogg' };
+            const sourceEl = videoEl.querySelector('source');
+            if (sourceEl) {
+                sourceEl.src = url;
+                sourceEl.type = mimeMap[ext] || 'video/mp4';
+            } else {
+                videoEl.src = url;
+            }
+            videoEl.load();
+            videoEl.play().catch(() => {});
+        }
+
+        videoEl.addEventListener('ended', function() {
+            loadVideo(currentIndex + 1);
+        });
+
+        videoEl.addEventListener('error', function() {
+            loadVideo(currentIndex + 1);
+        });
+
+        if (VIDEO_LIST.length > 0) {
+            loadVideo(0);
+        }
+    })();
+    </script>
 </body>
 </html>
