@@ -12,6 +12,7 @@ function getRepoRoot() {
 function getRuntimeRoot() {
   const e = process.env.ZHONGLIANG_RUNTIME && String(process.env.ZHONGLIANG_RUNTIME).trim();
   if (e) return path.resolve(e);
+  if (process.env.VERCEL) return path.join('/tmp', 'zhongliang-runtime');
   return path.join(getRepoRoot(), 'runtime');
 }
 

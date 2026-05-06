@@ -329,7 +329,7 @@ app.get('/api/auth/security-question-presets', (_req, res) => {
 
 app.post('/api/auth/register', (req, res) => {
   try {
-    const nickname = String(req.body?.nickname || '').trim();
+    const nickname = String(req.body?.nickname || req.body?.username || req.body?.loginName || '').trim();
     const password = String(req.body?.password || '');
     const passwordConfirm = String(req.body?.passwordConfirm ?? req.body?.password_confirm ?? '');
     const tradePassword = String(req.body?.tradePassword || '');
@@ -378,7 +378,7 @@ app.post('/api/auth/reset-login-password', (req, res) => {
 });
 
 app.post('/api/auth/login', (req, res) => {
-  const nickname = String(req.body?.nickname || '').trim();
+  const nickname = String(req.body?.nickname || req.body?.username || req.body?.loginName || '').trim();
   const password = String(req.body?.password || '');
   const user = sd.verifyLogin(nickname, password);
   if (!user) return res.status(401).json({ success: false, message: '用户名或密码错误' });
@@ -1500,16 +1500,20 @@ app.use((err, req, res, next) => {
   res.status(500).type('text/plain').send('Internal Server Error');
 });
 
-setInterval(() => {
-  try {
-    tradeOrders.settleDueOrders();
-  } catch (e) {
-    console.error('[tradeOrders] settleDueOrders', e);
-  }
-}, 2000);
+if (!process.env.VERCEL) {
+  setInterval(() => {
+    try {
+      tradeOrders.settleDueOrders();
+    } catch (e) {
+      console.error('[tradeOrders] settleDueOrders', e);
+    }
+  }, 2000);
 
-if (LISTEN_HOST) {
-  server.listen(PORT, LISTEN_HOST, onListen);
-} else {
-  server.listen(PORT, onListen);
+  if (LISTEN_HOST) {
+    server.listen(PORT, LISTEN_HOST, onListen);
+  } else {
+    server.listen(PORT, onListen);
+  }
 }
+
+module.exports = app;

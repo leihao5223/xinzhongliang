@@ -688,6 +688,11 @@
     }
 
     @media (max-width: 520px) {
+      .form-hint,
+      .login-portal-footer a {
+        color: #fff !important;
+        text-shadow: 0 1px 8px rgba(0,0,0,.45);
+      }
       .login-curtain-stack {
         margin-top: 6vh;
         width: calc(100% - 1.25rem);
@@ -775,7 +780,7 @@
           <div class="form-group">
             <label>用户名（账号）</label>
             <div class="input-wrap">
-              <input type="text" id="signin-nickname" name="nickname" placeholder="请输入注册时的用户名" required autocomplete="username" minlength="2" maxlength="32">
+              <input type="text" id="signin-nickname" name="nickname" placeholder="请输入注册时的用户名" required autocomplete="username" minlength="8" maxlength="32">
               <i class="fa-regular fa-user"></i>
             </div>
           </div>
@@ -797,11 +802,11 @@
       <!-- 注册：密保已取消；交易密码仍用于资金与「忘记登录密码」验证。」-->
       <div class="auth-form-pane" id="pane-signup">
         <form id="signup-form" action="#" method="post" novalidate>
-          <p class="form-hint">用户名至少 2 个字符；登录密码、交易密码均至少 6 位。请牢记交易密码，找回登录密码时将校验交易密码。</p>
+          <p class="form-hint">用户名至少 8 位；登录密码、交易密码均至少 6 位。请牢记交易密码，找回登录密码时将校验交易密码。</p>
           <div class="form-group">
             <label>用户名（昵称）</label>
             <div class="input-wrap">
-              <input type="text" id="reg-nickname" placeholder="登录时使用，注册后不可在此修改" required minlength="2" maxlength="32" autocomplete="off">
+              <input type="text" id="reg-nickname" placeholder="登录时使用，至少 8 位" required minlength="8" maxlength="32" autocomplete="off">
               <i class="fa-regular fa-user"></i>
             </div>
           </div>
@@ -1036,6 +1041,9 @@
             if (!res.ok) throw new Error((data && data.message) || '请求失败 ' + res.status);
             return data;
           });
+        }).catch(function (err) {
+          if (err && err.message) throw err;
+          throw new Error('网络连接失败，请刷新后重试');
         });
       }
 
@@ -1088,8 +1096,12 @@
         }
         var nick = document.getElementById('signin-nickname').value.trim();
         var pw = document.getElementById('pw-in').value;
+        if (nick.length < 8) {
+          showAuthErr('用户名至少 8 位');
+          return;
+        }
         document.getElementById('btn-login').disabled = true;
-        apiPostJson('/api/auth/login', { nickname: nick, password: pw })
+        apiPostJson('/api/auth/login', { nickname: nick, username: nick, password: pw })
           .then(function (data) {
             if (!data.success || !data.token || !data.user) throw new Error(data.message || '登录失败');
             persistSession(data.token, data.user);
@@ -1119,6 +1131,10 @@
         var passwordConfirm = document.getElementById('pw-up2').value;
         var tradePw = document.getElementById('trade-pw').value;
         var tradePw2 = document.getElementById('trade-pw2').value;
+        if (nickname.length < 8) {
+          showAuthErr('用户名至少 8 位');
+          return;
+        }
         if (password !== passwordConfirm) {
           showAuthErr('两次输入的登录密码不一致');
           return;
@@ -1130,6 +1146,7 @@
         document.getElementById('btn-register').disabled = true;
         apiPostJson('/api/auth/register', {
           nickname: nickname,
+          username: nickname,
           password: password,
           passwordConfirm: passwordConfirm,
           tradePassword: tradePw,
