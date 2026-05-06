@@ -4,7 +4,7 @@
 const VIDEO_LIST_API = '/api/public/videos';
 const ACTIVE_MEDIA_API = '/api/site/active-media?pageKey=home&slotKey=hero-bg';
 const MANIFEST_URL = '/media-gallery-manifest.json';
-const AUTO_ADVANCE_MS = 10000;
+const AUTO_ADVANCE_MS = 5 * 60 * 1000;
 
 function titleFromUrl(u) {
   try {
@@ -116,9 +116,7 @@ async function loadSlides() {
       }));
     if (slides.length) return dedupeSlidesByUrl([...scheduled, ...slides]).slice(0, 6);
     throw new Error('no video entries in manifest');
-  } catch (e) {
-    console.warn('[banner-media-carousel] manifest load failed', e);
-  }
+  } catch (_) {}
 
   return dedupeSlidesByUrl([...scheduled, ...FALLBACK_VIDEO_SLIDES]).slice(0, 6);
 }

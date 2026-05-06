@@ -3,6 +3,7 @@ jQuery(function ($) {
     initSidebar();
     initSidebarDropdown();
     initUnifiedTopNav();
+    initAuthAwareTopNav();
     initMobileVideoAutoplay();
     initNavLink();
     initCounterCount();
@@ -133,6 +134,35 @@ function initUnifiedTopNav() {
         $group.find('> .dropdown-header .sidebar-dropdown-btn').remove();
         $group.removeClass('sidebar-dropdown');
         $header.replaceWith($anchor);
+    });
+}
+
+/* =====================
+   Auth Aware Top Nav
+===================== */
+function initAuthAwareTopNav() {
+    var tokenKeys = ['zhongliang_token', 'zl_token', 'token'];
+    var hasToken = tokenKeys.some(function (key) {
+        var value = localStorage.getItem(key);
+        return value && String(value).trim();
+    });
+
+    document.body.classList.toggle('zl-is-authed', hasToken);
+
+    if (hasToken) {
+        $('.nav-btn, .navbar-cta-container').hide();
+        if (!$('.zl-shell').length) {
+            $('.nav-link-wrapper').hide();
+        }
+        $('.zl-actions').hide();
+        return;
+    }
+
+    $('.btn-nav-contact').each(function () {
+        var $btn = $(this);
+        $btn.attr('href', 'login.html#signup');
+        $btn.find('span').first().text('注册');
+        $btn.attr('aria-label', '注册');
     });
 }
 

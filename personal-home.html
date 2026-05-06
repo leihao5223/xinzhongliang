@@ -30,71 +30,589 @@
       z-index: 1;
     }
     .personal-home-shell {
-      padding: 1.25rem 0 0;
-      background: #ffffff;
+      padding: 1.1rem 0 0;
       min-height: calc(100vh - 88px);
-    }
-    .account-dashboard {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 1.5rem;
-      color: #0f172a;
-    }
-    .account-hero {
-      border-radius: 28px;
-      padding: clamp(1.4rem, 4vw, 2.4rem);
       background:
-        radial-gradient(circle at 85% 20%, rgba(94, 234, 212, .24), transparent 24rem),
-        linear-gradient(135deg, #071527, #0d5c2e 70%, #10351e);
-      color: #fff;
-      box-shadow: 0 24px 70px rgba(15, 23, 42, .16);
-      margin-bottom: 1.2rem;
+        radial-gradient(circle at 12% 0%, rgba(56, 189, 248, .22), transparent 24rem),
+        radial-gradient(circle at 90% 8%, rgba(125, 211, 252, .22), transparent 25rem),
+        linear-gradient(180deg, #eff8ff 0%, #ffffff 48%, #e0f2fe 100%);
     }
-    .account-hero h1 { margin: 0 0 .45rem; font-size: clamp(1.9rem, 5vw, 3.4rem); font-weight: 900; }
-    .account-hero p { margin: 0; color: rgba(255,255,255,.76); line-height: 1.8; }
-    .account-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .9rem; margin: 1rem 0; }
-    .account-card {
-      border: 1px solid rgba(15, 118, 110, .14);
+    .account-dashboard { max-width: 1180px; margin: 0 auto; padding: clamp(.9rem, 2vw, 1.5rem); color: #0f172a; }
+    .account-appbar {
+      position: sticky;
+      top: 72px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(125, 211, 252, .34);
       border-radius: 22px;
-      background: rgba(255,255,255,.92);
-      box-shadow: 0 18px 50px rgba(15, 23, 42, .06);
-      padding: 1rem;
+      background: rgba(255,255,255,.82);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 18px 60px rgba(14, 116, 144, .12);
+      padding: .72rem;
     }
-    .account-card h2, .account-card h3 { margin: 0 0 .75rem; font-weight: 850; color: #0f172a; }
-    .account-card small { color: #64748b; }
-    .account-card b { display: block; margin-top: .35rem; font-size: 1.55rem; color: #0d5c2e; }
-    .account-main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    .account-toolbar { display: flex; flex-wrap: wrap; gap: .55rem; align-items: center; }
-    .account-toolbar input {
-      border: 1px solid #dbe7df;
-      border-radius: 12px;
-      padding: .62rem .75rem;
-      min-width: 150px;
-      outline: none;
+    .account-appbar__brand { display: flex; align-items: center; gap: .7rem; min-width: 0; }
+    .account-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #0c4a6e, #38bdf8);
+      color: #fff;
+      font-weight: 900;
     }
-    .account-toolbar button, .account-btn {
+    .account-appbar__brand strong { display: block; line-height: 1.1; }
+    .account-appbar__brand small { color: #64748b; }
+    .account-tabs { display: flex; gap: .35rem; overflow-x: auto; }
+    .account-tab {
       border: 0;
       border-radius: 999px;
-      padding: .65rem 1rem;
-      background: linear-gradient(135deg, #0d5c2e, #2ecc71);
-      color: #fff;
-      font-weight: 750;
+      padding: .62rem .9rem;
+      background: transparent;
+      color: #475569;
+      font-weight: 800;
+      white-space: nowrap;
       cursor: pointer;
     }
-    .account-list { display: grid; gap: .55rem; max-height: 360px; overflow: auto; }
-    .account-row { border: 1px solid #edf2ef; border-radius: 14px; padding: .65rem .75rem; background: #fff; }
+    .account-tab.is-active { color: #062013; background: linear-gradient(135deg, #bae6fd, #38bdf8); box-shadow: 0 12px 26px rgba(56, 189, 248, .24); }
+    .account-hero {
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 1.2rem;
+      border-radius: 32px;
+      padding: clamp(1.35rem, 4vw, 2.6rem);
+      background:
+        radial-gradient(circle at 78% 12%, rgba(125, 211, 252, .30), transparent 20rem),
+        linear-gradient(135deg, #06131f, #0c4a6e 62%, #082f49);
+      color: #fff;
+      box-shadow: 0 28px 80px rgba(15, 23, 42, .16);
+      margin-bottom: 1rem;
+    }
+    .account-hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size: 62px 62px;
+      mask-image: linear-gradient(120deg, rgba(0,0,0,.45), transparent 72%);
+      pointer-events: none;
+    }
+    .account-hero > * { position: relative; z-index: 1; }
+    .account-kicker { color: #bae6fd; font-size: .78rem; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+    .account-hero h1 { margin: .5rem 0 .55rem; font-size: clamp(2rem, 5vw, 4.25rem); line-height: 1; font-weight: 950; letter-spacing: -.05em; }
+    .account-hero p { margin: 0; max-width: 680px; color: rgba(255,255,255,.76); line-height: 1.85; }
+    .account-status-card {
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 24px;
+      padding: 1rem;
+      background: rgba(255,255,255,.10);
+      backdrop-filter: blur(12px);
+      align-self: stretch;
+    }
+    .account-status-card small { display: block; color: rgba(255,255,255,.65); }
+    .account-status-card b { display: block; margin-top: .25rem; font-size: 1.8rem; color: #bae6fd; }
+    .account-quick-actions { display: flex; flex-wrap: wrap; gap: .55rem; margin-top: 1.15rem; }
+    .account-btn, .account-toolbar button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .35rem;
+      border: 0;
+      border-radius: 999px;
+      padding: .7rem 1rem;
+      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      color: #fff;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .account-btn--ghost { color: #0f172a; background: rgba(255,255,255,.92); }
+    .account-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .9rem; margin: 1rem 0; }
+    .account-card {
+      border: 1px solid rgba(125, 211, 252, .34);
+      border-radius: 24px;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 18px 50px rgba(14, 116, 144, .10);
+      padding: 1rem;
+    }
+    .account-card h2, .account-card h3 { margin: 0 0 .75rem; font-weight: 900; color: #0f172a; }
+    .account-card small { color: #64748b; }
+    .account-card b { display: block; margin-top: .35rem; font-size: 1.55rem; color: #0284c7; }
+    .account-card--metric { min-height: 126px; display: flex; flex-direction: column; justify-content: space-between; }
+    .account-main-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr); gap: 1rem; align-items: start; }
+    .account-stack { display: grid; gap: 1rem; }
+    .account-toolbar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) auto; gap: .55rem; align-items: center; }
+    .account-toolbar--money { grid-template-columns: 1fr auto auto; }
+    .account-toolbar input {
+      width: 100%;
+      border: 1px solid #dbe7df;
+      border-radius: 14px;
+      padding: .72rem .82rem;
+      outline: none;
+      background: #fff;
+    }
+    .account-list { display: grid; gap: .55rem; max-height: 430px; overflow: auto; }
+    .account-row { border: 1px solid #edf2ef; border-radius: 16px; padding: .78rem .85rem; background: #fff; }
+    .account-row__top { display: flex; align-items: center; justify-content: space-between; gap: .6rem; }
     .account-row strong { color: #0f172a; }
     .account-row span { color: #64748b; font-size: .86rem; }
-    .account-msg { margin: .65rem 0 0; color: #0d5c2e; min-height: 1.2em; }
+    .account-badge { display: inline-flex; border-radius: 999px; padding: .2rem .55rem; background: #e0f2fe; color: #0369a1; font-size: .78rem; font-weight: 800; }
+    .account-badge--warn { background: #fff7ed; color: #c2410c; }
+    .account-msg { margin: .65rem 0 0; color: #0284c7; min-height: 1.2em; }
+    .account-section { display: none; }
+    .account-section.is-active { display: block; }
     .auth-required { text-align: center; padding: 3rem 1rem; }
-    @media (max-width: 900px) {
+    @media (max-width: 980px) {
+      .account-appbar, .account-hero { grid-template-columns: 1fr; }
+      .account-appbar { position: static; align-items: flex-start; flex-direction: column; }
       .account-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .account-main-grid { grid-template-columns: 1fr; }
     }
-    @media (max-width: 560px) {
-      .account-dashboard { padding: .9rem; }
+    @media (max-width: 620px) {
+      .account-dashboard { padding: .85rem; }
       .account-grid { grid-template-columns: 1fr; }
-      .account-toolbar input, .account-toolbar button { width: 100%; }
+      .account-toolbar, .account-toolbar--money { grid-template-columns: 1fr; }
+      .account-toolbar input, .account-toolbar button, .account-btn { width: 100%; }
+    }
+    body.personal-home-page > header,
+    body.personal-home-page > aside,
+    body.personal-home-page > footer,
+    body.personal-home-page .sidebar-overlay,
+    body.personal-home-page .sidebar {
+      display: none !important;
+    }
+    body.personal-home-page {
+      background: #f8fafc;
+    }
+    .personal-home-shell {
+      min-height: 100vh;
+      padding: 0;
+      background: #f8fafc;
+    }
+    .zl-live-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #f8fafc;
+      color: #0f172a;
+      font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+    }
+    .zl-live-nav {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      border-bottom: 1px solid #e5e7eb;
+      background: rgba(255,255,255,.95);
+      backdrop-filter: blur(12px);
+    }
+    .zl-live-nav__inner {
+      max-width: 72rem;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .75rem;
+      padding: .75rem 1rem;
+      flex-wrap: wrap;
+    }
+    .zl-live-left, .zl-live-right, .zl-live-tabs {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .zl-live-brand-slot {
+      min-height: 2rem;
+      min-width: 6rem;
+      border: 1px dashed #d1d5db;
+      border-radius: .25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+      font-size: .82rem;
+    }
+    .zl-live-tab {
+      border: 0;
+      background: transparent;
+      color: #4b5563;
+      font-size: .9rem;
+      cursor: pointer;
+      padding: .25rem 0;
+    }
+    .zl-live-tab:hover,
+    .zl-live-tab.is-active {
+      color: #00796b;
+      font-weight: 700;
+    }
+    .zl-live-user {
+      max-width: 10rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      border: 1px dashed #e5e7eb;
+      border-radius: .35rem;
+      padding: .25rem .5rem;
+      color: #374151;
+      font-size: .875rem;
+    }
+    .zl-live-logout {
+      border: 1px solid #d1d5db;
+      background: #fff;
+      color: #374151;
+      border-radius: .5rem;
+      padding: .38rem .75rem;
+      font-size: .875rem;
+      cursor: pointer;
+    }
+    .zl-live-main {
+      width: 100%;
+      max-width: 72rem;
+      flex: 1;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+    .zl-live-space {
+      display: grid;
+      gap: 1.25rem;
+    }
+    .zl-live-card {
+      border: 1px solid #e5e7eb;
+      background: #fff;
+      border-radius: .75rem;
+      padding: 1rem;
+    }
+    .zl-live-card h2 {
+      margin: 0;
+      color: #1f2937;
+      font-size: 1.125rem;
+      font-weight: 700;
+    }
+    .zl-live-card h3 {
+      margin: 0 0 .75rem;
+      color: #1f2937;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+    .zl-live-muted {
+      margin: .25rem 0 0;
+      color: #64748b;
+      font-size: .875rem;
+    }
+    .zl-live-alert {
+      border-color: #fecdd3;
+      background: #fff1f2;
+      color: #be123c;
+      font-size: .875rem;
+    }
+    .zl-live-loading {
+      color: #475569;
+      font-size: .875rem;
+    }
+    .zl-live-grid-3 {
+      display: grid;
+      gap: .75rem;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .zl-live-metric {
+      border: 1px solid #e0f2fe;
+      background: #fff;
+      border-radius: .75rem;
+      padding: 1rem;
+    }
+    .zl-live-metric h3 {
+      margin: 0;
+      color: #64748b;
+      font-size: .875rem;
+      font-weight: 500;
+    }
+    .zl-live-metric p {
+      margin: .25rem 0 0;
+      color: #0f172a;
+      font-size: 1.5rem;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+    .zl-live-action-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: .5rem;
+    }
+    .zl-live-btn {
+      border: 0;
+      border-radius: .5rem;
+      padding: .45rem .75rem;
+      color: #fff;
+      font-size: .875rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .zl-live-btn--emerald { background: #059669; }
+    .zl-live-btn--sky { background: #0284c7; }
+    .zl-live-btn--outline {
+      color: #334155;
+      background: #fff;
+      border: 1px solid #cbd5e1;
+    }
+    .zl-live-input {
+      border: 1px solid #cbd5e1;
+      border-radius: .5rem;
+      padding: .55rem .75rem;
+      min-width: 9rem;
+    }
+    .zl-live-table-wrap {
+      overflow: auto;
+    }
+    .zl-live-table {
+      min-width: 100%;
+      border-collapse: collapse;
+      font-size: .875rem;
+    }
+    .zl-live-table th {
+      padding: .5rem;
+      color: #64748b;
+      text-align: left;
+      font-weight: 600;
+    }
+    .zl-live-table td {
+      border-top: 1px solid #f1f5f9;
+      padding: .5rem;
+      color: #334155;
+    }
+    .zl-live-table .right {
+      text-align: right;
+    }
+    .zl-live-list {
+      display: grid;
+      gap: .5rem;
+    }
+    .zl-live-order {
+      border: 1px solid #f1f5f9;
+      background: #f8fafc;
+      border-radius: .5rem;
+      padding: .65rem .75rem;
+      font-size: .875rem;
+    }
+    .zl-live-order-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: .5rem;
+    }
+    .zl-live-order strong {
+      color: #1f2937;
+    }
+    .zl-live-section {
+      display: none;
+    }
+    .zl-live-section.is-active {
+      display: grid;
+    }
+    @media (max-width: 768px) {
+      .zl-live-grid-3 { grid-template-columns: 1fr; }
+      .zl-live-nav__inner { align-items: flex-start; }
+      .zl-live-left, .zl-live-right, .zl-live-tabs { flex-wrap: wrap; gap: .65rem; }
+    }
+    .zltx-profile {
+      min-height: 100vh;
+      padding: 1.1rem 1rem 6.2rem;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(224, 242, 254, .95), rgba(248, 250, 252, .92) 38%, rgba(246, 240, 228, .62) 100%),
+        linear-gradient(180deg, #eef8ff, #f7f3ea);
+      color: #172033;
+      font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+    }
+    .zltx-phone {
+      width: min(100%, 560px);
+      margin: 0 auto;
+    }
+    .zltx-top {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: .75rem;
+      align-items: start;
+      margin-bottom: 1.45rem;
+      padding: 0 .15rem;
+    }
+    .zltx-label { margin: 0 0 .35rem; color: #73829a; font-size: .82rem; font-weight: 800; }
+    .zltx-userline { display: inline-flex; align-items: center; gap: .45rem; color: #172033; font-size: 1.35rem; font-weight: 900; }
+    button.zltx-userline {
+      border: 0;
+      padding: 0;
+      background: transparent;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .zltx-userline::after { content: "⌄"; color: #73829a; font-size: 1rem; transform: translateY(-1px); }
+    .zltx-credit {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      margin-top: .75rem;
+      padding: .48rem .9rem;
+      border-radius: 999px;
+      color: #b68a26;
+      background: rgba(255, 248, 220, .88);
+      border: 1px solid rgba(214, 179, 95, .36);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+      font-weight: 900;
+    }
+    .zltx-credit::before { content: ""; width: .48rem; height: .48rem; border-radius: 999px; background: #d6b35f; }
+    .zltx-currency {
+      justify-self: end;
+      display: grid;
+      gap: .55rem;
+      justify-items: end;
+    }
+    .zltx-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 2rem;
+      padding: .35rem 1rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,.78);
+      border: 1px solid rgba(214, 179, 95, .28);
+      color: #172033;
+      font-weight: 900;
+      box-shadow: 0 8px 24px rgba(15,23,42,.06);
+    }
+    .zltx-pill--muted { color: #42526a; font-size: .86rem; padding-inline: .85rem; }
+    .zltx-asset-card {
+      position: relative;
+      overflow: hidden;
+      margin: 0 auto 1.2rem;
+      padding: 1.55rem 1.7rem 1.4rem;
+      border-radius: 1.05rem;
+      background: rgba(255,255,255,.86);
+      border: 1px solid rgba(226,232,240,.82);
+      box-shadow: 0 20px 60px rgba(15,23,42,.08);
+    }
+    .zltx-asset-title { margin: 0 0 .35rem; color: #73829a; font-size: .98rem; font-weight: 900; }
+    .zltx-total {
+      margin: 0;
+      color: #111827;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2.25rem, 10vw, 3.55rem);
+      line-height: 1;
+      letter-spacing: -.04em;
+    }
+    .zltx-divider { height: 1px; margin: 1.45rem 0 1rem; background: #cbd5e1; }
+    .zltx-pnl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 72%; }
+    .zltx-mini-label { color: #73829a; font-size: .82rem; font-weight: 900; }
+    .zltx-mini-value { margin-top: .35rem; color: #172033; font-size: 1.2rem; font-weight: 950; }
+    .zltx-grain-mark {
+      position: absolute;
+      right: 1.55rem;
+      bottom: 1.1rem;
+      width: 5.1rem;
+      height: 5.1rem;
+      opacity: .95;
+    }
+    .zltx-action-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr 1.1fr;
+      gap: .75rem;
+      margin-bottom: 1.35rem;
+    }
+    .zltx-action-card {
+      min-height: 6.6rem;
+      border-radius: 1rem;
+      border: 1px solid rgba(226,232,240,.9);
+      background: rgba(255,255,255,.76);
+      box-shadow: 0 14px 36px rgba(15,23,42,.06);
+      display: grid;
+      place-items: center;
+      padding: .95rem;
+      color: #172033;
+      font-weight: 950;
+      cursor: pointer;
+      text-align: center;
+    }
+    .zltx-action-card--available { place-items: start; align-content: center; text-align: left; background: rgba(245,239,230,.78); }
+    .zltx-action-card--deposit { background: linear-gradient(135deg, #d9bd70, #a87a13); color: #fff; }
+    .zltx-action-card--withdraw { color: #b68a26; }
+    .zltx-plus {
+      width: 3.35rem;
+      height: 3.35rem;
+      border-radius: .75rem;
+      border: 2px solid rgba(148,163,184,.38);
+      display: grid;
+      place-items: center;
+      margin-bottom: .55rem;
+      font-size: 2rem;
+      font-weight: 300;
+    }
+    .zltx-action-card--deposit .zltx-plus { border-color: rgba(255,255,255,.28); background: rgba(255,255,255,.18); }
+    .zltx-feature-list { display: grid; gap: .75rem; }
+    .zltx-feature {
+      display: grid;
+      grid-template-columns: 3.45rem 1fr auto;
+      gap: 1rem;
+      align-items: center;
+      min-height: 5.25rem;
+      padding: 1rem 1.2rem;
+      border: 1px solid rgba(226,232,240,.92);
+      border-radius: .9rem;
+      background: rgba(255,255,255,.86);
+      box-shadow: 0 12px 30px rgba(15,23,42,.05);
+      color: inherit;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .zltx-feature-icon {
+      width: 3.1rem;
+      height: 3.1rem;
+      border-radius: .72rem;
+      display: grid;
+      place-items: center;
+      background: #f4f0e8;
+      color: #b68a26;
+      border: 1px solid rgba(214,179,95,.25);
+      font-size: 1.35rem;
+    }
+    .zltx-feature-title { color: #172033; font-size: 1.1rem; font-weight: 950; }
+    .zltx-feature-desc { margin-top: .2rem; color: #73829a; font-size: .92rem; font-weight: 700; }
+    .zltx-chevron { color: #8090a6; font-size: 1.45rem; }
+    .zltx-bottom-nav {
+      position: fixed;
+      left: 50%;
+      bottom: .75rem;
+      transform: translateX(-50%);
+      z-index: 60;
+      width: min(100% - 1.4rem, 560px);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: .35rem;
+      padding: .2rem;
+      border-radius: 1rem;
+      background: rgba(255,255,255,.74);
+      border: 1px solid rgba(226,232,240,.9);
+      box-shadow: 0 12px 40px rgba(15,23,42,.12);
+      backdrop-filter: blur(12px);
+    }
+    .zltx-bottom-btn {
+      min-height: 4.1rem;
+      border: 1px solid rgba(226,232,240,.86);
+      border-radius: .9rem;
+      background: rgba(255,255,255,.86);
+      color: #64748b;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .zltx-bottom-btn.is-active { color: #b68a26; border-color: rgba(214,179,95,.45); }
+    @media (max-width: 480px) {
+      .zltx-profile { padding-inline: .75rem; }
+      .zltx-action-grid { gap: .55rem; }
+      .zltx-asset-card { padding-inline: 1.25rem; }
+      .zltx-pnl-grid { max-width: 100%; }
+      .zltx-grain-mark { width: 4rem; height: 4rem; opacity: .42; }
     }
   </style>
 </head>
@@ -186,7 +704,6 @@
                                                 <li><a class="dropdown-item" href="case-studies.html">合作专题</a></li>
                                                 <li><a class="dropdown-item" href="faq.html">常见问题</a></li>
                                                 <li><a class="dropdown-item" href="team.html">团队介绍</a></li>
-                                                <li><a class="dropdown-item" href="admin-console.html">后台控台</a></li>
                                             </ul>
                                         </li>
                                     </ul>
@@ -249,7 +766,6 @@
                         <li><a href="case-studies.html">合作专题</a></li>
                         <li><a href="faq.html">常见问题</a></li>
                         <li><a href="team.html">团队介绍</a></li>
-                        <li><a href="admin-console.html">后台控台</a></li>
                     </ul>
                 </li>
             </ul>
@@ -266,51 +782,66 @@
 
   <main>
     <section class="personal-home-shell">
-      <div class="account-dashboard" id="account-dashboard">
-        <div class="account-hero">
-          <h1>个人资产与订单中心</h1>
-          <p>沿用 zhongliang-live 现有用户、资金、订单和银行卡接口，前台只升级视觉与交互，不重造业务算法。</p>
-        </div>
-        <div id="account-auth" class="account-card auth-required" style="display:none;">
-          <h2>请先登录</h2>
-          <p>登录后可查看余额、订单、资金流水、充值提现和个人资料。</p>
-          <a class="account-btn" href="login.html?redirect=/personal-home.html">去登录</a>
-        </div>
-        <div id="account-app">
-          <div class="account-grid">
-            <article class="account-card"><small>可用余额</small><b id="acc-available">--</b></article>
-            <article class="account-card"><small>总资产</small><b id="acc-total">--</b></article>
-            <article class="account-card"><small>冻结金额</small><b id="acc-frozen">--</b></article>
-            <article class="account-card"><small>信用分</small><b id="acc-credit">--</b></article>
-          </div>
-          <div class="account-main-grid">
-            <section class="account-card">
-              <h2>个人资料</h2>
-              <div class="account-toolbar">
-                <input id="profile-nickname" placeholder="昵称">
-                <input id="profile-phone" placeholder="手机号">
-                <input id="profile-realname" placeholder="真实姓名">
-                <button id="profile-save" type="button">保存资料</button>
+      <div class="zltx-profile">
+        <div class="zltx-phone">
+          <section id="account-auth" class="zltx-asset-card" style="display:none;">
+            <p class="zltx-asset-title">账户</p>
+            <h2 style="margin:.4rem 0;">请先登录</h2>
+            <p class="zltx-feature-desc">登录后可查看资产、出入金、订单和资金明细。</p>
+            <a href="login.html?redirect=/personal-home.html" class="zltx-action-card zltx-action-card--deposit" style="display:inline-grid;min-height:auto;margin-top:1rem;text-decoration:none;">去登录</a>
+          </section>
+          <div id="account-app">
+            <div class="zltx-top">
+              <div>
+                <p class="zltx-label">账户</p>
+                <button type="button" class="zltx-userline" id="account-name">--</button>
+                <div class="zltx-credit">信用分 <span id="acc-credit-score">--</span></div>
               </div>
-              <p class="account-msg" id="profile-msg"></p>
-            </section>
-            <section class="account-card">
-              <h2>资金操作</h2>
-              <div class="account-toolbar">
-                <input id="money-amount" type="number" min="1" step="100" placeholder="金额">
-                <button id="recharge-btn" type="button">提交充值</button>
-                <button id="withdraw-btn" type="button">提交提现</button>
+              <div class="zltx-currency">
+                <span class="zltx-pill">CNY</span>
+                <span class="zltx-pill zltx-pill--muted" id="acc-payout-state">未绑定提现卡</span>
               </div>
-              <p class="account-msg" id="money-msg"></p>
+            </div>
+
+            <section class="zltx-asset-card" aria-label="资产总览">
+              <p class="zltx-asset-title">总资产（CNY）</p>
+              <p class="zltx-total">¥ <span id="acc-total">--</span></p>
+              <div class="zltx-divider"></div>
+              <div class="zltx-pnl-grid">
+                <div><div class="zltx-mini-label">账户盈亏</div><div class="zltx-mini-value" id="acc-pnl">--</div></div>
+                <div><div class="zltx-mini-label">今日盈亏</div><div class="zltx-mini-value" id="acc-today-pnl">--</div></div>
+              </div>
+              <svg class="zltx-grain-mark" viewBox="0 0 100 100" aria-hidden="true">
+                <path d="M50 92V22M50 74c-16-7-25-19-27-36M50 58c-14-5-22-16-24-31M50 42c-10-5-16-12-17-23M50 74c16-7 25-19 27-36M50 58c14-5 22-16 24-31M50 42c10-5 16-12 17-23" fill="none" stroke="#111827" stroke-width="5" stroke-linecap="round"/>
+              </svg>
             </section>
-            <section class="account-card">
-              <h2>订单记录</h2>
-              <div class="account-list" id="orders-list"><div class="account-row">读取中...</div></div>
+
+            <section class="zltx-action-grid">
+              <div class="zltx-action-card zltx-action-card--available">
+                <div class="zltx-mini-label">可用余额</div>
+                <div class="zltx-mini-value" id="acc-available">--</div>
+              </div>
+              <button type="button" class="zltx-action-card zltx-action-card--deposit" id="recharge-btn"><span class="zltx-plus">＋</span>入金</button>
+              <button type="button" class="zltx-action-card zltx-action-card--withdraw" id="withdraw-btn"><span class="zltx-plus">＋</span>出金</button>
             </section>
-            <section class="account-card">
-              <h2>资金流水</h2>
-              <div class="account-list" id="tx-list"><div class="account-row">读取中...</div></div>
-            </section>
+            <input id="money-amount" type="number" min="1" step="100" value="1000" style="position:absolute;left:-9999px;width:1px;height:1px;">
+            <p id="money-msg" class="zltx-feature-desc" style="min-height:1.2rem;margin:.25rem 0 1rem;"></p>
+
+            <nav class="zltx-feature-list" aria-label="账户功能">
+              <button type="button" class="zltx-feature" data-open-feature="orders"><span class="zltx-feature-icon">☷</span><span><span class="zltx-feature-title">订单记录</span><span class="zltx-feature-desc">申购与赎回流水</span></span><span class="zltx-chevron">›</span></button>
+              <button type="button" class="zltx-feature" data-open-feature="deposits"><span class="zltx-feature-icon">↑</span><span><span class="zltx-feature-title">入金明细</span><span class="zltx-feature-desc">银行卡 / 渠道记录</span></span><span class="zltx-chevron">›</span></button>
+              <button type="button" class="zltx-feature" data-open-feature="withdraws"><span class="zltx-feature-icon">↓</span><span><span class="zltx-feature-title">出金明细</span><span class="zltx-feature-desc">提现进度查询</span></span><span class="zltx-chevron">›</span></button>
+              <button type="button" class="zltx-feature" data-open-feature="transactions"><span class="zltx-feature-icon">≋</span><span><span class="zltx-feature-title">资金明细</span><span class="zltx-feature-desc">余额变动总览</span></span><span class="zltx-chevron">›</span></button>
+              <button type="button" class="zltx-feature" data-open-feature="payout"><span class="zltx-feature-icon">▣</span><span><span class="zltx-feature-title">出款账户</span><span class="zltx-feature-desc">安全绑定与校验</span></span><span class="zltx-chevron">›</span></button>
+              <button type="button" class="zltx-feature" data-open-feature="settings"><span class="zltx-feature-icon">⚙</span><span><span class="zltx-feature-title">设置</span><span class="zltx-feature-desc">通知与安全</span></span><span class="zltx-chevron">›</span></button>
+              <button type="button" class="zltx-feature" data-open-feature="password"><span class="zltx-feature-icon">✎</span><span><span class="zltx-feature-title">修改登录密码</span><span class="zltx-feature-desc">验证交易密码与密保</span></span><span class="zltx-chevron">›</span></button>
+            </nav>
+
+            <nav class="zltx-bottom-nav" aria-label="主导航">
+              <button type="button" class="zltx-bottom-btn" data-bottom-nav="home">⌂<br>首页</button>
+              <button type="button" class="zltx-bottom-btn" data-bottom-nav="products">▥<br>产品</button>
+              <button type="button" class="zltx-bottom-btn is-active" data-bottom-nav="profile">♙<br>我的</button>
+            </nav>
           </div>
         </div>
       </div>

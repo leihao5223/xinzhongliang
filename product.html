@@ -24,17 +24,17 @@
             left: 0 !important;
             width: 100% !important;
             z-index: 1040 !important;
-            background: rgba(255, 255, 255, 0.96) !important;
-            backdrop-filter: blur(18px) !important;
+            background: linear-gradient(135deg, rgba(14, 116, 144, 0.66), rgba(37, 99, 235, 0.46)), rgba(186, 230, 253, 0.2) !important;
+            backdrop-filter: blur(18px) saturate(1.24) !important;
             -webkit-backdrop-filter: blur(18px) !important;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+            border-bottom: 1px solid rgba(125, 211, 252, 0.48) !important;
+            box-shadow: 0 18px 50px rgba(14, 116, 144, 0.22) !important;
         }
 
         /* 顶栏内部导航背景强制白色 */
         .index-glass-navbar {
-            background: rgba(255, 255, 255, 0.92) !important;
-            backdrop-filter: blur(18px) !important;
+            background: linear-gradient(135deg, rgba(14, 116, 144, 0.66), rgba(37, 99, 235, 0.46)), rgba(186, 230, 253, 0.2) !important;
+            backdrop-filter: blur(18px) saturate(1.24) !important;
             -webkit-backdrop-filter: blur(18px) !important;
         }
 
@@ -54,6 +54,13 @@
             .header-navbar-fixed {
                 position: fixed !important;
                 top: 0 !important;
+            }
+            .nav-btn {
+                display: none !important;
+            }
+            .navbar-collapse,
+            .navbar-nav {
+                display: flex !important;
             }
         }
 
@@ -82,7 +89,7 @@
         .tc-detail-body,
         .tc-trade-dialog,
         .tc-orders-dialog {
-            color: #1a1a1a;
+            color: #0f172a;
         }
 
         .dc-proj-title,
@@ -174,7 +181,6 @@
                                                 <li><a class="dropdown-item" href="case-studies.html">合作专题</a></li>
                                                 <li><a class="dropdown-item" href="faq.html">常见问题</a></li>
                                                 <li><a class="dropdown-item" href="team.html">团队介绍</a></li>
-                                                <li><a class="dropdown-item" href="admin-console.html">后台控台</a></li>
                                             </ul>
                                         </li>
                                     </ul>
@@ -237,7 +243,6 @@
                         <li><a href="case-studies.html">合作专题</a></li>
                         <li><a href="faq.html">常见问题</a></li>
                         <li><a href="team.html">团队介绍</a></li>
-                        <li><a href="admin-console.html">后台控台</a></li>
                     </ul>
                 </li>
             </ul>

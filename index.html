@@ -38,6 +38,14 @@
     a { color: inherit; text-decoration: none; }
     img { max-width: 100%; display: block; }
     .zl-shell { position: relative; min-height: 100vh; }
+    .zl-particle-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      opacity: .72;
+    }
     .zl-container { width: min(1180px, calc(100% - 2rem)); margin: 0 auto; }
     .zl-nav {
       position: fixed;
@@ -46,20 +54,35 @@
       transform: translateX(-50%);
       z-index: 1000;
       width: min(1180px, calc(100% - 1rem));
-      border: 1px solid rgba(255,255,255,.24);
+      border: 1px solid rgba(125, 211, 252, .36);
       border-radius: 999px;
-      background: rgba(5, 18, 31, 0.64);
+      background: linear-gradient(135deg, rgba(14, 116, 144, 0.72), rgba(37, 99, 235, 0.46)), rgba(186, 230, 253, 0.18);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
-      box-shadow: 0 22px 70px rgba(0, 34, 20, .22);
+      box-shadow: 0 22px 70px rgba(14, 116, 144, .22);
     }
-    .zl-nav__inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .72rem .85rem .72rem 1.1rem; }
+    .zl-nav__inner { position: relative; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 1rem; padding: .72rem .85rem .72rem 1.1rem; }
     .zl-brand { display: inline-flex; align-items: center; gap: .75rem; color: #fff; font-weight: 800; letter-spacing: .08em; white-space: nowrap; }
     .zl-brand img { height: 36px; width: auto; }
-    .zl-menu { display: flex; align-items: center; justify-content: center; gap: .35rem; margin: 0; padding: 0; list-style: none; }
-    .zl-menu a { display: inline-flex; align-items: center; padding: .55rem .75rem; color: rgba(255,255,255,.82); border-radius: 999px; font-size: .92rem; transition: .24s ease; }
+    .zl-brand-stack { position: relative; display: grid; justify-items: start; gap: .18rem; }
+    .zl-sound-toggle {
+      border: 1px solid rgba(255,255,255,.28);
+      border-radius: 999px;
+      padding: .22rem .58rem;
+      color: #fff;
+      background: rgba(255,255,255,.12);
+      font-size: .72rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .zl-menu { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; justify-content: center; gap: .65rem; margin: 0; padding: 0; list-style: none; }
+    .zl-menu a { display: inline-flex; align-items: center; padding: .55rem .9rem; color: rgba(255,255,255,.88); border-radius: 999px; font-size: .92rem; font-weight: 850; transition: .24s ease; }
     .zl-menu a:hover { color: #fff; background: rgba(255,255,255,.12); }
-    .zl-actions { display: flex; align-items: center; gap: .5rem; }
+    .zl-actions { display: flex; align-items: center; gap: .5rem; justify-self: end; }
+    body.zl-is-authed .zl-shell .zl-menu,
+    body.zl-is-authed .zl-shell .zl-actions {
+      display: flex !important;
+    }
     .zl-btn {
       display: inline-flex;
       align-items: center;
@@ -81,7 +104,8 @@
 
     .zl-hero {
       position: relative;
-      min-height: 100vh;
+      height: 50vh;
+      min-height: 360px;
       display: grid;
       align-items: center;
       overflow: hidden;
@@ -122,30 +146,64 @@
       background-size: 88px 88px;
       mask-image: linear-gradient(180deg, rgba(0,0,0,.68), transparent 86%);
     }
-    .zl-hero__grid { display: grid; grid-template-columns: minmax(0, 1.04fr) minmax(320px, .72fr); gap: 2.5rem; align-items: center; padding: 9rem 0 5rem; }
+    .zl-energy-lines {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .zl-energy-lines::before,
+    .zl-energy-lines::after {
+      content: "";
+      position: absolute;
+      width: 42vw;
+      height: 2px;
+      left: -45vw;
+      background: linear-gradient(90deg, transparent, rgba(56,189,248,.18), rgba(125,211,252,.92), transparent);
+      filter: drop-shadow(0 0 14px rgba(56,189,248,.9));
+      animation: zl-line-sweep 5.4s linear infinite;
+    }
+    .zl-energy-lines::before { top: 34%; }
+    .zl-energy-lines::after { top: 62%; animation-delay: 2.1s; }
+    .zl-hero-calligraphy {
+      position: absolute;
+      left: clamp(1.1rem, 5vw, 4.2rem);
+      top: 50%;
+      z-index: 6;
+      transform: translateY(-45%);
+      writing-mode: vertical-rl;
+      text-orientation: upright;
+      color: #050505;
+      font-family: "STXingkai", "KaiTi", "Kaiti SC", serif;
+      font-size: clamp(2.4rem, 5.8vw, 5.2rem);
+      line-height: 1.25;
+      letter-spacing: .18em;
+      text-shadow: 0 2px 0 rgba(255,255,255,.62), 0 0 24px rgba(255,255,255,.46);
+      animation: zl-ink-rise 1.4s ease both, zl-ink-breathe 5s ease-in-out 1.4s infinite;
+    }
+    .zl-hero__grid { display: grid; grid-template-columns: minmax(0, 820px); gap: 2.5rem; align-items: center; padding: 6rem 0 1.5rem; }
     .zl-kicker { display: inline-flex; align-items: center; gap: .55rem; color: #d9ff8d; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
     .zl-kicker::before { content: ""; width: 38px; height: 2px; border-radius: 999px; background: currentColor; box-shadow: 0 0 18px currentColor; }
     .zl-hero h1 { margin: 1.1rem 0 1rem; font-size: clamp(3.6rem, 9vw, 7.8rem); line-height: .92; letter-spacing: -.06em; font-weight: 950; }
     .zl-hero h1 span { display: block; color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,.76); text-shadow: none; }
     .zl-hero__lead { max-width: 680px; color: rgba(255,255,255,.82); font-size: clamp(1rem, 1.45vw, 1.25rem); line-height: 1.9; }
     .zl-hero__cta { display: flex; gap: .8rem; flex-wrap: wrap; margin-top: 2rem; }
-    .zl-status-card {
-      position: relative;
-      border: 1px solid rgba(255,255,255,.18);
-      border-radius: 30px;
-      padding: 1.2rem;
-      background: linear-gradient(145deg, rgba(255,255,255,.16), rgba(255,255,255,.05));
-      backdrop-filter: blur(18px);
-      box-shadow: 0 30px 90px rgba(0,0,0,.24);
-      overflow: hidden;
+    .zl-ad-float {
+      position: absolute;
+      right: clamp(1rem, 5vw, 4rem);
+      bottom: 4.5rem;
+      z-index: 5;
+      border: 1px solid rgba(255,255,255,.28);
+      border-radius: 999px;
+      padding: .85rem 1.2rem;
+      color: #06131f;
+      background: linear-gradient(135deg, #fef3c7, #d9ff8d, #63e6be);
+      box-shadow: 0 18px 48px rgba(0,0,0,.2);
+      font-weight: 950;
+      cursor: pointer;
     }
-    .zl-status-card::before { content: ""; position: absolute; inset: -60% -30% auto auto; width: 260px; height: 260px; background: radial-gradient(circle, rgba(217,255,141,.34), transparent 65%); }
-    .zl-console { border-radius: 24px; overflow: hidden; background: rgba(4, 18, 20, .78); border: 1px solid rgba(99,230,190,.2); }
-    .zl-console__top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .9rem 1rem; color: #a9f3d1; border-bottom: 1px solid rgba(99,230,190,.18); }
-    .zl-console__rows { padding: .85rem 1rem 1rem; display: grid; gap: .65rem; }
-    .zl-row { display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: center; color: rgba(255,255,255,.82); font-size: .92rem; }
-    .zl-row strong { color: #fff; font-size: 1.15rem; }
-    .zl-pulse { display: inline-flex; width: 10px; height: 10px; border-radius: 50%; background: #63e6be; box-shadow: 0 0 0 8px rgba(99,230,190,.12), 0 0 24px #63e6be; }
+    .zl-pulse { display: inline-flex; width: 10px; height: 10px; border-radius: 50%; background: #7dd3fc; box-shadow: 0 0 0 8px rgba(125,211,252,.12), 0 0 24px #7dd3fc; }
     .zl-ticker {
       position: absolute;
       left: 0;
@@ -169,12 +227,23 @@
     .zl-ticker b { color: #d9ff8d; }
     @keyframes ticker { to { transform: translateX(-50%); } }
 
-    .zl-section { padding: clamp(4rem, 7vw, 7rem) 0; position: relative; }
+    .zl-section { padding: clamp(3.6rem, 6vw, 5.8rem) 0; position: relative; }
+    .zl-section::before {
+      content: "";
+      position: absolute;
+      inset: 1.2rem auto auto 4vw;
+      width: 20rem;
+      height: 20rem;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(56,189,248,.16), transparent 62%);
+      pointer-events: none;
+      animation: zl-orb-float 8s ease-in-out infinite;
+    }
     .zl-section--dark { color: #fff; background: radial-gradient(circle at 15% 20%, rgba(99,230,190,.14), transparent 32rem), linear-gradient(135deg, #05131e, #082719 66%, #071527); }
     .zl-section__head { display: flex; align-items: end; justify-content: space-between; gap: 2rem; margin-bottom: 2rem; }
     .zl-section__eyebrow { margin: 0 0 .55rem; color: var(--zl-green); font-weight: 900; letter-spacing: .16em; text-transform: uppercase; }
     .zl-section--dark .zl-section__eyebrow { color: #d9ff8d; }
-    .zl-section h2 { margin: 0; font-size: clamp(2rem, 4vw, 4rem); line-height: 1.08; font-weight: 950; letter-spacing: -.05em; }
+    .zl-section h2 { margin: 0; font-size: clamp(1.55rem, 2.8vw, 3rem); line-height: 1.12; font-weight: 950; letter-spacing: -.035em; }
     .zl-section__desc { max-width: 680px; color: var(--zl-muted); line-height: 1.85; margin: .9rem 0 0; }
     .zl-section--dark .zl-section__desc { color: rgba(255,255,255,.72); }
     .zl-grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.1rem; }
@@ -185,12 +254,26 @@
       border: 1px solid var(--zl-line);
       border-radius: 28px;
       padding: 1.35rem;
-      background: var(--zl-card);
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.78), rgba(224,242,254,.38)),
+        var(--zl-card);
       box-shadow: 0 24px 60px rgba(5, 38, 24, .08);
       overflow: hidden;
-      transition: transform .28s ease, box-shadow .28s ease;
+      transform-style: preserve-3d;
+      transition: transform .45s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease, border-color .28s ease;
     }
-    .zl-card:hover { transform: translateY(-7px); box-shadow: 0 32px 80px rgba(5, 38, 24, .14); }
+    .zl-card::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      background: linear-gradient(120deg, transparent 10%, rgba(56,189,248,.38), transparent 42%);
+      transform: translateX(-115%);
+      transition: transform .7s ease;
+      pointer-events: none;
+    }
+    .zl-card:hover { transform: translateY(-7px) rotateX(2deg) rotateY(-3deg); box-shadow: 0 32px 80px rgba(14, 116, 144, .18); border-color: rgba(56,189,248,.38); }
+    .zl-card:hover::before { transform: translateX(115%); }
     .zl-card__image { height: 190px; border-radius: 22px; overflow: hidden; margin-bottom: 1rem; background: #e9f5ec; }
     .zl-card__image img { width: 100%; height: 100%; object-fit: cover; transition: transform .45s ease; }
     .zl-card:hover .zl-card__image img { transform: scale(1.07); }
@@ -208,11 +291,24 @@
     .zl-chip { display: inline-flex; align-items: center; gap: .35rem; padding: .45rem .7rem; border-radius: 999px; background: rgba(255,255,255,.12); color: rgba(255,255,255,.84); font-size: .84rem; }
     .zl-product-list { display: grid; gap: .65rem; }
     .zl-product-row { display: grid; grid-template-columns: 1fr auto auto; gap: .8rem; align-items: center; padding: .8rem .9rem; border-radius: 18px; background: rgba(255,255,255,.78); border: 1px solid var(--zl-line); }
+    .zl-product-row.is-tick { animation: zl-data-flash .42s ease; }
     .zl-product-row small { color: var(--zl-muted); }
     .zl-up { color: #0e7a3d; font-weight: 900; }
     .zl-down { color: #dc2626; font-weight: 900; }
     .zl-business-card { display: flex; flex-direction: column; gap: .8rem; }
     .zl-business-card i { width: 46px; height: 46px; display: inline-grid; place-items: center; border-radius: 16px; color: #082016; background: linear-gradient(135deg, #d9ff8d, #63e6be); }
+    .zl-feature-band { display: grid; grid-template-columns: 1.1fr .9fr; gap: 1.2rem; align-items: stretch; }
+    .zl-timeline { display: grid; gap: .75rem; counter-reset: zlstep; }
+    .zl-timeline li { list-style: none; display: grid; grid-template-columns: auto 1fr; gap: .8rem; align-items: start; padding: .95rem; border: 1px solid var(--zl-line); border-radius: 20px; background: rgba(255,255,255,.78); }
+    .zl-timeline li::before { counter-increment: zlstep; content: counter(zlstep); width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: linear-gradient(135deg, #0e7a3d, #38bdf8); font-weight: 900; }
+    .zl-news-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+    .zl-news-card { border: 1px solid var(--zl-line); border-radius: 24px; padding: 1rem; background: rgba(255,255,255,.86); box-shadow: 0 18px 48px rgba(5, 38, 24, .08); }
+    .zl-news-card img { height: 150px; width: 100%; object-fit: cover; border-radius: 18px; margin-bottom: .85rem; }
+    .zl-service-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+    .zl-service-item { border-radius: 24px; padding: 1.05rem; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.16); }
+    .zl-reveal { opacity: 0; transform: translateY(34px) rotateX(6deg); filter: blur(8px); transition: opacity .8s ease, transform .8s ease, filter .8s ease; }
+    .zl-reveal.is-visible { opacity: 1; transform: translateY(0) rotateX(0); filter: blur(0); }
+    .zl-music-frame { position: fixed; width: 1px; height: 1px; left: -9999px; bottom: -9999px; opacity: 0; pointer-events: none; }
     .zl-contact-band {
       border-radius: 36px;
       padding: clamp(2rem, 5vw, 4rem);
@@ -225,11 +321,32 @@
     .zl-footer { padding: 2rem 0; color: rgba(255,255,255,.70); background: #06130f; }
     .zl-footer__inner { display: flex; justify-content: space-between; gap: 1rem; align-items: center; flex-wrap: wrap; }
     .zl-footer a { color: #d9ff8d; }
+    @keyframes zl-line-sweep { to { transform: translateX(150vw); } }
+    @keyframes zl-ink-rise {
+      from { opacity: 0; transform: translateY(-38%) translateX(-18px) scale(.96); filter: blur(10px); }
+      to { opacity: 1; transform: translateY(-45%) translateX(0) scale(1); filter: blur(0); }
+    }
+    @keyframes zl-ink-breathe {
+      0%, 100% { text-shadow: 0 2px 0 rgba(255,255,255,.62), 0 0 22px rgba(255,255,255,.42); }
+      50% { text-shadow: 0 2px 0 rgba(255,255,255,.8), 0 0 36px rgba(125,211,252,.72); }
+    }
+    @keyframes zl-orb-float {
+      0%, 100% { transform: translate3d(0,0,0) scale(1); }
+      50% { transform: translate3d(22px,18px,0) scale(1.08); }
+    }
+    @keyframes zl-data-flash {
+      0% { box-shadow: 0 0 0 rgba(56,189,248,0); }
+      45% { box-shadow: 0 0 0 5px rgba(56,189,248,.22), 0 0 24px rgba(56,189,248,.24); }
+      100% { box-shadow: 0 0 0 rgba(56,189,248,0); }
+    }
 
     @media (max-width: 980px) {
-      .zl-menu { display: none; }
+      .zl-nav { width: calc(100% - 1rem); overflow-x: auto; }
+      .zl-nav__inner { min-width: 820px; }
+      .zl-menu { display: flex; }
       .zl-hero__grid, .zl-flow { grid-template-columns: 1fr; }
       .zl-grid-3, .zl-grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .zl-feature-band, .zl-news-grid, .zl-service-grid { grid-template-columns: 1fr; }
       .zl-section__head { display: block; }
     }
     @media (max-width: 640px) {
@@ -237,9 +354,10 @@
       .zl-nav__inner { align-items: flex-start; border-radius: 24px; }
       .zl-actions { flex-wrap: wrap; justify-content: flex-end; }
       .zl-btn { min-height: 38px; padding: .58rem .78rem; font-size: .86rem; }
-      .zl-brand span { display: none; }
-      .zl-hero__grid { padding-top: 7rem; }
+      .zl-brand span { display: inline; }
+      .zl-hero__grid { padding-top: 6.5rem; padding-bottom: 2rem; }
       .zl-hero h1 { font-size: clamp(3rem, 16vw, 5rem); }
+      .zl-hero-calligraphy { left: .8rem; font-size: clamp(2rem, 12vw, 3.5rem); }
       .zl-grid-3, .zl-grid-4 { grid-template-columns: 1fr; }
       .zl-product-row { grid-template-columns: 1fr; }
       .zl-card__image { height: 170px; }
@@ -250,20 +368,21 @@
   <div class="zl-shell">
     <nav class="zl-nav" aria-label="主导航">
       <div class="zl-nav__inner">
-        <a class="zl-brand" href="index.html">
-          <img src="assets/images/zhongliang-logo-light.svg" alt="中粮天下">
-          <span>中粮天下</span>
-        </a>
+        <div class="zl-brand-stack">
+          <a class="zl-brand" href="index.html">
+            <img src="assets/images/zhongliang-logo-light.svg" alt="中粮天下">
+          </a>
+          <button class="zl-sound-toggle" type="button" id="bgm-toggle" aria-pressed="true">关闭声音</button>
+        </div>
         <ul class="zl-menu">
-          <li><a href="#about">产业介绍</a></li>
-          <li><a href="#business">平台能力</a></li>
+          <li><a href="#top">首页</a></li>
+          <li><a href="#about">公司介绍</a></li>
           <li><a href="product.html">交易中心</a></li>
-          <li><a href="blog.html">资讯</a></li>
-          <li><a href="admin-console.html">后台</a></li>
+          <li><a href="#news">动态资讯</a></li>
         </ul>
         <div class="zl-actions">
-          <a class="zl-btn zl-btn--ghost" href="login.html">登录</a>
-          <a class="zl-btn zl-btn--primary" href="personal-home.html">个人主页</a>
+          <a class="zl-btn zl-btn--ghost" href="login.html">账号登录</a>
+          <a class="zl-btn zl-btn--primary" href="login.html#signup">注册</a>
         </div>
       </div>
     </nav>
@@ -281,27 +400,12 @@
             <div>
               <div class="zl-kicker" data-cms-text="homeHero.eyebrow">COFCO DIGITAL PLATFORM</div>
               <h1><span data-cms-text="homeHero.title">忠于国计 良于民生</span> <span data-cms-text="homeHero.outline">数字中粮</span></h1>
-              <p class="zl-hero__lead" data-cms-text="homeHero.lead">以中粮产业链内容为底座，融合产品交易、个人资产、客服协同和后台控台，打造更具科技感、可运营、可排期的视频化数字农粮平台。</p>
+              <p class="zl-hero__lead" data-cms-text="homeHero.lead">以粮油食品、贸易流通、加工制造与数字服务为基础，连接产品交易、资产管理、客户服务和内容运营，打造面向农粮产业的数字化服务平台。</p>
               <div class="zl-hero__cta">
-                <a class="zl-btn zl-btn--primary" href="login.html"><i class="bi bi-shield-lock-fill"></i> 进入登录</a>
+                <a class="zl-btn zl-btn--primary" href="login.html"><i class="bi bi-shield-lock-fill"></i> 账号登录</a>
                 <a class="zl-btn zl-btn--ghost" href="product.html"><i class="bi bi-graph-up-arrow"></i> 查看交易中心</a>
-                <button class="zl-btn zl-btn--ghost" type="button" id="play-advert-btn"><i class="bi bi-play-fill"></i> <span data-cms-text="homeHero.secondaryCta">播放品牌广告</span></button>
               </div>
             </div>
-            <aside class="zl-status-card" aria-label="平台状态">
-              <div class="zl-console">
-                <div class="zl-console__top">
-                  <span><span class="zl-pulse"></span> 系统在线</span>
-                  <span>MEDIA SCHEDULED</span>
-                </div>
-                <div class="zl-console__rows">
-                  <div class="zl-row"><span>登录动态背景</span><strong>后台可控</strong></div>
-                  <div class="zl-row"><span>首页顶部视频</span><strong id="media-status">实时读取</strong></div>
-                  <div class="zl-row"><span>交易/订单/个人</span><strong>旧逻辑复用</strong></div>
-                  <div class="zl-row"><span>控台能力</span><strong>持续扩展</strong></div>
-                </div>
-              </div>
-            </aside>
           </div>
         </div>
         <div class="banner-corner-carousel" aria-label="精选影像" aria-hidden="true">
@@ -319,12 +423,13 @@
           <div class="zl-ticker__track">
             <span><b>国家粮食安全</b> · 全产业链协同</span>
             <span><b>数字交易</b> · 产品行情与风控结算</span>
-            <span><b>后台排期</b> · 登录/首页/广告视频可控</span>
+            <span><b>品牌影像</b> · 首页视频内容定时切换</span>
             <span><b>客户服务</b> · 在线客服与资金审核</span>
             <span><b>国家粮食安全</b> · 全产业链协同</span>
             <span><b>数字交易</b> · 产品行情与风控结算</span>
           </div>
         </div>
+        <button class="zl-ad-float" type="button" id="play-advert-btn"><i class="bi bi-stars"></i> 观看品牌短片</button>
       </section>
 
       <section class="zl-section" id="about">
@@ -332,8 +437,8 @@
           <div class="zl-section__head">
             <div>
               <p class="zl-section__eyebrow" data-cms-text="about.eyebrow">About Zhongliang</p>
-              <h2 data-cms-text="about.title">把静态展示升级成可运营的平台级首页</h2>
-              <p class="zl-section__desc" data-cms-text="about.desc">中粮天下首页不再只是图片和文字堆叠，而是围绕“国计民生、产业链、交易能力、客户服务、后台可控”重新组织顶层内容，所有核心入口都指向真实业务链路。</p>
+              <h2 data-cms-text="about.title">从田间到餐桌，构建可信赖的农粮服务网络</h2>
+              <p class="zl-section__desc" data-cms-text="about.desc">中粮天下围绕粮食安全、产业协同、数字交易与客户服务展开，展示从粮源采购、仓储物流、精深加工到民生消费的完整价值链。</p>
             </div>
             <a class="zl-btn zl-btn--dark" href="about.html">公司介绍</a>
           </div>
@@ -341,17 +446,17 @@
             <a class="zl-card" href="article-grain-security.html">
               <div class="zl-card__image"><img src="assets/images/zhongliang-port-containers.jpg" alt="守护大国粮仓"></div>
               <h3>守护大国粮仓</h3>
-              <p>服务国家粮食安全战略，连接储备、贸易、加工、物流和民生消费。</p>
+              <p>服务国家粮食安全战略，连接粮源、储备、贸易、加工、物流和民生消费。</p>
             </a>
             <a class="zl-card" href="article-processing.html">
               <div class="zl-card__image"><img src="assets/images/zhongliang-grain-silo.jpg" alt="全球粮源与精深加工"></div>
               <h3>全球粮源与加工</h3>
-              <p>从全球优质粮源到国内精深加工，以透明链路支撑平台内容与产品表达。</p>
+              <p>从全球优质粮源到国内精深加工，以透明链路支撑产品品质与供应稳定。</p>
             </a>
             <a class="zl-card" href="article-tech-innovation.html">
               <div class="zl-card__image"><img src="assets/images/advert/field-terraces.jpg" alt="科技创新驱动"></div>
               <h3>科技创新驱动</h3>
-              <p>用数据、视频、行情和后台运营能力，提升前台高级感和用户信任。</p>
+              <p>以数字化工具连接行情、订单、资金和服务，让产业信息更清晰、更高效。</p>
             </a>
           </div>
         </div>
@@ -362,32 +467,53 @@
           <div class="zl-section__head">
             <div>
               <p class="zl-section__eyebrow" data-cms-text="business.eyebrow">Business Core</p>
-              <h2 data-cms-text="business.title">逻辑性板块沿用 zhongliang-live</h2>
-              <p class="zl-section__desc" data-cms-text="business.desc">交易板块、个人资料、订单中心、资金和控台不重造算法，继续复用旧项目已跑通的 Express API、JWT、订单结算、控盘和客服数据结构。</p>
+              <h2 data-cms-text="business.title">交易、资产、订单、服务一体化连接</h2>
+              <p class="zl-section__desc" data-cms-text="business.desc">平台围绕产品行情、交易下单、订单记录、个人资产、资金明细和在线客服形成完整闭环，让用户在一个入口完成关键操作。</p>
             </div>
-            <a class="zl-btn zl-btn--primary" href="admin-console.html">进入后台控台</a>
+            <a class="zl-btn zl-btn--primary" href="product.html">进入交易中心</a>
           </div>
           <div class="zl-grid-4">
             <a class="zl-card zl-business-card" href="product.html">
               <i class="bi bi-bar-chart-line-fill"></i>
               <h3>交易中心</h3>
-              <p>产品、行情、买涨买跌、委买和订单提交接旧版 `/api/products`、`/api/trade/order`。</p>
+              <p>聚合农粮产品、行情变动、交易方向和订单提交，帮助用户快速进入交易流程。</p>
             </a>
             <a class="zl-card zl-business-card" href="personal-home.html">
               <i class="bi bi-person-vcard-fill"></i>
               <h3>个人资料</h3>
-              <p>余额、总资产、冻结金额、资金流水、充值和提现沿用 `/api/me/*`。</p>
+              <p>集中展示余额、总资产、冻结金额、资金流水、充值和提现记录。</p>
             </a>
             <a class="zl-card zl-business-card" href="product.html#orders">
               <i class="bi bi-receipt-cutoff"></i>
               <h3>订单中心</h3>
-              <p>进行中与已结算订单统一读取 `/api/orders`，后端定时结算。</p>
+              <p>进行中与已完成订单统一管理，交易过程和资金变化清晰可追溯。</p>
             </a>
-            <a class="zl-card zl-business-card" href="admin-console.html#media">
+            <article class="zl-card zl-business-card">
               <i class="bi bi-camera-video-fill"></i>
-              <h3>视频排期</h3>
-              <p>后台按时间段控制登录页、首页顶部、品牌广告播放内容。</p>
-            </a>
+              <h3>品牌影像</h3>
+              <p>首页顶部视频、品牌广告与登录背景按运营节奏切换，强化平台视觉识别。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="zl-section" id="value">
+        <div class="zl-container">
+          <div class="zl-feature-band">
+            <div class="zl-card" style="padding:clamp(1.4rem,3vw,2.2rem);">
+              <p class="zl-section__eyebrow">Industry Foundation</p>
+              <h2 style="font-size:clamp(2rem,3.6vw,3.5rem);">四大能力支撑数字农粮平台</h2>
+              <p class="zl-section__desc">首页内容以正式运营表达为主，突出产业根基、产品交易、服务保障与风控能力，让用户第一眼就能理解平台价值。</p>
+              <ul class="zl-timeline">
+                <li><div><strong>粮源与供应链</strong><p>覆盖采购、仓储、物流和加工节点，保障产品来源稳定清晰。</p></div></li>
+                <li><div><strong>产品行情与交易</strong><p>围绕农粮品类建立行情展示、交易入口和订单追踪。</p></div></li>
+                <li><div><strong>资金与账户服务</strong><p>个人资产、充值提现、资金流水和安全校验集中呈现。</p></div></li>
+                <li><div><strong>内容与影像运营</strong><p>品牌视频、资讯动态和活动内容保持定期更新，提升访问体验。</p></div></li>
+              </ul>
+            </div>
+            <div class="zl-card" style="padding:0;overflow:hidden;">
+              <img src="assets/images/zhongliang-grain-silo.jpg" alt="农粮仓储" style="height:100%;min-height:460px;width:100%;object-fit:cover;">
+            </div>
           </div>
         </div>
       </section>
@@ -397,23 +523,23 @@
           <div class="zl-flow">
             <div class="zl-flow__panel" style="background:#fff;border:1px solid var(--zl-line);color:var(--zl-ink);">
               <img src="assets/images/zhongliang-supermarket-grocery.jpg" alt="民生消费">
-              <p class="zl-section__eyebrow">Content Architecture</p>
-              <h2 style="font-size:clamp(1.9rem,3vw,3rem);">前台内容全部向后台可编辑演进</h2>
-              <p class="zl-section__desc">首页、公司介绍、资讯、FAQ、联系方式、广告素材、视频排期都纳入后台 CMS 的扩展方向，不再长期写死在 HTML 中。</p>
+              <p class="zl-section__eyebrow">Service Scenario</p>
+              <h2 style="font-size:clamp(1.9rem,3vw,3rem);">民生消费与产业服务同屏呈现</h2>
+              <p class="zl-section__desc">以粮油食品、商超渠道、企业客户和线上服务为核心，形成从产业内容到用户操作的自然转化。</p>
               <div class="zl-chip-list">
-                <span class="zl-chip" style="background:#eef8f1;color:#0e7a3d;">首页板块</span>
-                <span class="zl-chip" style="background:#eef8f1;color:#0e7a3d;">文章资讯</span>
-                <span class="zl-chip" style="background:#eef8f1;color:#0e7a3d;">广告视频</span>
-                <span class="zl-chip" style="background:#eef8f1;color:#0e7a3d;">后台排期</span>
+                <span class="zl-chip" style="background:#eef8f1;color:#0e7a3d;">粮油食品</span>
+                <span class="zl-chip" style="background:#eef8f1;color:#0e7a3d;">商超渠道</span>
+                <span class="zl-chip" style="background:#eef8f1;color:#0e7a3d;">企业采购</span>
+                <span class="zl-chip" style="background:#eef8f1;color:#0e7a3d;">线上服务</span>
               </div>
             </div>
             <div class="zl-flow__panel">
               <img src="assets/images/zhongliang-corporate-handshake.jpg" alt="平台协同">
               <p class="zl-section__eyebrow">Live Products</p>
               <h2 style="font-size:clamp(1.9rem,3vw,3rem);">产品行情预览</h2>
-              <p class="zl-section__desc">以下列表实时读取旧后端产品接口，页面视觉升级但业务来源保持一致。</p>
+              <p class="zl-section__desc">重点农粮产品行情集中展示，用户可从首页直接进入交易中心查看详情。</p>
               <div class="zl-product-list" id="home-product-list">
-                <div class="zl-product-row"><span>读取产品数据中...</span><small>/api/products</small><b>--</b></div>
+                <div class="zl-product-row"><span>读取产品行情中...</span><small>产品中心</small><b>--</b></div>
               </div>
             </div>
           </div>
@@ -425,8 +551,56 @@
           <div class="zl-grid-4">
             <div class="zl-metric"><b>77</b><span>年品牌积淀与产业协同</span></div>
             <div class="zl-metric"><b>30+</b><span>农粮产品行情与交易标的</span></div>
-            <div class="zl-metric"><b>24h</b><span>后台排期和前端内容联动</span></div>
-            <div class="zl-metric"><b>1套</b><span>旧业务逻辑 + 新视觉体验</span></div>
+            <div class="zl-metric"><b>24h</b><span>品牌影像与内容节奏联动</span></div>
+            <div class="zl-metric"><b>1站</b><span>官网展示 + 交易服务体验</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="zl-section" id="news">
+        <div class="zl-container">
+          <div class="zl-section__head">
+            <div>
+              <p class="zl-section__eyebrow">News & Insight</p>
+              <h2>动态资讯</h2>
+              <p class="zl-section__desc">聚焦粮食安全、产业协同、产品服务和平台公告，以更丰富的内容支撑首页停留和用户理解。</p>
+            </div>
+            <a class="zl-btn zl-btn--dark" href="blog.html">查看更多资讯</a>
+          </div>
+          <div class="zl-news-grid">
+            <a class="zl-news-card" href="article-grain-security.html">
+              <img src="assets/images/zhongliang-wheat-field.jpg" alt="粮食安全">
+              <h3>守住粮食安全底线</h3>
+              <p>围绕粮源保障、仓储管理和供应链协同，夯实平台产业根基。</p>
+            </a>
+            <a class="zl-news-card" href="article-processing.html">
+              <img src="assets/images/zhongliang-port-containers.jpg" alt="加工与物流">
+              <h3>加工物流提升效率</h3>
+              <p>从港口物流到精深加工，强化产品品质与交付能力。</p>
+            </a>
+            <a class="zl-news-card" href="article-tech-innovation.html">
+              <img src="assets/images/advert/field-terraces.jpg" alt="数字科技">
+              <h3>数字科技赋能交易</h3>
+              <p>通过行情、订单、资产和客服系统，让用户操作更直接。</p>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section class="zl-section zl-section--dark">
+        <div class="zl-container">
+          <div class="zl-section__head">
+            <div>
+              <p class="zl-section__eyebrow">Customer Service</p>
+              <h2>客户服务保障</h2>
+              <p class="zl-section__desc">围绕账户、交易、资金和咨询建立服务入口，降低用户从了解平台到完成操作的距离。</p>
+            </div>
+          </div>
+          <div class="zl-service-grid">
+            <div class="zl-service-item"><h3>账户安全</h3><p>登录、注册、找回密码和个人资料集中管理。</p></div>
+            <div class="zl-service-item"><h3>交易支持</h3><p>产品行情、订单记录和交易结果清晰展示。</p></div>
+            <div class="zl-service-item"><h3>资金服务</h3><p>充值、提现、资金流水与审核状态可查询。</p></div>
+            <div class="zl-service-item"><h3>在线客服</h3><p>客服入口保留在页面下方，便于用户随时咨询。</p></div>
           </div>
         </div>
       </section>
@@ -434,13 +608,13 @@
       <section class="zl-section zl-section--dark">
         <div class="zl-container">
           <div class="zl-contact-band">
-            <p class="zl-section__eyebrow">Next Action</p>
-            <h2 data-cms-text="contact.title">登录保持原静态页逻辑，主页升级为顶级内容入口</h2>
-            <p data-cms-text="contact.desc" style="max-width:720px;color:rgba(255,255,255,.78);line-height:1.85;">如果用户直接访问根路径，仍按当前部署策略进入登录；用户从登录页浏览官网时，看到的是重构后的高级主页。交易、个人、订单和控台继续走旧版业务接口。</p>
+            <p class="zl-section__eyebrow">Join Zhongliang</p>
+            <h2>登录中粮天下，进入数字农粮服务平台</h2>
+            <p style="max-width:720px;color:rgba(255,255,255,.78);line-height:1.85;">立即登录或注册账号，查看产品行情、交易中心、个人资产、订单记录与客户服务。</p>
             <div class="zl-hero__cta">
-              <a class="zl-btn zl-btn--primary" href="login.html">立即登录</a>
-              <a class="zl-btn zl-btn--ghost" href="contact.html">联系客服</a>
-              <a class="zl-btn zl-btn--ghost" href="/echofy-template/index.html">查看 Echofy 原模板</a>
+              <a class="zl-btn zl-btn--primary" href="login.html">账号登录</a>
+              <a class="zl-btn zl-btn--ghost" href="login.html#signup">注册账号</a>
+              <a class="zl-btn zl-btn--ghost" href="product.html">进入交易中心</a>
             </div>
           </div>
         </div>
@@ -450,10 +624,17 @@
     <footer class="zl-footer">
       <div class="zl-container zl-footer__inner">
         <span>版权所有 © 2026 中粮天下。权威信息请以中粮集团有限公司官网为准。</span>
-        <span><a href="https://www.cofco.com/" target="_blank" rel="noopener noreferrer">中粮集团官网</a> · <a href="admin-console.html">后台控台</a></span>
+        <span><a href="https://www.cofco.com/" target="_blank" rel="noopener noreferrer">中粮集团官网</a></span>
       </div>
     </footer>
   </div>
+  <iframe
+    id="home-bgm-frame"
+    class="zl-music-frame"
+    src="https://player.bilibili.com/player.html?bvid=BV1XryeBtEjm&autoplay=1&loop=1&muted=0"
+    allow="autoplay"
+    title="背景音乐"
+    aria-hidden="true"></iframe>
 
   <script type="module" src="assets/js/banner-media-carousel.mjs?v=19"></script>
   <script src="assets/js/vendor/jquery.min.js"></script>
@@ -476,19 +657,45 @@
         }
       }
 
+      var bgmFrame = document.getElementById('home-bgm-frame');
+      var bgmToggle = document.getElementById('bgm-toggle');
+      var bgmMutedByUser = false;
+      var bgmUrl = 'https://player.bilibili.com/player.html?bvid=BV1XryeBtEjm&autoplay=1&loop=1';
+
+      function setBgmMuted(muted) {
+        if (!bgmFrame) return;
+        bgmFrame.src = bgmUrl + '&muted=' + (muted ? '1' : '0');
+        if (bgmToggle) {
+          bgmToggle.textContent = muted ? '开启声音' : '关闭声音';
+          bgmToggle.setAttribute('aria-pressed', muted ? 'false' : 'true');
+        }
+      }
+
+      if (bgmToggle) {
+        bgmToggle.addEventListener('click', function () {
+          bgmMutedByUser = !bgmMutedByUser;
+          setBgmMuted(bgmMutedByUser);
+        });
+      }
+
       var advertBtn = document.getElementById('play-advert-btn');
       if (advertBtn) {
         var overlay = document.createElement('div');
         overlay.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:9999;';
-        overlay.innerHTML = '<button id="advert-close-btn" style="position:absolute;top:1rem;right:1rem;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.1);color:#fff;font-size:1.5rem;cursor:pointer;z-index:10000;">×</button><iframe src="advert.html" style="width:100%;height:100%;border:0;" allow="autoplay; fullscreen"></iframe>';
+        overlay.innerHTML = '<button id="advert-close-btn" style="position:absolute;top:1rem;right:1rem;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.1);color:#fff;font-size:1.5rem;cursor:pointer;z-index:10000;">×</button><iframe src="" data-advert-frame style="width:100%;height:100%;border:0;" allow="autoplay; fullscreen"></iframe>';
         document.body.appendChild(overlay);
+        var advertFrame = overlay.querySelector('[data-advert-frame]');
         advertBtn.addEventListener('click', function () {
           overlay.style.display = 'block';
+          if (advertFrame) advertFrame.src = 'advert.html';
+          setBgmMuted(true);
           var bgVideo = document.getElementById('banner-hero-video');
           if (bgVideo) bgVideo.pause();
         });
         overlay.querySelector('#advert-close-btn').addEventListener('click', function () {
           overlay.style.display = 'none';
+          if (advertFrame) advertFrame.src = '';
+          setBgmMuted(bgmMutedByUser);
           var bgVideo = document.getElementById('banner-hero-video');
           if (bgVideo) bgVideo.play().catch(function () {});
         });
@@ -510,7 +717,10 @@
             var path = String(el.getAttribute('data-cms-text') || '').split('.');
             var val = data;
             path.forEach(function (key) { val = val && val[key]; });
-            if (val !== undefined && val !== null && String(val).trim()) el.textContent = String(val);
+            var text = val !== undefined && val !== null ? String(val).trim() : '';
+            if (text && !/(Echofy|zhongliang-live|旧版|旧后端|\/api|Express|JWT|模板|重构|后台)/i.test(text)) {
+              el.textContent = text;
+            }
           });
         })
         .catch(function () {});
@@ -522,7 +732,7 @@
           if (!list) return;
           var items = Array.isArray(rows) ? rows.slice(0, 6) : [];
           if (!items.length) {
-            list.innerHTML = '<div class="zl-product-row"><span>暂无产品数据</span><small>请检查后端</small><b>--</b></div>';
+            list.innerHTML = '<div class="zl-product-row"><span>暂无产品数据</span><small>敬请期待</small><b>--</b></div>';
             return;
           }
           list.innerHTML = items.map(function (p) {

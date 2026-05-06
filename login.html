@@ -1140,6 +1140,10 @@
           }
         });
       });
+      if (window.location.hash === '#signup') {
+        var signupBtn = document.querySelector('.form-toggle button[data-target="signup"]');
+        if (signupBtn) signupBtn.click();
+      }
 
       document.querySelectorAll('.toggle-pw').forEach(function(icon) {
         icon.addEventListener('click', function() {

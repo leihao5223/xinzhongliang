@@ -12,6 +12,10 @@
     var n = Number(v);
     return Number.isFinite(n) ? n.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '--';
   }
+  function setText(id, text) {
+    var node = el(id);
+    if (node) node.textContent = text == null || text === '' ? '--' : String(text);
+  }
   async function api(path, opt) {
     opt = opt || {};
     var headers = opt.headers || {};
@@ -30,43 +34,62 @@
     var node = el(id);
     if (!node) return;
     node.textContent = text || '';
-    node.style.color = err ? '#dc2626' : '#0d5c2e';
+    node.style.color = err ? '#dc2626' : '#64748b';
   }
   function renderSummary(sum) {
-    el('acc-available').textContent = money(sum.available);
-    el('acc-total').textContent = money(sum.totalAsset);
-    el('acc-frozen').textContent = money(sum.frozen);
-    el('acc-credit').textContent = sum.creditScore == null ? '--' : String(sum.creditScore);
+    setText('acc-available', money(sum.available));
+    setText('acc-total', money(sum.totalAsset));
+    setText('acc-pnl', money(sum.accountPnl));
+    setText('acc-today-pnl', money(sum.todayPnl));
+    setText('acc-credit-score', sum.creditScore == null ? 100 : sum.creditScore);
+    setText('acc-payout-state', sum.hasPayoutMethod ? '已绑定提现卡' : '未绑定提现卡');
+    if (user.nickname || sum.nameMask) setText('account-name', user.nickname || sum.nameMask);
+  }
+  function orderHtml(o) {
+    var direction = o.direction === 'short' ? '买跌' : o.direction === 'long' ? '买涨' : (o.direction || '--');
+    var status = o.status === 'open' ? '进行中' : '已结算';
+    return '<article class="zl-live-order"><div class="zl-live-order-top"><strong>' + (o.productName || o.id) + '</strong><span>' +
+      (o.createdAt ? new Date(o.createdAt).toLocaleString('zh-CN') : '--') + '</span></div><p class="zl-live-muted">' +
+      '方向 ' + direction + ' · 金额 ' + money(o.amount) + ' · 盈亏 ' + money(o.profitAmount) + ' · 状态 ' + status +
+      '</p></article>';
   }
   function renderOrders(rows) {
-    var node = el('orders-list');
-    if (!node) return;
     rows = Array.isArray(rows) ? rows : [];
-    node.innerHTML = rows.length ? rows.slice(0, 50).map(function (o) {
-      var direction = o.direction === 'short' ? '买跌' : o.direction === 'long' ? '买涨' : (o.direction || '--');
-      var status = o.status === 'open' ? '进行中' : '已结算';
-      return '<div class="account-row"><strong>' + (o.productName || o.id) + '</strong><br><span>' +
-        direction + ' · ' + status + ' · 金额 ' + money(o.amount) + ' · 盈亏 ' + money(o.profitAmount) +
-        '</span></div>';
-    }).join('') : '<div class="account-row">暂无订单</div>';
+    var open = rows.filter(function (o) { return String(o.status || '') === 'open' || !String(o.status || '').includes('settled'); });
+    var settled = rows.filter(function (o) { return String(o.status || '').includes('settled'); });
+    setText('open-order-count', open.length);
+    setText('settled-order-count', settled.length);
+    window.__zltxOrders = rows;
   }
   function renderTx(rows) {
-    var node = el('tx-list');
-    if (!node) return;
-    rows = Array.isArray(rows) ? rows : [];
-    node.innerHTML = rows.length ? rows.slice(0, 50).map(function (t) {
-      return '<div class="account-row"><strong>' + (t.title || t.type || '资金变动') + '</strong><br><span>' +
-        (t.createdAt ? new Date(t.createdAt).toLocaleString('zh-CN') : '--') + ' · 可用 ' + money(t.deltaAvailable || t.amount || 0) +
-        '</span></div>';
-    }).join('') : '<div class="account-row">暂无资金流水</div>';
+    window.__zltxTx = Array.isArray(rows) ? rows : [];
   }
   async function reload() {
     var sum = await api('/api/me/summary');
     renderSummary(sum);
     var orders = await api('/api/orders').catch(function () { return { list: [] }; });
     renderOrders(orders.list || []);
-    var tx = await api('/api/me/transactions?limit=50').catch(function () { return { list: [] }; });
+    var tx = await api('/api/me/transactions?limit=20').catch(function () { return { list: [] }; });
     renderTx(tx.list || []);
+  }
+  function activateTab(name) {
+    if (name === 'home') window.location.href = 'index.html';
+    else if (name === 'products') window.location.href = 'product.html';
+  }
+  function showFeature(name) {
+    if (name === 'orders') {
+      var rows = window.__zltxOrders || [];
+      alert(rows.length ? rows.map(function (o) { return (o.productName || o.id) + ' · ' + money(o.amount) + ' · ' + (o.status || '--'); }).join('\n') : '暂无订单记录');
+      return;
+    }
+    if (name === 'transactions' || name === 'deposits' || name === 'withdraws') {
+      var tx = window.__zltxTx || [];
+      alert(tx.length ? tx.slice(0, 20).map(function (t) { return (t.createdAt ? new Date(t.createdAt).toLocaleString('zh-CN') : '--') + ' · ' + (t.title || t.type || '资金变动'); }).join('\n') : '暂无资金明细');
+      return;
+    }
+    if (name === 'payout') alert('请在提现流程中绑定本人名下储蓄卡。');
+    else if (name === 'settings') alert('设置功能沿用旧版账户安全逻辑。');
+    else if (name === 'password') window.location.href = 'forgot-login.html';
   }
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -78,29 +101,16 @@
       if (auth) auth.style.display = '';
       return;
     }
-    if (user.nickname) el('profile-nickname').value = user.nickname;
-    if (user.phone) el('profile-phone').value = user.phone;
-    if (user.realName) el('profile-realname').value = user.realName;
-
-    el('profile-save')?.addEventListener('click', async function () {
-      try {
-        await api('/api/me/profile', {
-          method: 'PATCH',
-          json: {
-            nickname: el('profile-nickname').value,
-            phone: el('profile-phone').value,
-            realName: el('profile-realname').value,
-          },
-        });
-        setMsg('profile-msg', '资料已保存');
-        await reload();
-      } catch (e) {
-        setMsg('profile-msg', e.message || '保存失败', true);
-      }
+    document.querySelectorAll('[data-bottom-nav]').forEach(function (btn) {
+      btn.addEventListener('click', function () { activateTab(btn.getAttribute('data-bottom-nav')); });
+    });
+    document.querySelectorAll('[data-open-feature]').forEach(function (btn) {
+      btn.addEventListener('click', function () { showFeature(btn.getAttribute('data-open-feature')); });
     });
     el('recharge-btn')?.addEventListener('click', async function () {
       try {
-        var amount = Number(el('money-amount').value || 0);
+        var input = window.prompt('请输入入金金额', el('money-amount') ? el('money-amount').value : '1000');
+        var amount = Number(input || 0);
         var res = await api('/api/intent/recharge', { method: 'POST', json: { amount: amount } });
         setMsg('money-msg', res.message || '充值申请已提交');
         await reload();
@@ -110,7 +120,8 @@
     });
     el('withdraw-btn')?.addEventListener('click', async function () {
       try {
-        var amount = Number(el('money-amount').value || 0);
+        var input = window.prompt('请输入出金金额', el('money-amount') ? el('money-amount').value : '1000');
+        var amount = Number(input || 0);
         var res = await api('/api/intent/withdraw', { method: 'POST', json: { amount: amount } });
         setMsg('money-msg', res.message || '提现申请已提交');
         await reload();
@@ -123,7 +134,7 @@
         app.style.display = 'none';
         if (auth) auth.style.display = '';
       } else {
-        setMsg('profile-msg', e.message || '加载失败', true);
+        setMsg('money-msg', e.message || '加载失败', true);
       }
     });
   });
