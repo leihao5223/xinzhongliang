@@ -656,7 +656,7 @@ function resolveRegisterSecurity(security) {
 
 function createRegisteredUser({ nickname, password, tradePassword, security }) {
   const nick = String(nickname).trim().slice(0, 32);
-  if (nick.length < 2) throw new Error('用户名至少 2 个字符');
+  if (nick.length < 8) throw new Error('用户名至少 8 位');
   if (String(password).length < 6) throw new Error('密码至少 6 位');
   const tp = String(tradePassword || '').trim();
   if (tp.length < 6) throw new Error('交易密码至少 6 位');
@@ -771,7 +771,7 @@ function getSecurityQuestionsForUserPublic(userId) {
 
 function adminCreateUser({ nickname, password, tradePassword, phone, realName, userKind }) {
   const nick = String(nickname).trim().slice(0, 32);
-  if (nick.length < 2) throw new Error('用户名至少 2 个字符');
+  if (nick.length < 8) throw new Error('用户名至少 8 位');
   if (String(password).length < 6) throw new Error('登录密码至少 6 位');
   if (findUserByNickname(nick)) throw new Error('用户名已存在');
   const salt = crypto.randomBytes(16).toString('hex');
