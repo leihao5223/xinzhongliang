@@ -598,6 +598,9 @@ app.get('/api/site/company', (_req, res) => {
 app.get('/api/site/company-content', (_req, res) => {
   res.json({ success: true, data: store.getCompanyContent() });
 });
+app.get('/api/site/sections', (_req, res) => {
+  res.json({ success: true, data: store.getSiteSections() });
+});
 
 app.get('/api/trade/config', (_req, res) => {
   const c = store.getTradeConfig();

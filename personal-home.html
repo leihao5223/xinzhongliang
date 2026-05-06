@@ -34,12 +34,67 @@
       background: #ffffff;
       min-height: calc(100vh - 88px);
     }
-    .personal-home-embed {
-      width: 100%;
-      min-height: calc(100vh - 118px);
+    .account-dashboard {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 1.5rem;
+      color: #0f172a;
+    }
+    .account-hero {
+      border-radius: 28px;
+      padding: clamp(1.4rem, 4vw, 2.4rem);
+      background:
+        radial-gradient(circle at 85% 20%, rgba(94, 234, 212, .24), transparent 24rem),
+        linear-gradient(135deg, #071527, #0d5c2e 70%, #10351e);
+      color: #fff;
+      box-shadow: 0 24px 70px rgba(15, 23, 42, .16);
+      margin-bottom: 1.2rem;
+    }
+    .account-hero h1 { margin: 0 0 .45rem; font-size: clamp(1.9rem, 5vw, 3.4rem); font-weight: 900; }
+    .account-hero p { margin: 0; color: rgba(255,255,255,.76); line-height: 1.8; }
+    .account-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .9rem; margin: 1rem 0; }
+    .account-card {
+      border: 1px solid rgba(15, 118, 110, .14);
+      border-radius: 22px;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 18px 50px rgba(15, 23, 42, .06);
+      padding: 1rem;
+    }
+    .account-card h2, .account-card h3 { margin: 0 0 .75rem; font-weight: 850; color: #0f172a; }
+    .account-card small { color: #64748b; }
+    .account-card b { display: block; margin-top: .35rem; font-size: 1.55rem; color: #0d5c2e; }
+    .account-main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .account-toolbar { display: flex; flex-wrap: wrap; gap: .55rem; align-items: center; }
+    .account-toolbar input {
+      border: 1px solid #dbe7df;
+      border-radius: 12px;
+      padding: .62rem .75rem;
+      min-width: 150px;
+      outline: none;
+    }
+    .account-toolbar button, .account-btn {
       border: 0;
-      background: #ffffff;
-      display: block;
+      border-radius: 999px;
+      padding: .65rem 1rem;
+      background: linear-gradient(135deg, #0d5c2e, #2ecc71);
+      color: #fff;
+      font-weight: 750;
+      cursor: pointer;
+    }
+    .account-list { display: grid; gap: .55rem; max-height: 360px; overflow: auto; }
+    .account-row { border: 1px solid #edf2ef; border-radius: 14px; padding: .65rem .75rem; background: #fff; }
+    .account-row strong { color: #0f172a; }
+    .account-row span { color: #64748b; font-size: .86rem; }
+    .account-msg { margin: .65rem 0 0; color: #0d5c2e; min-height: 1.2em; }
+    .auth-required { text-align: center; padding: 3rem 1rem; }
+    @media (max-width: 900px) {
+      .account-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .account-main-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .account-dashboard { padding: .9rem; }
+      .account-grid { grid-template-columns: 1fr; }
+      .account-toolbar input, .account-toolbar button { width: 100%; }
     }
   </style>
 </head>
@@ -211,13 +266,54 @@
 
   <main>
     <section class="personal-home-shell">
-      <iframe
-        class="personal-home-embed"
-        src="/app/profile"
-        title="个人主页"
-        loading="eager"
-        referrerpolicy="strict-origin-when-cross-origin"
-      ></iframe>
+      <div class="account-dashboard" id="account-dashboard">
+        <div class="account-hero">
+          <h1>个人资产与订单中心</h1>
+          <p>沿用 zhongliang-live 现有用户、资金、订单和银行卡接口，前台只升级视觉与交互，不重造业务算法。</p>
+        </div>
+        <div id="account-auth" class="account-card auth-required" style="display:none;">
+          <h2>请先登录</h2>
+          <p>登录后可查看余额、订单、资金流水、充值提现和个人资料。</p>
+          <a class="account-btn" href="login.html?redirect=/personal-home.html">去登录</a>
+        </div>
+        <div id="account-app">
+          <div class="account-grid">
+            <article class="account-card"><small>可用余额</small><b id="acc-available">--</b></article>
+            <article class="account-card"><small>总资产</small><b id="acc-total">--</b></article>
+            <article class="account-card"><small>冻结金额</small><b id="acc-frozen">--</b></article>
+            <article class="account-card"><small>信用分</small><b id="acc-credit">--</b></article>
+          </div>
+          <div class="account-main-grid">
+            <section class="account-card">
+              <h2>个人资料</h2>
+              <div class="account-toolbar">
+                <input id="profile-nickname" placeholder="昵称">
+                <input id="profile-phone" placeholder="手机号">
+                <input id="profile-realname" placeholder="真实姓名">
+                <button id="profile-save" type="button">保存资料</button>
+              </div>
+              <p class="account-msg" id="profile-msg"></p>
+            </section>
+            <section class="account-card">
+              <h2>资金操作</h2>
+              <div class="account-toolbar">
+                <input id="money-amount" type="number" min="1" step="100" placeholder="金额">
+                <button id="recharge-btn" type="button">提交充值</button>
+                <button id="withdraw-btn" type="button">提交提现</button>
+              </div>
+              <p class="account-msg" id="money-msg"></p>
+            </section>
+            <section class="account-card">
+              <h2>订单记录</h2>
+              <div class="account-list" id="orders-list"><div class="account-row">读取中...</div></div>
+            </section>
+            <section class="account-card">
+              <h2>资金流水</h2>
+              <div class="account-list" id="tx-list"><div class="account-row">读取中...</div></div>
+            </section>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
     <!-- Footer Section -->
@@ -570,6 +666,6 @@
   <script src="assets/js/vendor/jquery.min.js"></script>
   <script src="assets/js/vendor/bootstrap.bundle.min.js"></script>
   <script src="assets/js/script.js"></script>
-  <script></script>
+  <script src="assets/js/account-dashboard.js?v=1"></script>
 </body>
 </html>

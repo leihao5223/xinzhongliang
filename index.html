@@ -279,13 +279,13 @@
         <div class="zl-container">
           <div class="zl-hero__grid">
             <div>
-              <div class="zl-kicker">COFCO DIGITAL PLATFORM</div>
-              <h1>忠于国计 <span>良于民生</span></h1>
-              <p class="zl-hero__lead">以中粮产业链内容为底座，融合产品交易、个人资产、客服协同和后台控台，打造更具科技感、可运营、可排期的视频化数字农粮平台。</p>
+              <div class="zl-kicker" data-cms-text="homeHero.eyebrow">COFCO DIGITAL PLATFORM</div>
+              <h1><span data-cms-text="homeHero.title">忠于国计 良于民生</span> <span data-cms-text="homeHero.outline">数字中粮</span></h1>
+              <p class="zl-hero__lead" data-cms-text="homeHero.lead">以中粮产业链内容为底座，融合产品交易、个人资产、客服协同和后台控台，打造更具科技感、可运营、可排期的视频化数字农粮平台。</p>
               <div class="zl-hero__cta">
                 <a class="zl-btn zl-btn--primary" href="login.html"><i class="bi bi-shield-lock-fill"></i> 进入登录</a>
                 <a class="zl-btn zl-btn--ghost" href="product.html"><i class="bi bi-graph-up-arrow"></i> 查看交易中心</a>
-                <button class="zl-btn zl-btn--ghost" type="button" id="play-advert-btn"><i class="bi bi-play-fill"></i> 播放品牌广告</button>
+                <button class="zl-btn zl-btn--ghost" type="button" id="play-advert-btn"><i class="bi bi-play-fill"></i> <span data-cms-text="homeHero.secondaryCta">播放品牌广告</span></button>
               </div>
             </div>
             <aside class="zl-status-card" aria-label="平台状态">
@@ -331,9 +331,9 @@
         <div class="zl-container">
           <div class="zl-section__head">
             <div>
-              <p class="zl-section__eyebrow">About Zhongliang</p>
-              <h2>把静态展示升级成可运营的平台级首页</h2>
-              <p class="zl-section__desc">中粮天下首页不再只是图片和文字堆叠，而是围绕“国计民生、产业链、交易能力、客户服务、后台可控”重新组织顶层内容，所有核心入口都指向真实业务链路。</p>
+              <p class="zl-section__eyebrow" data-cms-text="about.eyebrow">About Zhongliang</p>
+              <h2 data-cms-text="about.title">把静态展示升级成可运营的平台级首页</h2>
+              <p class="zl-section__desc" data-cms-text="about.desc">中粮天下首页不再只是图片和文字堆叠，而是围绕“国计民生、产业链、交易能力、客户服务、后台可控”重新组织顶层内容，所有核心入口都指向真实业务链路。</p>
             </div>
             <a class="zl-btn zl-btn--dark" href="about.html">公司介绍</a>
           </div>
@@ -361,9 +361,9 @@
         <div class="zl-container">
           <div class="zl-section__head">
             <div>
-              <p class="zl-section__eyebrow">Business Core</p>
-              <h2>逻辑性板块沿用 zhongliang-live</h2>
-              <p class="zl-section__desc">交易板块、个人资料、订单中心、资金和控台不重造算法，继续复用旧项目已跑通的 Express API、JWT、订单结算、控盘和客服数据结构。</p>
+              <p class="zl-section__eyebrow" data-cms-text="business.eyebrow">Business Core</p>
+              <h2 data-cms-text="business.title">逻辑性板块沿用 zhongliang-live</h2>
+              <p class="zl-section__desc" data-cms-text="business.desc">交易板块、个人资料、订单中心、资金和控台不重造算法，继续复用旧项目已跑通的 Express API、JWT、订单结算、控盘和客服数据结构。</p>
             </div>
             <a class="zl-btn zl-btn--primary" href="admin-console.html">进入后台控台</a>
           </div>
@@ -435,8 +435,8 @@
         <div class="zl-container">
           <div class="zl-contact-band">
             <p class="zl-section__eyebrow">Next Action</p>
-            <h2>登录保持原静态页逻辑，主页升级为顶级内容入口</h2>
-            <p style="max-width:720px;color:rgba(255,255,255,.78);line-height:1.85;">如果用户直接访问根路径，仍按当前部署策略进入登录；用户从登录页浏览官网时，看到的是重构后的高级主页。交易、个人、订单和控台继续走旧版业务接口。</p>
+            <h2 data-cms-text="contact.title">登录保持原静态页逻辑，主页升级为顶级内容入口</h2>
+            <p data-cms-text="contact.desc" style="max-width:720px;color:rgba(255,255,255,.78);line-height:1.85;">如果用户直接访问根路径，仍按当前部署策略进入登录；用户从登录页浏览官网时，看到的是重构后的高级主页。交易、个人、订单和控台继续走旧版业务接口。</p>
             <div class="zl-hero__cta">
               <a class="zl-btn zl-btn--primary" href="login.html">立即登录</a>
               <a class="zl-btn zl-btn--ghost" href="contact.html">联系客服</a>
@@ -499,6 +499,19 @@
         .then(function (data) {
           var el = document.getElementById('media-status');
           if (el && data && data.item && data.item.title) el.textContent = data.item.title;
+        })
+        .catch(function () {});
+
+      fetch('/api/site/sections', { cache: 'no-store' })
+        .then(function (res) { return res.ok ? res.json() : null; })
+        .then(function (payload) {
+          var data = payload && payload.data ? payload.data : {};
+          document.querySelectorAll('[data-cms-text]').forEach(function (el) {
+            var path = String(el.getAttribute('data-cms-text') || '').split('.');
+            var val = data;
+            path.forEach(function (key) { val = val && val[key]; });
+            if (val !== undefined && val !== null && String(val).trim()) el.textContent = String(val);
+          });
         })
         .catch(function () {});
 

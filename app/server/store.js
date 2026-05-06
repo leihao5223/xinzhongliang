@@ -94,6 +94,31 @@ const defaultMediaSchedules = [
   },
 ];
 
+const defaultSiteSections = {
+  homeHero: {
+    eyebrow: 'COFCO DIGITAL AGRI PLATFORM',
+    title: '忠于国计 良于民生',
+    outline: '数字中粮',
+    lead: '中粮天下以农粮产业链为根基，融合数字交易、资产服务、客户运营与智能风控，构建面向用户与产业伙伴的一体化服务平台。',
+    primaryCta: '进入交易中心',
+    secondaryCta: '播放品牌广告',
+  },
+  about: {
+    eyebrow: '产业根基',
+    title: '从田间到餐桌，连接粮源、加工、仓储、物流与消费场景',
+    desc: '平台围绕粮油食品主业与数字化服务能力，展示产业协同、交易服务、客户支持与内容运营，让品牌表达、业务交易和后台管理形成统一闭环。',
+  },
+  business: {
+    eyebrow: '平台能力',
+    title: '业务逻辑沿用旧版成熟链路，视觉体验全面升级',
+    desc: '登录、交易、个人资料、订单、客服和控台沿用 zhongliang-live 现有接口与结算逻辑；前台则使用 Echofy 模板语言重构为更高级、更动态、更科技的中粮平台体验。',
+  },
+  contact: {
+    title: '共建数字农粮服务平台',
+    desc: '通过后台维护首页内容、文章、视频排期与交易配置，让运营可以快速调整前台展示与业务节奏。',
+  },
+};
+
 function buildCompanyContentSeed() {
   const base = new Date('2018-01-15T10:00:00+08:00').getTime();
   const now = Date.now();
@@ -297,6 +322,7 @@ const defaultStore = {
   tradeConfig: JSON.parse(JSON.stringify(defaultTradeConfig)),
   companyContent: buildCompanyContentSeed(),
   mediaSchedules: JSON.parse(JSON.stringify(defaultMediaSchedules)),
+  siteSections: JSON.parse(JSON.stringify(defaultSiteSections)),
 };
 
 function fallbackMeta(p) {
@@ -522,6 +548,11 @@ function migrateLoaded(data) {
   }
   if (!Array.isArray(d.mediaSchedules)) d.mediaSchedules = JSON.parse(JSON.stringify(defaultMediaSchedules));
   else d.mediaSchedules = normalizeMediaSchedules(d.mediaSchedules);
+  if (!d.siteSections || typeof d.siteSections !== 'object' || Array.isArray(d.siteSections)) {
+    d.siteSections = JSON.parse(JSON.stringify(defaultSiteSections));
+  } else {
+    d.siteSections = { ...JSON.parse(JSON.stringify(defaultSiteSections)), ...d.siteSections };
+  }
   /** 固定目录：仅保留内置 30 个中国农产标的，其余产品一律移除 */
   d.products = normalizeProductCatalogRows(d.products);
   (d.products || []).forEach(patchProductRow);
@@ -644,7 +675,12 @@ function getCmsSnapshot() {
     settlementOverride: JSON.parse(JSON.stringify(store.settlementOverride || defaultSettlementOverride)),
     productSettlementRules: JSON.parse(JSON.stringify(store.productSettlementRules || [])),
     mediaSchedules: JSON.parse(JSON.stringify(store.mediaSchedules || defaultMediaSchedules)),
+    siteSections: JSON.parse(JSON.stringify(store.siteSections || defaultSiteSections)),
   };
+}
+
+function getSiteSections() {
+  return JSON.parse(JSON.stringify({ ...defaultSiteSections, ...(store.siteSections || {}) }));
 }
 
 function normalizeMediaSchedule(row, index = 0) {
@@ -1121,6 +1157,9 @@ function updateCmsSection(section, data) {
     const rows = normalizeMediaSchedules(data);
     if (!rows.length) throw new Error('mediaSchedules 至少需要一条有效媒体规则');
     store.mediaSchedules = rows;
+  } else if (section === 'siteSections') {
+    if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('siteSections 须为对象');
+    store.siteSections = { ...JSON.parse(JSON.stringify(defaultSiteSections)), ...data };
   } else {
     throw new Error('未知 section');
   }
@@ -1145,6 +1184,7 @@ module.exports = {
   updateCmsSectionProductsAsync,
   getCompanyInfo,
   getCompanyContent,
+  getSiteSections,
   getMediaSchedules,
   getActiveMediaSchedule,
   getSettlementOverrideState,

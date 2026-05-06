@@ -168,13 +168,48 @@
           </div>
         </div>
 
-        <div id="sec-finance" class="hidden"><div class="admin-card"><h3>充提审核</h3><p class="muted">功能开发中...</p></div></div>
-        <div id="sec-orders" class="hidden"><div class="admin-card"><h3>订单管理</h3><p class="muted">功能开发中...</p></div></div>
-        <div id="sec-products" class="hidden"><div class="admin-card"><h3>产品管理</h3><p class="muted">功能开发中...</p></div></div>
-        <div id="sec-users" class="hidden"><div class="admin-card"><h3>用户管理</h3><p class="muted">功能开发中...</p></div></div>
+        <div id="sec-finance" class="hidden">
+          <div class="admin-card">
+            <h3>充提审核</h3>
+            <div id="finance-list" class="admin-list" style="max-height:520px;"></div>
+          </div>
+        </div>
+        <div id="sec-orders" class="hidden">
+          <div class="admin-card">
+            <h3>订单管理</h3>
+            <div class="admin-toolbar">
+              <select id="orders-status"><option value="">全部</option><option value="open">进行中</option><option value="settled">已结算</option></select>
+              <button id="orders-refresh" class="btn-blue">刷新</button>
+            </div>
+            <div id="orders-list" class="admin-list" style="max-height:520px;"></div>
+          </div>
+        </div>
+        <div id="sec-products" class="hidden">
+          <div class="admin-card">
+            <h3>产品管理</h3>
+            <p class="muted" style="font-size:.82rem;">读取旧版 `/api/products`，高级编辑仍通过 CMS 产品接口保存。</p>
+            <div id="products-list" class="admin-list" style="max-height:520px;"></div>
+          </div>
+        </div>
+        <div id="sec-users" class="hidden">
+          <div class="admin-card">
+            <h3>用户管理</h3>
+            <div id="users-list" class="admin-list" style="max-height:520px;"></div>
+          </div>
+        </div>
         <div id="sec-market" class="hidden"><div class="admin-card"><h3>行情控制</h3><p class="muted">功能开发中...</p></div></div>
         <div id="sec-articles" class="hidden"><div class="admin-card"><h3>文章管理</h3><p class="muted">功能开发中...</p></div></div>
-        <div id="sec-settings" class="hidden"><div class="admin-card"><h3>前端设置</h3><p class="muted">功能开发中...</p></div></div>
+        <div id="sec-settings" class="hidden">
+          <div class="admin-card">
+            <h3>前端内容设置</h3>
+            <p class="muted" style="font-size:.82rem;">编辑首页核心文案 JSON，保存后首页会通过 `/api/site/sections` 自动读取。</p>
+            <textarea id="site-sections-json" style="width:100%;min-height:320px;border:1px solid rgba(148,211,255,.35);background:rgba(8,27,44,.55);color:#e7f4ff;border-radius:10px;padding:.75rem;font-family:Consolas,monospace;"></textarea>
+            <div class="admin-toolbar" style="margin-top:.6rem;">
+              <button id="site-sections-load" class="btn-blue">读取内容</button>
+              <button id="site-sections-save" class="btn-green">保存内容</button>
+            </div>
+          </div>
+        </div>
         <div id="sec-media" class="hidden">
           <div class="admin-card">
             <h3>前台视频排期</h3>
@@ -347,9 +382,105 @@
       const nav = document.querySelector('.admin-nav-item[href="#' + name + '"]');
       if (nav) nav.classList.add('active');
       if (name === 'media') loadMediaSchedules().catch((e) => { loginMsg.textContent = e.message; });
+      if (name === 'finance') loadFinance().catch((e) => { loginMsg.textContent = e.message; });
+      if (name === 'orders') loadOrders().catch((e) => { loginMsg.textContent = e.message; });
+      if (name === 'products') loadProducts().catch((e) => { loginMsg.textContent = e.message; });
+      if (name === 'users') loadUsers().catch((e) => { loginMsg.textContent = e.message; });
+      if (name === 'settings') loadSiteSections().catch((e) => { loginMsg.textContent = e.message; });
     }
 
     window.showSec = showSec;
+
+    function fmtMoney(v) {
+      const n = Number(v);
+      return Number.isFinite(n) ? n.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '--';
+    }
+
+    async function loadFinance() {
+      const res = await api('/api/admin/treasury/pending');
+      const rows = []
+        .concat((res.deposits || []).map((x) => ({ ...x, kind: '充值' })))
+        .concat((res.withdrawals || []).map((x) => ({ ...x, kind: '提现' })));
+      const box = document.getElementById('finance-list');
+      box.innerHTML = rows.length ? rows.map((x) => `
+        <div class="admin-list-row" style="display:block;">
+          <div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center;">
+            <strong>${x.kind} · ${fmtMoney(x.amount)}</strong>
+            <span>
+              <button data-finance-act="approve" data-kind="${x.kind}" data-id="${x.id}" class="btn-green">通过</button>
+              <button data-finance-act="reject" data-kind="${x.kind}" data-id="${x.id}">驳回</button>
+            </span>
+          </div>
+          <div style="opacity:.78;margin-top:.25rem;">用户 ${x.userId || x.user_id || '--'} · ${x.status || 'pending'} · ${x.createdAt ? new Date(x.createdAt).toLocaleString('zh-CN') : '--'}</div>
+        </div>
+      `).join('') : '<p class="muted">暂无待审核充提</p>';
+      box.querySelectorAll('[data-finance-act]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const kind = btn.getAttribute('data-kind');
+          const id = btn.getAttribute('data-id');
+          const action = btn.getAttribute('data-finance-act');
+          const url = kind === '充值' ? `/api/admin/treasury/deposits/${id}` : `/api/admin/treasury/withdrawals/${id}`;
+          await api(url, { method: 'POST', json: { action, note: '后台控台处理' } });
+          toast('审核已处理');
+          await loadFinance();
+        });
+      });
+    }
+
+    async function loadOrders() {
+      const status = val('orders-status');
+      const qs = new URLSearchParams({ limit: '100' });
+      if (status) qs.set('status', status);
+      const res = await api('/api/admin/trade-orders?' + qs.toString());
+      const box = document.getElementById('orders-list');
+      const rows = res.list || [];
+      box.innerHTML = rows.length ? rows.map((o) => `
+        <div class="admin-list-row" style="display:block;">
+          <strong>${o.productName || o.productId || o.id}</strong>
+          <div style="opacity:.8;margin-top:.25rem;">${o.status || '--'} · ${o.direction || '--'} · ${o.orderKind || 'market'} · ${fmtMoney(o.amount)} · 盈亏 ${fmtMoney(o.profitAmount)}</div>
+          <div style="opacity:.65;margin-top:.2rem;">${o.userDisplay || o.userId || '--'} · ${o.createdAt ? new Date(o.createdAt).toLocaleString('zh-CN') : '--'}</div>
+        </div>
+      `).join('') : '<p class="muted">暂无订单</p>';
+    }
+
+    async function loadProducts() {
+      const rows = await api('/api/products');
+      const box = document.getElementById('products-list');
+      box.innerHTML = (Array.isArray(rows) && rows.length) ? rows.map((p) => `
+        <div class="admin-list-row" style="display:block;">
+          <strong>${p.name || p.tradeName || p.productCode || p.id}</strong>
+          <div style="opacity:.8;margin-top:.25rem;">现价 ${fmtMoney(p.livePrice || p.basePrice)} · ${p.marketSymbol || p.productCode || '--'} · ${p.listed === false ? '下架' : '上架'}</div>
+        </div>
+      `).join('') : '<p class="muted">暂无产品</p>';
+    }
+
+    async function loadUsers() {
+      const res = await api('/api/admin/users');
+      const rows = res.list || [];
+      const box = document.getElementById('users-list');
+      box.innerHTML = rows.length ? rows.map((u) => `
+        <div class="admin-list-row" style="display:block;">
+          <strong>${u.nickname || u.username || u.id}</strong>
+          <div style="opacity:.8;margin-top:.25rem;">余额 ${fmtMoney(u.account && u.account.available)} · 总资产 ${fmtMoney(u.account && u.account.totalAsset)} · ${u.userKind || 'real'}</div>
+          <div style="opacity:.65;margin-top:.2rem;">${u.id}</div>
+        </div>
+      `).join('') : '<p class="muted">暂无用户</p>';
+    }
+
+    async function loadSiteSections() {
+      const res = await api('/api/admin/cms');
+      const data = res.data && res.data.siteSections ? res.data.siteSections : {};
+      document.getElementById('site-sections-json').value = JSON.stringify(data, null, 2);
+    }
+
+    async function saveSiteSections() {
+      const text = document.getElementById('site-sections-json').value || '{}';
+      let data;
+      try { data = JSON.parse(text); } catch (e) { throw new Error('JSON 格式错误'); }
+      await api('/api/admin/cms/siteSections', { method: 'PUT', json: { data } });
+      toast('前台内容已保存');
+      await loadSiteSections();
+    }
 
     async function loadMediaSchedules() {
       const res = await api('/api/admin/media-schedules');
@@ -531,6 +662,10 @@
     }
 
     document.getElementById('ac-login-btn')?.addEventListener('click', login);
+    document.getElementById('orders-refresh')?.addEventListener('click', () => loadOrders().catch((e) => { loginMsg.textContent = e.message; }));
+    document.getElementById('orders-status')?.addEventListener('change', () => loadOrders().catch((e) => { loginMsg.textContent = e.message; }));
+    document.getElementById('site-sections-load')?.addEventListener('click', () => loadSiteSections().catch((e) => { loginMsg.textContent = e.message; }));
+    document.getElementById('site-sections-save')?.addEventListener('click', () => saveSiteSections().catch((e) => { loginMsg.textContent = e.message; }));
     document.getElementById('media-add')?.addEventListener('click', async () => {
       const row = {
         id: 'media_' + Date.now(),
