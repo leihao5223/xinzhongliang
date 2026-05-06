@@ -781,12 +781,16 @@ footer .footer-content-container {
 
 body.personal-home-page .zl-chat-fab {
   right: .75rem;
-  bottom: 5.75rem;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
 }
 
 body.personal-home-page .zl-chat-panel {
-  right: .5rem;
-  bottom: 9.35rem;
+  right: calc(0.75rem + 56px + 0.65rem);
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
   width: min(360px, calc(100vw - 1rem));
   max-height: 48vh;
 }
@@ -871,14 +875,18 @@ body.personal-home-page .zl-chat-panel {
 
   .zl-chat-fab {
     right: .75rem;
-    bottom: .75rem;
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
     width: 48px;
     height: 48px;
   }
 
   .zl-chat-panel {
-    right: .5rem;
-    bottom: 4.25rem;
+    right: calc(0.75rem + 48px + 0.55rem);
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
     width: calc(100vw - 1rem);
     max-height: 58vh;
   }

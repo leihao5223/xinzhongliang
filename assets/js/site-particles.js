@@ -41,20 +41,22 @@
   var timeAcc = 0;
 
   var cfg = {
-    cohesionRadius: 108,
-    separationRadius: 30,
-    alignmentRadius: 92,
+    cohesionRadius: 52,
+    separationRadius: 56,
+    alignmentRadius: 58,
     predatorRadius: 150,
-    cohesionWeight: 0.62,
-    separationWeight: 1.05,
-    alignmentWeight: 0.72,
+    cohesionWeight: 0.18,
+    separationWeight: 1.72,
+    alignmentWeight: 0.32,
     predatorWeight: 1.85,
     boundaryMargin: 72,
     boundaryForce: 0.68,
     maxSpeed: 2.9,
     maxForce: 0.12,
     minCruiseSpeed: 0.32,
-    wanderForce: 0.055,
+    wanderForce: 0.078,
+    crowdRadius: 54,
+    crowdDensityWeight: 0.052,
     trailLength: 12
   };
   var palette = ['#e3e9f2', '#cfdbe9', '#f4f7fc', '#7fd9b5', '#6bc8ff', '#89e0c0'];
@@ -111,6 +113,24 @@
     };
   }
 
+  function jitteredGridPlace(arr, w, h) {
+    var n = arr.length;
+    if (n === 0) return;
+    var cols = Math.max(1, Math.ceil(Math.sqrt(n * w / h)));
+    var rows = Math.max(1, Math.ceil(n / cols));
+    var cw = w / cols;
+    var ch = h / rows;
+    var k = 0;
+    for (var r = 0; r < rows && k < n; r += 1) {
+      for (var c = 0; c < cols && k < n; c += 1) {
+        var p = arr[k];
+        p.x = c * cw + cw * 0.1 + Math.random() * cw * 0.8;
+        p.y = r * ch + ch * 0.1 + Math.random() * ch * 0.8;
+        k += 1;
+      }
+    }
+  }
+
   function resize() {
     dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = Math.floor(window.innerWidth * dpr);
@@ -126,6 +146,7 @@
     while (points.length < nextCount) {
       points.push(createPoint());
     }
+    jitteredGridPlace(points, window.innerWidth, window.innerHeight);
   }
 
   function updatePoint(point, index) {
@@ -141,6 +162,9 @@
     var alignmentX = 0;
     var alignmentY = 0;
     var alignmentCount = 0;
+    var crowdPushX = 0;
+    var crowdPushY = 0;
+    var crowdNear = 0;
 
     for (var j = 0; j < points.length; j += 1) {
       if (j === index) continue;
@@ -154,7 +178,7 @@
         cohesionCount += 1;
       }
       if (dist < cfg.separationRadius && dist > 0.01) {
-        var sepForce = 1.3 / dist;
+        var sepForce = (cfg.separationRadius - dist + 12) / (dist * dist + 4);
         separationX -= (dx / dist) * sepForce;
         separationY -= (dy / dist) * sepForce;
         separationCount += 1;
@@ -163,6 +187,11 @@
         alignmentX += other.vx;
         alignmentY += other.vy;
         alignmentCount += 1;
+      }
+      if (dist < cfg.crowdRadius && dist > 0.01) {
+        crowdNear += 1;
+        crowdPushX -= dx / dist;
+        crowdPushY -= dy / dist;
       }
     }
 
@@ -194,6 +223,13 @@
       var limitedA = limitVector(afX, afY, maxForce);
       point.vx += limitedA[0] * cfg.alignmentWeight * (0.82 + activity * 0.32);
       point.vy += limitedA[1] * cfg.alignmentWeight * (0.82 + activity * 0.32);
+    }
+
+    if (crowdNear > 3) {
+      var cpMag = Math.hypot(crowdPushX, crowdPushY) || 1;
+      var dens = (crowdNear - 3) * cfg.crowdDensityWeight * (0.55 + activity * 0.55);
+      point.vx += (crowdPushX / cpMag) * dens;
+      point.vy += (crowdPushY / cpMag) * dens;
     }
 
     var wanderTime = timeAcc * (0.82 + activity * 1.85) + point.phase;
