@@ -6,6 +6,9 @@ const ACTIVE_MEDIA_API = '/api/site/active-media?pageKey=home&slotKey=hero-bg';
 const MANIFEST_URL = '/media-gallery-manifest.json';
 const AUTO_ADVANCE_MS = 5 * 60 * 1000;
 
+/** 本地未放置素材网 / 接口无数据时，保证首屏仍有可播放地址（可替换为自有 CDN） */
+const REMOTE_HERO_FALLBACK = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+
 function titleFromUrl(u) {
   try {
     const seg = String(u || '').split('/').pop().split('?')[0];
@@ -95,7 +98,12 @@ async function loadSlides() {
           title: (it.title && String(it.title)) || titleFromUrl(it.url),
           caption: (it.caption && String(it.caption)) || '',
         }));
-      if (slides.length) return dedupeSlidesByUrl([...slides, ...scheduled]);
+      if (slides.length)
+        return dedupeSlidesByUrl([
+          ...slides,
+          ...scheduled,
+          { url: REMOTE_HERO_FALLBACK, type: 'video', title: '精选影像', caption: '' },
+        ]);
     }
   } catch (e) {
     console.warn('[banner-media-carousel] video list API failed', e);
@@ -114,11 +122,25 @@ async function loadSlides() {
         title: it.title || titleFromUrl(it.url),
         caption: it.caption || '',
       }));
-    if (slides.length) return dedupeSlidesByUrl([...slides, ...scheduled]);
+    if (slides.length)
+      return dedupeSlidesByUrl([
+        ...slides,
+        ...scheduled,
+        { url: REMOTE_HERO_FALLBACK, type: 'video', title: '精选影像', caption: '' },
+      ]);
     throw new Error('no video entries in manifest');
   } catch (_) {}
 
-  return dedupeSlidesByUrl([...FALLBACK_VIDEO_SLIDES, ...scheduled]);
+  return dedupeSlidesByUrl([
+    ...FALLBACK_VIDEO_SLIDES,
+    ...scheduled,
+    {
+      url: REMOTE_HERO_FALLBACK,
+      type: 'video',
+      title: '精选影像',
+      caption: '',
+    },
+  ]);
 }
 
 function buildCarousel(slides) {
@@ -241,6 +263,24 @@ function syncHeroBackdrop(slide) {
     forceHeroAutoplay(video);
   };
   video.addEventListener('canplay', video._bannerCanplayHandler, { once: true });
+
+  if (video._bannerVideoErrorHandler) {
+    video.removeEventListener('error', video._bannerVideoErrorHandler);
+  }
+  video._bannerVideoErrorHandler = function () {
+    const el = video.querySelector('source');
+    var cur = (el && el.src) || video.currentSrc || '';
+    if (cur.indexOf('flower.mp4') !== -1) {
+      video.classList.add('is-ready');
+      video.style.opacity = '1';
+      return;
+    }
+    if (el) el.src = REMOTE_HERO_FALLBACK;
+    else video.src = REMOTE_HERO_FALLBACK;
+    video.load();
+    forceHeroAutoplay(video);
+  };
+  video.addEventListener('error', video._bannerVideoErrorHandler, { once: true });
 }
 
 function revealDefaultHeroVideo() {

@@ -26,7 +26,7 @@
   canvas.style.height = '100vh';
   canvas.style.display = 'block';
   canvas.style.pointerEvents = 'none';
-  canvas.style.zIndex = '2';
+  canvas.style.zIndex = '5';
   canvas.style.opacity = '0.78';
   canvas.style.mixBlendMode = 'screen';
   canvas.style.contain = 'strict';

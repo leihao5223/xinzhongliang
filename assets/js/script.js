@@ -16,7 +16,7 @@ function loadGlobalWaterRipple() {
     if (window.__zlWaterRippleLoadScheduled) return;
     window.__zlWaterRippleLoadScheduled = true;
     var s = document.createElement('script');
-    s.src = 'assets/js/zl-water-ripple.js?v=1';
+    s.src = 'assets/js/zl-water-ripple.js?v=2';
     s.async = true;
     document.head.appendChild(s);
 }

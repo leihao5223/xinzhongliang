@@ -2604,11 +2604,11 @@ body.personal-home-page .zl-chat-panel {
   }
 }
 
-/* ---------- 全局水纹（低强度，叠在页面底层、粒子之下） ---------- */
+/* ---------- 全局水纹：叠在整站内容之上、粒子之下；不拦截点击（pointer-events: none） ---------- */
 .zl-water-ripple-host {
   position: fixed;
   inset: 0;
-  z-index: 1;
+  z-index: 3;
   pointer-events: none;
   overflow: hidden;
 }
@@ -2618,7 +2618,7 @@ body.personal-home-page .zl-chat-panel {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.22;
-  mix-blend-mode: soft-light;
-  filter: saturate(1.08) blur(0.6px);
+  opacity: 0.48;
+  mix-blend-mode: overlay;
+  filter: saturate(1.12);
 }
