@@ -2506,6 +2506,39 @@ ul{
     width: 100%;
 }
 
+.footer-info-container .swiper-gallery .swiper-wrapper {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.footer-info-container .swiper-gallery .swiper-slide:nth-child(n+4) {
+    display: none;
+}
+
+.footer-info-container .footer-gallery-img img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.footer-mini-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    width: min(360px, 90%);
+}
+
+.footer-mini-gallery img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
 .footer-copyright-wrapper{
     border-top: 1px solid var(--accent-color-5);
 }
@@ -2866,3 +2899,174 @@ ul{
 .grid-spacer-y-100{
     --bg-gutter-y: 100px
 }
+
+/* Unified Zhongliang capsule navigation */
+.zl-nav {
+    position: fixed;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1050;
+    width: min(1180px, calc(100% - 1rem));
+    border: 1px solid rgba(187, 247, 208, 0.34);
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(5, 46, 22, 0.86), rgba(6, 95, 70, 0.66)), rgba(5, 46, 22, 0.82);
+    backdrop-filter: blur(18px) saturate(1.18);
+    -webkit-backdrop-filter: blur(18px) saturate(1.18);
+    box-shadow: 0 22px 70px rgba(5, 46, 22, 0.34);
+}
+
+.zl-nav__inner {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    padding: .36rem .62rem .36rem .82rem;
+}
+
+.zl-brand-stack {
+    position: relative;
+    display: grid;
+    justify-items: start;
+    gap: 0;
+}
+
+.zl-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: .75rem;
+    color: #f0fdf4;
+    font-weight: 800;
+    letter-spacing: .08em;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.zl-brand img {
+    height: 26px;
+    width: auto;
+}
+
+.zl-menu {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .65rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.zl-menu a {
+    display: inline-flex;
+    align-items: center;
+    padding: .35rem .82rem;
+    color: rgba(240, 253, 244, 0.88);
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: .88rem;
+    font-weight: 850;
+    line-height: 1.35;
+    text-decoration: none;
+    transition: color .24s ease, background .24s ease, border-color .24s ease;
+}
+
+.zl-menu a:hover,
+.zl-menu a.is-active {
+    color: #ffffff;
+    background: rgba(187, 247, 208, 0.16);
+    border-color: rgba(187, 247, 208, 0.26);
+}
+
+.zl-actions {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    justify-self: end;
+}
+
+.zl-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .45rem;
+    min-height: 32px;
+    padding: .48rem .92rem;
+    border: 0;
+    border-radius: 999px;
+    font-weight: 750;
+    letter-spacing: .03em;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform .24s ease, box-shadow .24s ease, background .24s ease;
+}
+
+.zl-btn:hover {
+    transform: translateY(-2px);
+}
+
+.zl-btn--ghost {
+    color: #ecfdf5;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(187, 247, 208, 0.28);
+}
+
+.zl-btn--primary {
+    color: #052e16;
+    background: linear-gradient(135deg, #dcfce7, #86efac);
+    box-shadow: 0 12px 34px rgba(134, 239, 172, 0.22);
+}
+
+body.zl-page-with-unified-nav main {
+    padding-top: 98px !important;
+}
+
+body.zl-page-with-unified-nav > .effect-top-hud,
+body.zl-page-with-unified-nav .header-info-wrapper,
+body.zl-page-with-unified-nav .header-navbar-fixed,
+body.zl-page-with-unified-nav > aside {
+    display: none !important;
+}
+
+@media (max-width: 980px) {
+    .zl-nav {
+        width: calc(100% - 1rem);
+        overflow-x: auto;
+    }
+
+    .zl-nav__inner {
+        min-width: 820px;
+    }
+
+    .zl-menu {
+        display: flex;
+    }
+}
+
+@media (max-width: 640px) {
+    .zl-nav {
+        top: 8px;
+        border-radius: 24px;
+    }
+
+    .zl-nav__inner {
+        align-items: flex-start;
+        border-radius: 24px;
+    }
+
+    .zl-actions {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .zl-btn {
+        min-height: 38px;
+        padding: .58rem .78rem;
+        font-size: .86rem;
+    }
+}
+

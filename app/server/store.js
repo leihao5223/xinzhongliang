@@ -96,9 +96,9 @@ const defaultMediaSchedules = [
 
 const defaultSiteSections = {
   homeHero: {
-    eyebrow: 'COFCO DIGITAL AGRI PLATFORM',
-    title: '忠于国计 良于民生',
-    outline: '数字中粮',
+    eyebrow: '中粮天下 · 数字农粮服务平台',
+    title: '产业兴粮 科技惠民',
+    outline: '中粮天下',
     lead: '中粮天下以农粮产业链为根基，融合数字交易、资产服务、客户运营与智能风控，构建面向用户与产业伙伴的一体化服务平台。',
     primaryCta: '进入交易中心',
     secondaryCta: '播放品牌广告',
@@ -106,7 +106,7 @@ const defaultSiteSections = {
   about: {
     eyebrow: '产业根基',
     title: '从田间到餐桌，连接粮源、加工、仓储、物流与消费场景',
-    desc: '平台围绕粮油食品主业与数字化服务能力，展示产业协同、交易服务、客户支持与内容运营，让品牌表达、业务交易和服务保障形成统一闭环。',
+    desc: '平台围绕粮油食品主业与数字化服务能力，连接产业协同、交易服务、客户支持与内容运营，让品牌表达、业务交易和服务保障形成统一闭环。',
   },
   business: {
     eyebrow: '平台能力',

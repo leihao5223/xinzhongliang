@@ -198,28 +198,28 @@ section {
 
 /* ---------- Footer ---------- */
 .footer-container {
-  background: rgba(220, 237, 221, 0.5) !important;
+  background: #07111f !important;
 }
 .footer-info-text {
-  color: #555555 !important;
+  color: rgba(226, 232, 240, 0.82) !important;
 }
 .footer-contact-text {
-  color: #333333 !important;
+  color: rgba(226, 232, 240, 0.82) !important;
 }
 .footer-link {
-  color: #555555 !important;
+  color: #f8fafc !important;
 }
 .footer-link:hover {
-  color: #00796b !important;
+  color: #38bdf8 !important;
 }
 .copyright-text {
-  color: #777777 !important;
+  color: rgba(226, 232, 240, 0.82) !important;
 }
 .copyright-text a {
-  color: #00796b !important;
+  color: #38bdf8 !important;
 }
 .legallink {
-  color: #777777 !important;
+  color: rgba(226, 232, 240, 0.82) !important;
 }
 
 /* ---------- Header / Nav ---------- */
@@ -463,7 +463,7 @@ body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .nav-link-
 }
 body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-nav .nav-link,
 body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-nav .dropdown-toggle {
-  color: #fff !important;
+  color: #0f2744 !important;
   background: rgba(224, 242, 254, 0.16) !important;
   border-color: rgba(186, 230, 253, 0.38) !important;
   white-space: nowrap !important;
@@ -502,4 +502,392 @@ body.zl-is-authed .navbar-cta-container,
 body.zl-is-authed .zl-menu,
 body.zl-is-authed .zl-actions {
   display: none !important;
+}
+
+/* ---------- 最终白色玻璃态覆盖：内部主底色统一白色系 ---------- */
+.glass-card,
+.service-glass-card,
+.whychoose-glass-card,
+.about-glass-card,
+.company-overview-card,
+.eco-partner-card,
+.dc-glass-panel,
+.tc-list-panel,
+.tc-detail-panel,
+.tc-trade-dialog,
+.tc-orders-dialog,
+.tc-order-item,
+.dc-proj-block,
+.zl-chat-panel,
+.contact-cta-banner,
+.sidebar,
+.sidebar-dropdown-menu,
+.coop-glass-section .case-content-background {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(240, 249, 255, 0.78)) !important;
+  border-color: rgba(125, 211, 252, 0.42) !important;
+  box-shadow: 0 18px 54px rgba(14, 116, 144, 0.12) !important;
+}
+.index-glass-navbar,
+.header-container.scrolled .header-navbar-fixed,
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar,
+body:not(.personal-home-page) .header-container.scrolled .header-navbar-fixed,
+body:not(.personal-home-page) .header-container.scrolled .header-navbar-fixed.index-glass-navbar {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(240, 249, 255, 0.76)) !important;
+  border-color: rgba(125, 211, 252, 0.44) !important;
+  box-shadow: 0 18px 50px rgba(14, 116, 144, 0.16) !important;
+}
+.zl-chat-head,
+.zl-chat-body,
+.zl-chat-actions {
+  background: rgba(255, 255, 255, 0.82) !important;
+  color: #0f2744 !important;
+}
+.zl-chat-actions input,
+.zl-chat-actions button {
+  background: rgba(255, 255, 255, 0.92) !important;
+  color: #0f2744 !important;
+}
+.data-comparison-section--dark-glass .dc-glass-panel,
+.data-comparison-section--dark-glass .comparison-table--on-glass thead th,
+.data-comparison-section--dark-glass .comparison-table--on-glass tbody td {
+  color: #0f2744 !important;
+}
+.glass-card h1,
+.glass-card h2,
+.glass-card h3,
+.service-glass-card h1,
+.service-glass-card h2,
+.service-glass-card h3,
+.whychoose-glass-card h1,
+.whychoose-glass-card h2,
+.whychoose-glass-card h3,
+.about-glass-card h1,
+.about-glass-card h2,
+.about-glass-card h3,
+.dc-glass-panel h1,
+.dc-glass-panel h2,
+.dc-glass-panel h3,
+.tc-list-panel h1,
+.tc-list-panel h2,
+.tc-list-panel h3,
+.tc-detail-panel h1,
+.tc-detail-panel h2,
+.tc-detail-panel h3,
+.tc-trade-dialog h1,
+.tc-trade-dialog h2,
+.tc-trade-dialog h3,
+.tc-orders-dialog h1,
+.tc-orders-dialog h2,
+.tc-orders-dialog h3,
+.tc-order-item h1,
+.tc-order-item h2,
+.tc-order-item h3,
+.zl-chat-panel h1,
+.zl-chat-panel h2,
+.zl-chat-panel h3,
+.zl-chat-panel strong {
+  color: #071527 !important;
+}
+.glass-card p,
+.service-glass-card p,
+.whychoose-glass-card p,
+.about-glass-card p,
+.dc-glass-panel p,
+.tc-list-panel p,
+.tc-detail-panel p,
+.tc-trade-dialog p,
+.tc-orders-dialog p,
+.tc-order-item p,
+.zl-chat-panel p,
+.zl-chat-panel span {
+  color: #334155 !important;
+}
+
+/* ---------- 深色三栏页脚（用户指定截图风格） ---------- */
+footer .section-none,
+footer .bg-primary-accent,
+footer .footer-container {
+  background: #07111f !important;
+}
+footer .footer-container {
+  color: #f8fafc !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+footer .footer-content-container {
+  background: #07111f !important;
+}
+footer .footer-contact-container,
+footer .footer-info-container,
+footer .footer-cta-container {
+  color: #f8fafc !important;
+}
+footer .footer-info-container {
+  border-color: rgba(148, 163, 184, 0.24) !important;
+}
+footer h5,
+footer .footer-link,
+footer .footer-contact-text,
+footer .footer-info-text,
+footer .secondary-accent,
+footer .copyright-text,
+footer .legallink {
+  color: #f8fafc !important;
+}
+footer .footer-info-text,
+footer .secondary-accent,
+footer .footer-contact-text,
+footer .copyright-text {
+  color: rgba(226, 232, 240, 0.82) !important;
+}
+footer .contact-icon,
+footer .footer-link:hover,
+footer .legallink:hover {
+  color: #38bdf8 !important;
+}
+footer .footer-copyright-wrapper,
+footer .footer-divider {
+  border-color: rgba(148, 163, 184, 0.24) !important;
+}
+footer .form input,
+footer input[type="email"] {
+  background: rgba(255, 255, 255, 0.94) !important;
+  color: #071527 !important;
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar,
+body:not(.personal-home-page) .header-container.scrolled .header-navbar-fixed.index-glass-navbar {
+  top: 12px !important;
+  left: 50% !important;
+  right: auto !important;
+  width: min(1180px, calc(100% - 1rem)) !important;
+  max-width: calc(100% - 1rem) !important;
+  transform: translateX(-50%) !important;
+  border: 1px solid rgba(134, 239, 172, .28) !important;
+  border-radius: 999px !important;
+  background: linear-gradient(135deg, rgba(5, 46, 22, .92), rgba(6, 95, 70, .76)), rgba(5, 46, 22, .76) !important;
+  box-shadow: 0 22px 70px rgba(3, 24, 13, .32) !important;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .hero-container,
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .container-fluid,
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .container-fluid {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: .75rem !important;
+  padding: .36rem .62rem .36rem .82rem !important;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .logo-container.header-logo {
+  max-width: none !important;
+  width: auto !important;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .logo-container.header-logo img {
+  width: auto !important;
+  max-width: 180px !important;
+  max-height: 32px !important;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .nav-link-wrapper {
+  position: static !important;
+  transform: none !important;
+  width: auto !important;
+  min-width: 0 !important;
+  justify-content: center !important;
+  overflow-x: auto !important;
+  scrollbar-width: thin;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-nav {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  justify-content: center !important;
+  gap: .45rem !important;
+  min-width: 0 !important;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-nav .nav-link,
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-nav .dropdown-toggle {
+  color: rgba(255, 255, 255, .92) !important;
+  background: rgba(255, 255, 255, .12) !important;
+  border-color: rgba(255, 255, 255, .18) !important;
+  text-shadow: none !important;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-cta-container {
+  width: auto !important;
+  min-width: 0 !important;
+  justify-content: flex-end !important;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .btn-nav-login-green,
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-cta-container .btn-nav-contact {
+  color: #fff !important;
+  background: linear-gradient(135deg, #0d5c2e, #1a7a3e, #2ecc71) !important;
+  border-color: rgba(200, 255, 220, .45) !important;
+}
+
+body:not(.personal-home-page) .glass-card,
+body:not(.personal-home-page) .service-glass-card,
+body:not(.personal-home-page) .whychoose-glass-card,
+body:not(.personal-home-page) .about-glass-card,
+body:not(.personal-home-page) .company-overview-card,
+body:not(.personal-home-page) .eco-partner-card,
+body:not(.personal-home-page) .contact-cta-banner,
+body:not(.personal-home-page) .sidebar {
+  color: #071527 !important;
+}
+
+body:not(.personal-home-page) .glass-card p,
+body:not(.personal-home-page) .service-glass-card p,
+body:not(.personal-home-page) .whychoose-glass-card p,
+body:not(.personal-home-page) .about-glass-card p,
+body:not(.personal-home-page) .company-overview-card p,
+body:not(.personal-home-page) .eco-partner-card p,
+body:not(.personal-home-page) .contact-cta-banner p,
+body:not(.personal-home-page) .sidebar p,
+body:not(.personal-home-page) .sidebar a {
+  color: #334155 !important;
+}
+
+footer .footer-content-container {
+  display: flex;
+  align-items: stretch;
+}
+
+.zl-chat-panel {
+  max-width: calc(100vw - 1rem);
+  max-height: min(68vh, 580px);
+}
+
+.zl-chat-actions,
+.zl-chat-actions input {
+  min-width: 0;
+}
+
+body.personal-home-page .zl-chat-fab {
+  right: .75rem;
+  bottom: 5.75rem;
+}
+
+body.personal-home-page .zl-chat-panel {
+  right: .5rem;
+  bottom: 9.35rem;
+  width: min(360px, calc(100vw - 1rem));
+  max-height: 48vh;
+}
+
+@media (max-width: 991.98px) {
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar,
+  body:not(.personal-home-page) .header-container.scrolled .header-navbar-fixed.index-glass-navbar {
+    top: 8px !important;
+    border-radius: 26px !important;
+  }
+
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .container-fluid {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: .5rem .75rem !important;
+    padding: .55rem .75rem !important;
+  }
+
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .nav-link-wrapper {
+    order: 3 !important;
+    flex: 1 1 100% !important;
+    justify-content: flex-start !important;
+  }
+
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-nav {
+    justify-content: flex-start !important;
+  }
+
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-cta-container {
+    margin-left: auto !important;
+    flex: 0 0 auto !important;
+    display: flex !important;
+    gap: .4rem !important;
+  }
+
+  footer .footer-content-container,
+  footer .footer-copyright-container {
+    flex-direction: column !important;
+  }
+
+  footer .footer-contact-container,
+  footer .footer-info-container,
+  footer .footer-cta-container {
+    width: 100% !important;
+    padding: 2rem 0 !important;
+  }
+
+  footer .footer-info-container {
+    border-width: 1px 0 !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar,
+  body:not(.personal-home-page) .header-container.scrolled .header-navbar-fixed.index-glass-navbar {
+    top: 6px !important;
+    border-radius: 22px !important;
+  }
+
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .container-fluid {
+    padding: .5rem .62rem !important;
+  }
+
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-cta-container {
+    margin-left: 0 !important;
+    flex-wrap: wrap !important;
+  }
+
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-cta-container .btn {
+    padding: .42rem .64rem !important;
+    font-size: .74rem !important;
+  }
+
+  footer .footer-mini-gallery {
+    width: 100% !important;
+  }
+
+  footer #newsletter-form,
+  footer .form {
+    width: 100%;
+  }
+
+  .zl-chat-fab {
+    right: .75rem;
+    bottom: .75rem;
+    width: 48px;
+    height: 48px;
+  }
+
+  .zl-chat-panel {
+    right: .5rem;
+    bottom: 4.25rem;
+    width: calc(100vw - 1rem);
+    max-height: 58vh;
+  }
+
+  .zl-chat-actions {
+    flex-wrap: wrap;
+  }
+
+  .zl-chat-actions input {
+    flex: 1 1 100%;
+  }
 }

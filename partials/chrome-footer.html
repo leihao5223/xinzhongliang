@@ -1,4 +1,4 @@
-    <!-- Footer Section -->
+﻿    <!-- Footer Section -->
     <footer>
         <div class="section-none bg-primary-accent">
             <div class="d-flex flex-column gspace-0">
@@ -43,67 +43,10 @@
                                         <a href="team.html" class="footer-link">团队介绍</a>
                                     </div>
                                     <div class="footer-divider"></div>
-                                    <div class="overflow-hidden">
-                                        <div class="swiper swiper-gallery">
-                                            <div class="swiper-wrapper">
-                                                <div class="swiper-slide">
-                                                    <div class="image-container gallery-image footer-gallery-img">
-                                                        <a href="assets/images/zhongliang-grain-silo.jpg" data-fslightbox="gallery">
-                                                            <img src="assets/images/zhongliang-grain-silo.jpg" alt="页脚图库" class="img-fluid">
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                                <div class="swiper-slide">
-                                                    <div class="image-container gallery-image footer-gallery-img">
-                                                        <a href="assets/images/zhongliang-port-containers.jpg" data-fslightbox="gallery">
-                                                            <img src="assets/images/zhongliang-port-containers.jpg" alt="页脚图库" class="img-fluid">
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                                <div class="swiper-slide">
-                                                    <div class="image-container gallery-image footer-gallery-img">
-                                                        <a href="assets/images/zhongliang-corporate-handshake.jpg" data-fslightbox="gallery">
-                                                            <img src="assets/images/zhongliang-corporate-handshake.jpg" alt="页脚图库" class="img-fluid">
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                                <div class="swiper-slide">
-                                                    <div class="image-container gallery-image footer-gallery-img">
-                                                        <a href="assets/images/advert/field-terraces.jpg" data-fslightbox="gallery">
-                                                            <img src="assets/images/advert/field-terraces.jpg" alt="页脚图库" class="img-fluid">
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                                <div class="swiper-slide">
-                                                    <div class="image-container gallery-image footer-gallery-img">
-                                                        <a href="assets/images/advert/village-aerial.jpg" data-fslightbox="gallery">
-                                                            <img src="assets/images/advert/village-aerial.jpg" alt="页脚图库" class="img-fluid">
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                                <div class="swiper-slide">
-                                                    <div class="image-container gallery-image footer-gallery-img">
-                                                        <a href="assets/images/advert/snow-mountain.jpg" data-fslightbox="gallery">
-                                                            <img src="assets/images/advert/snow-mountain.jpg" alt="页脚图库" class="img-fluid">
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                                <div class="swiper-slide">
-                                                    <div class="image-container gallery-image footer-gallery-img">
-                                                        <a href="assets/images/experienced-gray-haired-businessman-with-a-beard-i-2025-03-25-20-08-46-utc.jpg" data-fslightbox="gallery">
-                                                            <img src="assets/images/experienced-gray-haired-businessman-with-a-beard-i-2025-03-25-20-08-46-utc.jpg" alt="页脚图库" class="img-fluid">
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                                <div class="swiper-slide">
-                                                    <div class="image-container gallery-image footer-gallery-img">
-                                                        <a href="assets/images/confident-leader-2025-04-02-00-33-39-utc.jpg" data-fslightbox="gallery">
-                                                            <img src="assets/images/confident-leader-2025-04-02-00-33-39-utc.jpg" alt="页脚图库" class="img-fluid">
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div class="footer-mini-gallery">
+                                        <img src="assets/images/zhongliang-grain-silo.jpg" alt="粮仓">
+                                        <img src="assets/images/zhongliang-port-containers.jpg" alt="港口">
+                                        <img src="assets/images/zhongliang-corporate-handshake.jpg" alt="合作">
                                     </div>
                                 </div>
                                 <div class="footer-cta-container">
@@ -149,7 +92,7 @@
                     <div class="footer-copyright-wrapper">
                         <div class="hero-container">
                             <div class="footer-copyright-container">
-                                <p class="copyright-text">版权所有 © 2026 中粮天下。权威信息请以中粮集团有限公司官网为准。<a href="https://www.cofco.com/" target="_blank" rel="noopener noreferrer">中粮集团官网</a></p>
+                                <p class="copyright-text">版权所有 © 2026 中粮天下</p>
                                 <div class="legallink-container">
                                     <a href="#" class="legallink">条款与条件</a>
                                     <a href="#" class="legallink">隐私政策</a>
@@ -205,7 +148,7 @@
             row.style.justifyContent = role === 'user' ? 'flex-end' : 'flex-start';
             row.innerHTML = '<span style="max-width:82%;display:inline-block;padding:.42rem .58rem;border-radius:10px;background:' +
               (role === 'user' ? 'rgba(45,212,191,.22)' : 'rgba(148,211,255,.2)') +
-              ';color:#e7f4ff;font-size:.8rem;line-height:1.45;">' + text + '</span>';
+              ';color:#0f2744;font-size:.8rem;line-height:1.45;">' + text + '</span>';
             listEl.appendChild(row);
             listEl.scrollTop = listEl.scrollHeight;
           }

@@ -95,7 +95,7 @@ async function loadSlides() {
           title: (it.title && String(it.title)) || titleFromUrl(it.url),
           caption: (it.caption && String(it.caption)) || '',
         }));
-      if (slides.length) return dedupeSlidesByUrl([...scheduled, ...slides]).slice(0, 6);
+      if (slides.length) return dedupeSlidesByUrl([...slides, ...scheduled]);
     }
   } catch (e) {
     console.warn('[banner-media-carousel] video list API failed', e);
@@ -114,11 +114,11 @@ async function loadSlides() {
         title: it.title || titleFromUrl(it.url),
         caption: it.caption || '',
       }));
-    if (slides.length) return dedupeSlidesByUrl([...scheduled, ...slides]).slice(0, 6);
+    if (slides.length) return dedupeSlidesByUrl([...slides, ...scheduled]);
     throw new Error('no video entries in manifest');
   } catch (_) {}
 
-  return dedupeSlidesByUrl([...scheduled, ...FALLBACK_VIDEO_SLIDES]).slice(0, 6);
+  return dedupeSlidesByUrl([...FALLBACK_VIDEO_SLIDES, ...scheduled]);
 }
 
 function buildCarousel(slides) {
@@ -182,8 +182,8 @@ function syncHeroBackdrop(slide) {
     } catch (_) {}
     video.classList.remove('is-ready');
     video.style.opacity = '0';
-    cover.style.backgroundImage = 'url(' + JSON.stringify(url) + ')';
-    cover.classList.add('is-visible');
+    cover.style.backgroundImage = '';
+    cover.classList.remove('is-visible');
     return;
   }
 

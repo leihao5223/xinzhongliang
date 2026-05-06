@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
@@ -119,11 +119,7 @@
       transition: opacity 0.5s ease;
     }
 
-    /* 玻璃闪光：黑底 + 高光条扫过 */
-    @keyframes text-glass-shine {
-      0% { background-position: 130% center; }
-      100% { background-position: -130% center; }
-    }
+    /* 静态玻璃文字：禁用高光条扫过 */
 
     /* ---------- 正中央「中粮天下」水印（卷帘落下时挡住；z 低于登录层） ---------- */
     .portal-center-brand {
@@ -141,18 +137,9 @@
       font-weight: 600;
       letter-spacing: 0.18em;
       color: transparent;
-      background-image: linear-gradient(
-        100deg,
-        #0a0a0a 0%,
-        #0a0a0a 34%,
-        rgba(255, 255, 255, 0.95) 47%,
-        rgba(210, 236, 255, 0.92) 50%,
-        rgba(255, 255, 255, 0.98) 52%,
-        #0a0a0a 64%,
-        #0a0a0a 100%
-      );
-      background-size: 240% 100%;
-      background-position: 130% center;
+      background-image: linear-gradient(100deg, #0a0a0a 0%, #23425f 48%, #0a0a0a 100%);
+      background-size: 100% 100%;
+      background-position: center;
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -164,7 +151,6 @@
     .portal-center-brand.portal-center--in .portal-center-brand__txt {
       opacity: 1;
       transform: scale(1);
-      animation: text-glass-shine 3.4s ease-in-out infinite;
     }
     /* 登录卷帘打开后隐藏背景大字，仅保留卡片内 Logo 品牌区 */
     .portal-center-brand.portal-center--behind-login {
@@ -197,18 +183,9 @@
       font-size: clamp(2rem, 4vw, 3.85rem);
       font-weight: 600;
       color: transparent;
-      background-image: linear-gradient(
-        100deg,
-        #0a0a0a 0%,
-        #0a0a0a 32%,
-        rgba(255, 255, 255, 0.92) 46%,
-        rgba(200, 230, 255, 0.88) 50%,
-        rgba(255, 255, 255, 0.95) 53%,
-        #0a0a0a 66%,
-        #0a0a0a 100%
-      );
-      background-size: 240% 100%;
-      background-position: 130% center;
+      background-image: linear-gradient(100deg, #0a0a0a 0%, #23425f 48%, #0a0a0a 100%);
+      background-size: 100% 100%;
+      background-position: center;
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -223,8 +200,6 @@
     .portal-flank.portal-flank--in span {
       opacity: 1;
       transform: translateY(0);
-      animation: text-glass-shine 3.6s ease-in-out infinite;
-      animation-delay: 0.15s;
     }
 
     /* ---------- 卷帘内顶部：Logo + 标题（纵向居中，无并排重复） ---------- */
@@ -333,18 +308,9 @@
       font-weight: 700;
       letter-spacing: 0.28em;
       color: transparent;
-      background-image: linear-gradient(
-        100deg,
-        #0a0a0a 0%,
-        #0a0a0a 32%,
-        rgba(255, 255, 255, 0.94) 46%,
-        rgba(200, 230, 255, 0.86) 50%,
-        rgba(255, 255, 255, 0.96) 53%,
-        #0a0a0a 66%,
-        #0a0a0a 100%
-      );
-      background-size: 240% 100%;
-      background-position: 130% center;
+      background-image: linear-gradient(100deg, #0a0a0a 0%, #23425f 48%, #0a0a0a 100%);
+      background-size: 100% 100%;
+      background-position: center;
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -353,10 +319,10 @@
       margin: 0;
     }
     .login-mobile-slogan.login-mobile-slogan--in .login-mobile-slogan__line {
-      animation: text-glass-shine 3.5s ease-in-out infinite;
+      animation: none;
     }
     .login-mobile-slogan.login-mobile-slogan--in .login-mobile-slogan__line:nth-child(2) {
-      animation-delay: 0.35s;
+      animation-delay: 0s;
     }
     .login-mobile-slogan__line + .login-mobile-slogan__line {
       margin-top: 0.35rem;
@@ -431,7 +397,7 @@
       z-index: 1;
     }
 
-    /* 细绿玻璃边：旋转高光（用于 Tab、输入框、下拉等子区域） */
+    /* 细绿玻璃边：静态边框（禁用旋转/扫过高光） */
     @keyframes subfield-edge-spin {
       to { transform: rotate(360deg); }
     }
@@ -441,29 +407,7 @@
       border-radius: 12px;
     }
     .sub-glow::before {
-      content: '';
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 260%;
-      height: 260%;
-      margin-left: -130%;
-      margin-top: -130%;
-      z-index: 0;
-      pointer-events: none;
-      background: conic-gradient(
-        from 0deg,
-        transparent 0%,
-        transparent 12%,
-        rgba(26, 122, 62, 0.35) 22%,
-        rgba(200, 255, 220, 0.92) 38%,
-        rgba(46, 166, 90, 0.55) 52%,
-        rgba(180, 255, 215, 0.88) 68%,
-        rgba(26, 122, 62, 0.3) 82%,
-        transparent 100%
-      );
-      animation: subfield-edge-spin 6.5s linear infinite;
-      opacity: 0.88;
+      content: none;
     }
 
     .form-toggle {
@@ -549,25 +493,10 @@
     .input-wrap::before {
       content: '';
       position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 240%;
-      height: 240%;
-      margin-left: -120%;
-      margin-top: -120%;
+      inset: 0;
       z-index: 0;
       pointer-events: none;
-      background: conic-gradient(
-        from 0deg,
-        transparent 0%,
-        rgba(26, 122, 62, 0.28) 20%,
-        rgba(210, 255, 225, 0.9) 40%,
-        rgba(46, 166, 90, 0.5) 55%,
-        rgba(190, 255, 210, 0.85) 72%,
-        rgba(26, 122, 62, 0.25) 88%,
-        transparent 100%
-      );
-      animation: subfield-edge-spin 5.5s linear infinite;
+      background: linear-gradient(135deg, rgba(41, 182, 246, 0.28), rgba(26, 122, 62, 0.18));
       opacity: 0.9;
     }
     .input-wrap input {
@@ -674,16 +603,10 @@
       box-shadow: 0 8px 28px rgba(26,122,62,0.35);
     }
     .btn-nature::after {
-      content: '';
-      position: absolute;
-      top: -50%; left: -50%;
-      width: 200%; height: 200%;
-      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.18), transparent);
-      transform: rotate(30deg) translateX(-100%);
-      transition: transform 0.6s;
+      content: none;
     }
     .btn-nature:hover::after {
-      transform: rotate(30deg) translateX(100%);
+      content: none;
     }
 
     .form-hint {

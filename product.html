@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -13,34 +13,147 @@
         body {
             margin: 0;
             padding: 0;
-            background: #f5f7fa;
+            background: #071527;
             overflow-x: hidden;
         }
 
-        /* ========== 固定顶栏（强制锁定） ========== */
-        .header-navbar-fixed {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            z-index: 1040 !important;
-            background: linear-gradient(135deg, rgba(14, 116, 144, 0.66), rgba(37, 99, 235, 0.46)), rgba(186, 230, 253, 0.2) !important;
-            backdrop-filter: blur(18px) saturate(1.24) !important;
-            -webkit-backdrop-filter: blur(18px) !important;
-            border-bottom: 1px solid rgba(125, 211, 252, 0.48) !important;
-            box-shadow: 0 18px 50px rgba(14, 116, 144, 0.22) !important;
+        .trading-bg-video,
+        .trading-bg-fallback {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -3;
+            pointer-events: none;
         }
 
-        /* 顶栏内部导航背景强制白色 */
-        .index-glass-navbar {
-            background: linear-gradient(135deg, rgba(14, 116, 144, 0.66), rgba(37, 99, 235, 0.46)), rgba(186, 230, 253, 0.2) !important;
-            backdrop-filter: blur(18px) saturate(1.24) !important;
-            -webkit-backdrop-filter: blur(18px) !important;
+        .trading-bg-fallback {
+            background: url("assets/images/zhongliang-port-containers.jpg") center/cover no-repeat;
+            z-index: -4;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            pointer-events: none;
+            background:
+                linear-gradient(180deg, rgba(7, 21, 39, .28), rgba(7, 21, 39, .62)),
+                radial-gradient(circle at 50% 8%, rgba(125, 211, 252, .2), transparent 34rem);
+        }
+
+        .effect-top-hud,
+        .header-info-wrapper {
+            display: none !important;
+        }
+
+        .header-navbar-fixed {
+            position: fixed !important;
+            top: 12px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            z-index: 1040 !important;
+            width: min(1180px, calc(100% - 1rem)) !important;
+            border: 1px solid rgba(134, 239, 172, .28) !important;
+            border-radius: 999px !important;
+            background: linear-gradient(135deg, rgba(5, 46, 22, .9), rgba(6, 95, 70, .72)), rgba(5, 46, 22, .72) !important;
+            backdrop-filter: blur(18px) saturate(1.18) !important;
+            -webkit-backdrop-filter: blur(18px) saturate(1.18) !important;
+            box-shadow: 0 22px 70px rgba(3, 24, 13, .32) !important;
+        }
+
+        .header-navbar-fixed .hero-container,
+        .header-navbar-fixed .container-fluid,
+        .header-navbar-fixed .navbar {
+            width: 100% !important;
+            max-width: none !important;
+        }
+
+        .header-navbar-fixed .container-fluid {
+            position: relative !important;
+            display: grid !important;
+            grid-template-columns: auto 1fr auto !important;
+            align-items: center !important;
+            gap: 1rem !important;
+            min-height: 46px !important;
+            padding: .36rem .62rem .36rem .82rem !important;
+        }
+
+        .header-logo img {
+            height: 26px !important;
+            width: auto !important;
+        }
+
+        .nav-link-wrapper {
+            position: absolute !important;
+            left: 50% !important;
+            top: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+        }
+
+        .navbar-collapse,
+        .navbar-nav {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
+        .navbar-nav {
+            gap: .65rem !important;
+            margin: 0 !important;
+        }
+
+        .navbar-nav .dropdown-menu,
+        .navbar-nav .fa-angle-down,
+        .nav-btn {
+            display: none !important;
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, .9) !important;
+            border-radius: 999px !important;
+            padding: .35rem .82rem !important;
+            font-size: .88rem !important;
+            font-weight: 850 !important;
+        }
+
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link[aria-expanded="true"] {
+            color: #fff !important;
+            background: rgba(255, 255, 255, .12) !important;
+        }
+
+        .navbar-cta-container {
+            justify-self: end !important;
+        }
+
+        .navbar-cta-container .btn {
+            min-height: 32px !important;
+            border-radius: 999px !important;
+            padding: .48rem .92rem !important;
+            font-weight: 800 !important;
+        }
+
+        .btn-nav-login-green {
+            color: #062013 !important;
+            background: linear-gradient(135deg, #d9ff8d, #63e6be) !important;
+            border: 0 !important;
+        }
+
+        .btn-nav-contact {
+            color: #fff !important;
+            background: rgba(255, 255, 255, .12) !important;
+            border: 1px solid rgba(255,255,255,.18) !important;
         }
 
         /* 给 main 留出顶栏高度（80px 是适配你这个模板的高度） */
         main {
-            padding-top: 80px !important;
+            padding-top: 112px !important;
             min-height: 100vh;
         }
 
@@ -49,11 +162,34 @@
             top: 80px !important;
         }
 
-        /* 移动端同样固定 */
-        @media (max-width: 992px) {
+        @media (max-width: 1100px) {
             .header-navbar-fixed {
                 position: fixed !important;
-                top: 0 !important;
+                top: 8px !important;
+                width: calc(100% - 1rem) !important;
+                border-radius: 26px !important;
+            }
+            .header-navbar-fixed .container-fluid {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                align-items: center !important;
+                gap: .5rem .75rem !important;
+                padding: .55rem .75rem !important;
+            }
+            .logo-container.header-logo {
+                max-width: none !important;
+                flex: 0 0 auto !important;
+            }
+            .nav-link-wrapper {
+                position: static !important;
+                transform: none !important;
+                order: 3 !important;
+                flex: 1 1 100% !important;
+                width: 100% !important;
+                min-width: 0 !important;
+                justify-content: flex-start !important;
+                overflow-x: auto !important;
+                scrollbar-width: thin;
             }
             .nav-btn {
                 display: none !important;
@@ -61,12 +197,57 @@
             .navbar-collapse,
             .navbar-nav {
                 display: flex !important;
+                flex-wrap: nowrap !important;
+            }
+            .navbar-nav {
+                justify-content: flex-start !important;
+                gap: .45rem !important;
+            }
+            .navbar-nav .nav-link {
+                white-space: nowrap !important;
+                padding: .4rem .72rem !important;
+            }
+            .navbar-cta-container {
+                display: flex !important;
+                flex: 0 0 auto !important;
+                width: auto !important;
+                margin-left: auto !important;
+                gap: .4rem !important;
+            }
+            main {
+                padding-top: 142px !important;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .header-navbar-fixed {
+                top: 6px !important;
+                border-radius: 22px !important;
+            }
+            .header-navbar-fixed .container-fluid {
+                padding: .5rem .62rem !important;
+            }
+            .navbar-cta-container {
+                margin-left: 0 !important;
+                flex-wrap: wrap !important;
+            }
+            .navbar-cta-container .btn {
+                padding: .44rem .68rem !important;
+                font-size: .75rem !important;
+            }
+            main {
+                padding-top: 166px !important;
+            }
+            .trading-container {
+                padding: 0 .75rem;
             }
         }
 
         /* ========== 交易平台容器 ========== */
         .trading-platform {
-            padding: 2rem 0;
+            padding: 6vh 0 2.5rem;
+            position: relative;
+            z-index: 1;
         }
 
         .trading-container {
@@ -105,6 +286,10 @@
     </style>
 </head>
 <body>
+    <div class="trading-bg-fallback" aria-hidden="true"></div>
+    <video class="trading-bg-video" autoplay muted loop playsinline preload="metadata" poster="assets/images/zhongliang-port-containers.jpg" aria-hidden="true">
+        <source src="assets/videos/trading-bg.mp4" type="video/mp4">
+    </video>
     <!-- 全局顶部 HUD 扫描线 -->
     <div class="effect-top-hud"></div>
 
@@ -342,7 +527,7 @@
                     <div class="footer-copyright-wrapper">
                         <div class="hero-container">
                             <div class="footer-copyright-container">
-                                <p class="copyright-text">版权所有 © 2026 中粮天下。权威信息请以中粮集团有限公司官网为准。<a href="https://www.cofco.com/" target="_blank" rel="noopener noreferrer">中粮集团官网</a></p>
+                                <p class="copyright-text">版权所有 © 2026 中粮天下</p>
                                 <div class="legallink-container">
                                     <a href="#" class="legallink">条款与条件</a>
                                     <a href="#" class="legallink">隐私政策</a>
@@ -384,6 +569,7 @@
     <script src="assets/js/vendor/swiper-bundle.min.js"></script>
     <script src="assets/js/vendor/fslightbox.js"></script>
     <script src="assets/js/script.js"></script>
+    <script src="assets/js/site-particles.js?v=1"></script>
     <script src="assets/js/form-script.js"></script>
     <script src="assets/js/swiper-script.js"></script>
     <script src="assets/js/video_embedded.js"></script>

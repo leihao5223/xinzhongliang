@@ -84,16 +84,6 @@
       if (active && descEl) {
         descEl.textContent = `${active.summary || ''} · 最新价 ${formatNum(active.livePrice)}，涨跌幅 ${(active.changePct >= 0 ? '+' : '') + active.changePct.toFixed(2)}%`;
       }
-      // 每 3 秒刷新一次走势图 iframe，避免每秒刷新造成闪烁与性能问题
-      if (active && Date.now() - (window._lastChartRefresh || 0) > 3000) {
-        window._lastChartRefresh = Date.now();
-        const t = String(active.chartSourceType || 'tradingview').toLowerCase();
-        const web = String(active.chartWebsiteUrl || '').trim();
-        const newSrc = t === 'website' && web ? web : tvEmbedUrl(active.marketSymbol);
-        // 加随机参数强制刷新
-        const separator = newSrc.includes('?') ? '&' : '?';
-        iframe.src = newSrc + separator + '_t=' + Date.now();
-      }
     }, 1000);
   }
 
@@ -129,21 +119,12 @@
   main.innerHTML = `
     <section class="section data-comparison-section data-comparison-section--dark-glass" id="trade-hub">
       <div class="hero-container">
-        <div class="sub-heading animate-box animated-delay-slow animate__animated" data-animate="animate__fadeIn" style="margin-bottom:1.5rem;">
-          <i class="fa-solid fa-circle"></i>
-          <h4 class="accent-color">实时行情</h4>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;">
-          <h2 class="animate-box animated animate__animated" data-animate="animate__fadeInLeft" style="margin:0;"></h2>
-          <button id="tc-open-orders" class="tc-order-entry">订单记录</button>
-        </div>
-
         <div class="tc-grid">
           <div class="tc-list-panel animate-box animated animate__animated" data-animate="animate__fadeInUp">
             <div id="tc-product-list"></div>
           </div>
           <div class="tc-detail-panel animate-box animated animate__animated" data-animate="animate__fadeInUp">
-            <h3 id="tc-trend-title" class="dc-trend-title">加载中…</h3>
+            <h3 id="tc-trend-title" class="dc-trend-title">产品走势</h3>
             <p id="tc-product-desc" class="tc-product-desc"></p>
             <div class="dc-chart-shell">
               <iframe id="dc-chart-frame" class="dc-chart-frame" title="产品走势" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
@@ -154,6 +135,19 @@
               <button type="button" data-order-kind="entrust" data-direction="long">委买</button>
             </div>
           </div>
+          <aside id="tc-orders-panel" class="tc-orders-panel animate-box animated animate__animated" data-animate="animate__fadeInUp" aria-label="订单记录">
+            <div class="tc-orders-panel-head">
+              <div>
+                <h3>订单记录</h3>
+                <p id="tc-orders-balance" class="tc-balance">当前可用余额：--</p>
+              </div>
+            </div>
+            <div class="tc-orders-tabs">
+              <button type="button" data-tab="running" class="is-active">进行中</button>
+              <button type="button" data-tab="settled">已结算</button>
+            </div>
+            <div id="tc-orders-list" class="tc-orders-list"></div>
+          </aside>
         </div>
       </div>
     </section>
@@ -190,26 +184,13 @@
         <p id="tc-msg" class="tc-msg"></p>
       </div>
     </div>
-
-    <div id="tc-orders-modal" class="tc-trade-modal" aria-hidden="true">
-      <div class="tc-trade-dialog tc-orders-dialog">
-        <button type="button" id="tc-close-orders" class="tc-modal-close" aria-label="关闭">&times;</button>
-        <h3>订单记录</h3>
-        <p id="tc-orders-balance" class="tc-balance">当前可用余额：--</p>
-        <div class="tc-orders-tabs">
-          <button type="button" data-tab="running" class="is-active">进行中</button>
-          <button type="button" data-tab="settled">已结算</button>
-        </div>
-        <div id="tc-orders-list" class="tc-orders-list"></div>
-      </div>
-    </div>
   `;
 
   const style = document.createElement('style');
   style.textContent = `
-    .tc-trade-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:60;padding:1rem}
+    .tc-trade-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:6000;padding:1rem}
     .tc-trade-modal.is-open{display:flex}
-    .tc-trade-dialog{position:relative;width:min(460px,100%);background:#ffffff;border-radius:14px;padding:1rem 1rem 1.1rem;border:1px solid rgba(0,0,0,.1);box-shadow:0 8px 32px rgba(0,0,0,.12)}
+    .tc-trade-dialog{position:relative;width:min(460px,100%);max-height:calc(100vh - 2rem);overflow:auto;background:#ffffff;border-radius:14px;padding:1rem 1rem 1.1rem;border:1px solid rgba(0,0,0,.1);box-shadow:0 8px 32px rgba(0,0,0,.12)}
     .tc-trade-dialog h3{font-size:1.05rem;margin:0 0 .4rem;color:#1a1a1a}
     .tc-balance{margin:0 0 .7rem;color:#555555;font-size:.84rem}
     .tc-modal-close{position:absolute;right:.6rem;top:.5rem;border:0;background:transparent;font-size:1.6rem;line-height:1;color:#777777;cursor:pointer}
@@ -219,10 +200,10 @@
     .tc-form input{background:#ffffff;color:#1a1a1a;border:1px solid rgba(0,0,0,.15);border-radius:10px;padding:.55rem}
     .tc-form button{border:0;border-radius:10px;padding:.6rem;color:#fff;background:linear-gradient(135deg,#0d5c2e,#1a7a3e,#2ecc71);cursor:pointer}
     .tc-msg{margin:.55rem 0 0;color:#555555;font-size:.82rem}
-    .tc-order-entry{border:1px solid rgba(0,0,0,.15);background:#f0f0f0;color:#333333;border-radius:999px;padding:.42rem .9rem;font-size:.82rem;cursor:pointer}
-    .tc-grid{display:grid;grid-template-columns:minmax(240px,1fr) minmax(420px,1.9fr);gap:1rem}
-    .tc-list-panel,.tc-detail-panel{background:#ffffff;border:1px solid rgba(0,0,0,.08);border-radius:16px;padding:.95rem;box-shadow:0 2px 8px rgba(0,0,0,.04)}
-    .tc-list-panel{max-height:620px;overflow:auto}
+    .tc-grid{display:grid;grid-template-columns:minmax(220px,.82fr) minmax(360px,1.45fr) minmax(280px,.92fr);gap:1.35rem;align-items:stretch;margin-top:1rem;max-width:100%}
+    .tc-list-panel,.tc-detail-panel,.tc-orders-panel{height:min(640px,calc(100vh - 190px));min-height:500px;background:rgba(255,255,255,.82);border:1px solid rgba(125,211,252,.34);border-radius:16px;padding:.85rem;box-shadow:0 18px 54px rgba(14,116,144,.14);backdrop-filter:blur(18px) saturate(1.12);-webkit-backdrop-filter:blur(18px) saturate(1.12)}
+    .tc-list-panel{overflow:auto}
+    .tc-detail-panel{display:flex;flex-direction:column;min-width:0}
     .tc-product-desc{margin:0 0 .8rem;color:#555555;font-size:.88rem}
     .dc-proj-block{position:relative;padding:.85rem .9rem;border-radius:14px;background:#ffffff;border:1px solid rgba(0,0,0,.08);margin-bottom:.7rem;cursor:pointer;transition:all .35s ease}
     .dc-proj-block:hover{border-color:rgba(0,0,0,.15);background:#fafafa}
@@ -244,41 +225,63 @@
     .tc-card-actions button{border:0;border-radius:999px;padding:.35rem .8rem;font-size:.76rem;color:#fff;cursor:pointer}
     .tc-card-actions .tc-open-detail{background:linear-gradient(135deg,#1d4ed8,#2563eb,#38bdf8)}
     .tc-card-actions .tc-open-buy{background:linear-gradient(135deg,#0d5c2e,#1a7a3e,#2ecc71)}
-    .tc-card-pop{margin-top:.6rem;border:1px solid rgba(0,0,0,.1);background:#f8f9fa;border-radius:12px;padding:.55rem}
-    .tc-card-pop .dc-chart-shell{border:1px solid rgba(0,0,0,.08);border-radius:10px;overflow:hidden}
-    .tc-card-pop .dc-chart-frame{height:180px}
-    .tc-card-pop .tc-open-detail{display:block;margin-top:.55rem;width:100%}
+    .tc-detail-panel .dc-chart-shell{flex:1;min-height:0}
+    .tc-detail-panel .dc-chart-frame{height:100%}
     .tc-detail-sheet{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:58;align-items:flex-end}
     .tc-detail-sheet.is-open{display:flex}
     .tc-detail-body{width:100%;max-height:92vh;overflow:auto;background:#ffffff;border-top-left-radius:18px;border-top-right-radius:18px;padding:1rem;box-shadow:0 -4px 24px rgba(0,0,0,.12)}
     .tc-detail-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;color:#1a1a1a}
     .tc-detail-head button{border:0;background:transparent;color:#777777}
-    .tc-action-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem;margin-top:.85rem}
-    .tc-action-bar button{border:0;border-radius:999px;padding:.52rem .6rem;font-size:.82rem;color:#fff;cursor:pointer}
+    .tc-action-bar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.55rem;margin-top:.85rem}
+    .tc-action-bar button{min-width:0;border:0;border-radius:999px;padding:.58rem .6rem;font-size:.82rem;color:#fff;cursor:pointer;white-space:nowrap}
     .tc-action-bar button[data-direction="long"][data-order-kind="market"]{background:linear-gradient(135deg,#0d5c2e,#1a7a3e,#2ecc71)}
     .tc-action-bar button[data-direction="short"]{background:linear-gradient(135deg,#6b1f1f,#ef4444,#f97316)}
     .tc-action-bar button[data-order-kind="entrust"]{background:linear-gradient(135deg,#164f8b,#2563eb,#38bdf8)}
-    .tc-orders-dialog{width:min(620px,100%);background:#ffffff}
+    .tc-orders-panel{position:sticky;top:112px;display:flex;flex-direction:column;overflow:hidden}
+    .tc-orders-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:.8rem}
+    .tc-orders-panel h3{margin:0 0 .25rem;color:#0f172a;font-size:1.05rem}
+    .tc-orders-panel .tc-balance{margin:0;color:#475569}
     .tc-orders-tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem;margin:.7rem 0}
-    .tc-orders-tabs button{border:1px solid #c6ced9;background:#fff;color:#4a5d75;border-radius:14px;padding:.52rem}
-    .tc-orders-tabs button.is-active{border-color:#b98a1f;color:#b98a1f;background:#f6efe0}
-    .tc-orders-list{max-height:56vh;overflow:auto;display:flex;flex-direction:column;gap:.6rem}
+    .tc-orders-tabs button{border:1px solid rgba(125,211,252,.45);background:rgba(255,255,255,.72);color:#0369a1;border-radius:14px;padding:.52rem;font-weight:800}
+    .tc-orders-tabs button.is-active{border-color:#38bdf8;color:#075985;background:linear-gradient(135deg,rgba(224,242,254,.95),rgba(186,230,253,.72))}
+    .tc-orders-list{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:.6rem;padding-right:.15rem}
     .tc-order-item{background:#fff;border:1px solid #dbe2eb;border-radius:14px;padding:.65rem .8rem}
     .tc-order-item h4{margin:0 0 .2rem;font-size:.95rem;color:#1a1a1a}
     .tc-order-item p{margin:0;color:#555555;font-size:.8rem;line-height:1.5}
     .tc-order-item .tc-order-pnl{font-size:1.08rem;font-weight:700;margin-top:.32rem}
     .tc-order-item .tc-order-pnl.is-win{color:#22c55e}
     .tc-order-item .tc-order-pnl.is-loss{color:#ef4444}
-    @media (max-width: 992px){
-      .tc-grid{grid-template-columns:1fr}
-      .tc-list-panel{max-height:none}
-      .tc-detail-panel{display:none}
+    @media (max-width: 1180px){
+      .tc-grid{grid-template-columns:minmax(220px,.9fr) minmax(0,1.35fr)}
+      .tc-list-panel,.tc-detail-panel{height:560px;min-height:480px}
+      .tc-orders-panel{grid-column:1 / -1;position:relative;top:auto;height:auto;min-height:320px;max-height:460px}
+      .tc-orders-list{max-height:320px}
+    }
+    @media (max-width: 760px){
+      .tc-grid{grid-template-columns:1fr;gap:1rem;margin-top:.5rem}
+      .tc-list-panel,.tc-detail-panel,.tc-orders-panel{width:100%;height:auto;min-height:0;max-height:none;padding:.75rem;border-radius:14px}
+      .tc-list-panel{max-height:none;overflow:visible}
+      .tc-detail-panel{display:flex;min-height:430px}
+      .tc-detail-panel .dc-chart-shell{min-height:300px;flex:0 0 auto}
+      .tc-detail-panel .dc-chart-frame{height:300px}
+      .tc-orders-panel{position:relative;top:auto;min-height:320px}
+      .tc-orders-list{max-height:52vh}
+      .tc-card-actions,.tc-action-bar{grid-template-columns:repeat(3,minmax(0,1fr));gap:.45rem}
+      .tc-card-actions button,.tc-action-bar button{padding:.56rem .35rem;font-size:.78rem}
+      .dc-proj-title{align-items:flex-start}
+      .dc-proj-pct{margin-left:0}
+      .tc-quick-amounts{grid-template-columns:repeat(2,1fr)}
+    }
+    @media (max-width: 420px){
+      .tc-card-actions{display:grid;grid-template-columns:1fr 1fr}
+      .tc-action-bar{grid-template-columns:1fr}
+      .tc-action-bar button{width:100%}
     }
   `;
   document.head.appendChild(style);
 
   const listRoot = document.getElementById('tc-product-list');
-  const titleEl = document.getElementById('dc-trend-title');
+  const titleEl = document.getElementById('tc-trend-title');
   const descEl = document.getElementById('tc-product-desc');
   const iframe = document.getElementById('dc-chart-frame');
   const modal = document.getElementById('tc-trade-modal');
@@ -293,12 +296,10 @@
   const detailSheetDesc = document.getElementById('tc-sheet-desc');
   const detailSheetChart = document.getElementById('tc-sheet-chart');
   const detailSheetClose = document.getElementById('tc-close-detail');
-  const openOrdersBtn = document.getElementById('tc-open-orders');
-  const ordersModal = document.getElementById('tc-orders-modal');
-  const ordersCloseBtn = document.getElementById('tc-close-orders');
+  const ordersPanel = document.getElementById('tc-orders-panel');
   const ordersBalance = document.getElementById('tc-orders-balance');
   const ordersList = document.getElementById('tc-orders-list');
-  const ordersTabs = ordersModal.querySelectorAll('.tc-orders-tabs button');
+  const ordersTabs = ordersPanel.querySelectorAll('.tc-orders-tabs button');
   let active = null;
   let products = [];
   let summary = null;
@@ -341,14 +342,6 @@
             <button type="button" class="tc-open-detail" data-id="${p.id}">查看详情</button>
             <button type="button" class="tc-open-buy" data-id="${p.id}">购买</button>
           </div>
-          ${active && active.id === p.id ? `
-            <div class="tc-card-pop">
-              <div class="dc-chart-shell">
-                <iframe class="dc-chart-frame tc-pop-chart" data-id="${p.id}" title="产品弹层走势" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
-              </div>
-              <button type="button" class="tc-open-detail tc-open-detail-inline" data-id="${p.id}">查看详情</button>
-            </div>
-          ` : ''}
         </div>
       `;
     }).join('');
@@ -388,18 +381,11 @@
       });
     });
 
-    listRoot.querySelectorAll('.tc-pop-chart').forEach((frame) => {
-      const p = products.find((x) => String(x.id) === String(frame.getAttribute('data-id')));
-      if (!p) return;
-      const t = String(p.chartSourceType || 'tradingview').toLowerCase();
-      const web = String(p.chartWebsiteUrl || '').trim();
-      frame.src = t === 'website' && web ? web : tvEmbedUrl(p.marketSymbol);
-    });
   }
 
   function setChartForProduct(p) {
     if (!p) return;
-    if (titleEl) titleEl.textContent = `${p.name} · 走势`;
+    if (titleEl) titleEl.textContent = p.name || '产品走势';
     if (descEl) descEl.textContent = `${p.summary || ''} · 最新价 ${formatNum(p.livePrice)}，涨跌幅 ${(p.changePct >= 0 ? '+' : '') + p.changePct.toFixed(2)}%`;
     const t = String(p.chartSourceType || 'tradingview').toLowerCase();
     const web = String(p.chartWebsiteUrl || '').trim();
@@ -479,14 +465,11 @@
 
   function openOrdersModal() {
     ordersBalance.textContent = `当前可用余额：${formatNum(summary?.available)} 元`;
-    ordersModal.classList.add('is-open');
-    ordersModal.setAttribute('aria-hidden', 'false');
     refreshOrders();
   }
 
   function closeOrdersModal() {
-    ordersModal.classList.remove('is-open');
-    ordersModal.setAttribute('aria-hidden', 'true');
+    refreshOrders();
   }
 
   orderForm && orderForm.addEventListener('submit', async (e) => {
@@ -528,9 +511,6 @@
   });
   detailSheetClose && detailSheetClose.addEventListener('click', closeDetailSheet);
   detailSheet && detailSheet.addEventListener('click', (e) => { if (e.target === detailSheet) closeDetailSheet(); });
-  openOrdersBtn && openOrdersBtn.addEventListener('click', openOrdersModal);
-  ordersCloseBtn && ordersCloseBtn.addEventListener('click', closeOrdersModal);
-  ordersModal && ordersModal.addEventListener('click', (e) => { if (e.target === ordersModal) closeOrdersModal(); });
   ordersTabs.forEach((btn) => {
     btn.addEventListener('click', () => {
       ordersTabs.forEach((b) => b.classList.remove('is-active'));

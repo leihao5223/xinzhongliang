@@ -403,27 +403,32 @@ app.get('/api/site/active-media', (req, res) => {
   res.json({ success: true, item });
 });
 
-/** Steris 首页相册：`app/web/public/video` 下视频列表（按文件名排序），供 `/video/…` 静态资源轮播 */
+/** Steris 首页相册：扫描公共视频目录与 assets/videos，供首页背景轮播 */
 const VIDEO_GALLERY_DIR = path.join(__dirname, '..', 'web', 'public', 'video');
+const ASSET_VIDEO_DIR = path.join(paths.repoRoot, 'assets', 'videos');
 const VIDEO_GALLERY_EXT = new Set(['.mp4', '.webm', '.mov', '.m4v']);
 app.get('/api/public/videos', (_req, res) => {
   try {
-    if (!fs.existsSync(VIDEO_GALLERY_DIR)) {
-      return res.json({ items: [] });
-    }
-    const entries = fs.readdirSync(VIDEO_GALLERY_DIR, { withFileTypes: true });
     const items = [];
-    for (const ent of entries) {
-      if (!ent.isFile()) continue;
-      const ext = path.extname(ent.name).toLowerCase();
-      if (!VIDEO_GALLERY_EXT.has(ext)) continue;
-      const safeBase = path.basename(ent.name);
-      if (safeBase !== ent.name) continue;
-      items.push({
-        url: '/video/' + encodeURIComponent(safeBase),
-        type: 'video',
-        title: safeBase.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' '),
-      });
+    const sources = [
+      { dir: VIDEO_GALLERY_DIR, urlPrefix: '/video/' },
+      { dir: ASSET_VIDEO_DIR, urlPrefix: '/assets/videos/' },
+    ];
+    for (const source of sources) {
+      if (!fs.existsSync(source.dir)) continue;
+      const entries = fs.readdirSync(source.dir, { withFileTypes: true });
+      for (const ent of entries) {
+        if (!ent.isFile()) continue;
+        const ext = path.extname(ent.name).toLowerCase();
+        if (!VIDEO_GALLERY_EXT.has(ext)) continue;
+        const safeBase = path.basename(ent.name);
+        if (safeBase !== ent.name) continue;
+        items.push({
+          url: source.urlPrefix + encodeURIComponent(safeBase),
+          type: 'video',
+          title: safeBase.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' '),
+        });
+      }
     }
     items.sort((a, b) => a.url.localeCompare(b.url, 'en', { numeric: true }));
     res.json({ items });

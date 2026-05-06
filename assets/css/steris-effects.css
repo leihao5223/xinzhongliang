@@ -129,7 +129,7 @@
   position: relative;
   z-index: 1;
   border-radius: 8px;
-  background: var(--secondary, #1a1f26);
+  background: rgba(255, 255, 255, 0.94);
 }
 
 /* ---------- 星尘按钮（基于「漂亮的css按钮带星星吸附动画」结构，限定在 .effect-star-cta） ---------- */
@@ -205,7 +205,7 @@
   justify-content: center;
   padding: 1rem;
   backdrop-filter: blur(10px);
-  background: rgba(8, 12, 18, 0.55);
+  background: rgba(15, 23, 42, 0.36);
 }
 .effect-auth-modal.is-open {
   display: flex;
@@ -217,7 +217,7 @@
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
-  background: #111;
+  background: rgba(255, 255, 255, 0.94);
 }
 .effect-auth-modal__panel iframe {
   width: 100%;
@@ -262,21 +262,21 @@
   opacity: 1;
   transition: opacity 0.45s ease;
   filter: none;
-  background: #121a2a;
+  background: #fff;
 }
 .banner-home__sync-cover {
   display: none;
   position: absolute;
   inset: 0;
   z-index: 1;
-  background-color: #121a2a;
+  background-color: #fff;
   background-position: center center;
   background-size: cover;
   background-repeat: no-repeat;
   pointer-events: none;
 }
 .banner-home__sync-cover.is-visible {
-  display: block;
+  display: none;
 }
 /* 不压暗视频：遮罩层透明（保留节点以维持叠放顺序） */
 .banner-home__video-overlay {
@@ -452,15 +452,7 @@
   overflow: hidden;
 }
 .effect-hud__scanlines {
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 3px,
-    rgba(0,0,0,0.06) 3px,
-    rgba(0,0,0,0.06) 6px
-  );
+  display: none;
 }
 .effect-hud__grid {
   position: absolute;
@@ -667,14 +659,9 @@
   100% { opacity: 1; transform: translateY(0); }
 }
 
-/* ---------- 扫描线增强（横向滚动） ---------- */
+/* ---------- HUD 静态层：禁用扫描线 ---------- */
 .effect-hud__scanline-h {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  background: linear-gradient(90deg, transparent 50%, rgba(212,168,67,0.015) 50%);
-  background-size: 6px 100%;
+  display: none;
 }
 
 /* ---------- 科技角标（四角L型） ---------- */
@@ -725,20 +712,9 @@
   50% { text-shadow: 0 0 25px rgba(212,168,67,0.6), 0 0 50px rgba(212,168,67,0.2); }
 }
 
-/* ---------- 全局页面顶部HUD条（可选） ---------- */
+/* ---------- 全局页面顶部HUD条：禁用扫过动效 ---------- */
 .effect-top-hud {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(212,168,67,0.6), rgba(200,16,46,0.6), rgba(212,168,67,0.6), transparent);
-  background-size: 200% 100%;
-  animation: hud-top-scan 4s linear infinite;
-  z-index: 9999;
-  pointer-events: none;
-}
-@keyframes hud-top-scan {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  display: none;
 }
 
 /* ---------- 自然主题高级表单（参考绿色流动边框） ---------- */
@@ -845,18 +821,7 @@
   transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .page-transition::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 3px,
-    rgba(212,168,67,0.04) 3px,
-    rgba(212,168,67,0.04) 6px
-  );
-  opacity: 0;
-  transition: opacity 0.4s ease;
+  content: none;
 }
 .page-transition::after {
   content: '';
@@ -1060,22 +1025,10 @@
   opacity: 1;
 }
 .img-reveal-shine {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
-  background-size: 200% 200%;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  pointer-events: none;
-  z-index: 2;
+  display: none;
 }
 .img-reveal-wrap:hover .img-reveal-shine {
-  opacity: 1;
-  animation: img-shine-sweep 0.8s ease forwards;
-}
-@keyframes img-shine-sweep {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  display: none;
 }
 
 /* ---------- 3D卡片悬浮 ---------- */
@@ -1116,30 +1069,12 @@
   transform: translateY(0);
 }
 
-/* ---------- 光晕扫描线（全屏） ---------- */
+/* ---------- 全屏扫光/扫描线：禁用 ---------- */
 .effect-global-scan {
-  position: fixed;
-  inset: 0;
-  z-index: 9990;
-  pointer-events: none;
-  background: linear-gradient(180deg, transparent 50%, rgba(212,168,67,0.02) 50%);
-  background-size: 100% 4px;
-  opacity: 0.4;
+  display: none;
 }
 .effect-light-sweep {
-  position: fixed;
-  top: 0;
-  left: -100%;
-  width: 60%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
-  animation: light-sweep 8s ease-in-out infinite;
-  z-index: 9991;
-  pointer-events: none;
-}
-@keyframes light-sweep {
-  0%, 100% { left: -100%; }
-  50% { left: 140%; }
+  display: none;
 }
 
 /* ---------- 鼠标跟随光斑 ---------- */
@@ -1231,37 +1166,23 @@ body:hover .cursor-glow {
   100% { transform: translateY(-20vh) scale(1); opacity: 0; }
 }
 
-/* ---------- 按钮流光效果 ---------- */
+/* ---------- 按钮静态玻璃效果（禁用流光扫过） ---------- */
 .btn-glow-flow {
   position: relative;
   overflow: hidden;
   z-index: 1;
 }
 .btn-glow-flow::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  transition: left 0.5s ease;
-  z-index: -1;
+  content: none;
 }
 .btn-glow-flow:hover::before {
-  left: 100%;
+  content: none;
 }
 
 /* ---------- 分割线动态效果 ---------- */
 .divider-glow {
   height: 1px;
   background: linear-gradient(90deg, transparent, rgba(212,168,67,0.4), transparent);
-  background-size: 200% 100%;
-  animation: divider-glow-move 3s linear infinite;
-}
-@keyframes divider-glow-move {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
 }
 
 /* ---------- 导航链接下划线动画 ---------- */
@@ -1953,13 +1874,13 @@ body:hover .cursor-glow {
 .chart-bar--gray { background: linear-gradient(90deg, #94a3b8, #cbd5e1); }
 .chart-bar--red { background: linear-gradient(90deg, #c8102e, #ef4444); }
 
-/* ---------- 首页：玻璃态顶栏 + 主标语绿色玻璃扫光 ---------- */
+/* ---------- 首页：白色玻璃态顶栏 + 静态主标语 ---------- */
 .header-navbar-fixed.index-glass-navbar {
   backdrop-filter: blur(14px) saturate(1.2);
   -webkit-backdrop-filter: blur(14px) saturate(1.2);
-  background: rgba(17, 17, 17, 0.28) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.86) !important;
+  border-bottom: 1px solid rgba(125, 211, 252, 0.34);
+  box-shadow: 0 8px 32px rgba(14, 116, 144, 0.12);
 }
 .header-navbar-fixed.index-glass-navbar .navbar-nav {
   gap: 0.35rem;
@@ -2051,7 +1972,7 @@ body:hover .cursor-glow {
   box-shadow: 0 6px 22px rgba(26, 122, 62, 0.55);
 }
 .header-container.scrolled .header-navbar-fixed.index-glass-navbar {
-  background: rgba(17, 17, 17, 0.9) !important;
+  background: rgba(255, 255, 255, 0.94) !important;
   backdrop-filter: blur(16px) saturate(1.15);
   -webkit-backdrop-filter: blur(16px) saturate(1.15);
 }
@@ -2102,32 +2023,13 @@ body:hover .cursor-glow {
   line-height: 1.35;
   margin: 0;
   color: transparent;
-  background-image: linear-gradient(
-    100deg,
-    #0a3d1f 0%,
-    #157a3e 22%,
-    rgba(180, 255, 210, 0.95) 45%,
-    #22c55e 50%,
-    rgba(210, 255, 225, 0.98) 55%,
-    #157a3e 78%,
-    #0a3d1f 100%
-  );
-  background-size: 240% 100%;
-  background-position: 130% center;
+  background-image: linear-gradient(100deg, #0a3d1f 0%, #157a3e 45%, #22c55e 100%);
+  background-size: 100% 100%;
+  background-position: center;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 2px 12px rgba(34, 197, 94, 0.5));
-  animation: home-hero-slogan-shine 3.4s ease-in-out infinite;
-}
-@keyframes home-hero-slogan-shine {
-  0%,
-  100% {
-    background-position: 130% center;
-  }
-  50% {
-    background-position: -30% center;
-  }
 }
 
 /* 产业链伙伴生态（虚构企业示意） */
@@ -2243,10 +2145,10 @@ body:hover .cursor-glow {
   z-index: 3999;
   border-radius: 16px;
   border: 1px solid rgba(148, 211, 255, 0.35);
-  background: rgba(22, 40, 62, 0.72);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 18px 50px rgba(14, 116, 144, 0.18);
   display: none;
   overflow: hidden;
 }
@@ -2259,18 +2161,18 @@ body:hover .cursor-glow {
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 0.9rem;
-  background: rgba(8, 20, 35, 0.52);
+  background: rgba(240, 249, 255, 0.92);
   border-bottom: 1px solid rgba(148, 211, 255, 0.2);
-  color: #e7f4ff;
+  color: #0f2744;
 }
 .zl-chat-head button {
   border: 0;
   background: transparent;
-  color: #d4e8ff;
+  color: #0f2744;
 }
 .zl-chat-body {
   padding: 0.9rem;
-  color: #d9ebff;
+  color: #1e3a5f;
   overflow: auto;
   line-height: 1.65;
   min-height: 220px;
@@ -2290,8 +2192,8 @@ body:hover .cursor-glow {
 .zl-chat-actions button {
   border-radius: 10px;
   border: 1px solid rgba(148, 211, 255, 0.38);
-  background: rgba(8, 27, 44, 0.5);
-  color: #e7f4ff;
+  background: rgba(255, 255, 255, 0.88);
+  color: #0f2744;
   font-size: 0.78rem;
   padding: 0.4rem 0.62rem;
 }
@@ -2323,8 +2225,8 @@ body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar {
   visibility: visible !important;
   pointer-events: auto !important;
   background:
-    linear-gradient(135deg, rgba(14, 116, 144, 0.62), rgba(37, 99, 235, 0.44)),
-    rgba(186, 230, 253, 0.18) !important;
+    linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(240, 249, 255, 0.68)),
+    rgba(255, 255, 255, 0.76) !important;
   border-bottom: 1px solid rgba(125, 211, 252, 0.46) !important;
   box-shadow: 0 18px 50px rgba(14, 116, 144, 0.22) !important;
   backdrop-filter: blur(18px) saturate(1.24) !important;
@@ -2337,8 +2239,8 @@ body:not(.personal-home-page) .header-container.scrolled .header-info-wrapper {
 body:not(.personal-home-page) .header-container.scrolled .header-navbar-fixed.index-glass-navbar {
   top: 0 !important;
   background:
-    linear-gradient(135deg, rgba(14, 116, 144, 0.74), rgba(37, 99, 235, 0.56)),
-    rgba(186, 230, 253, 0.22) !important;
+    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(240, 249, 255, 0.74)),
+    rgba(255, 255, 255, 0.82) !important;
 }
 body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .nav-btn {
   display: none !important;
@@ -2366,6 +2268,7 @@ body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .nav-link-
 }
 body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-nav .nav-link,
 body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-nav .dropdown-toggle {
+  color: #0f2744 !important;
   background: rgba(224, 242, 254, 0.16) !important;
   border-color: rgba(186, 230, 253, 0.38) !important;
   white-space: nowrap !important;
@@ -2399,11 +2302,61 @@ body:not(.personal-home-page) .tc-order-item,
 body:not(.personal-home-page) .dc-proj-block,
 body:not(.personal-home-page) .zl-chat-panel {
   background:
-    linear-gradient(145deg, rgba(224, 242, 254, 0.74), rgba(186, 230, 253, 0.42)) !important;
+    linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(240, 249, 255, 0.78)) !important;
   border-color: rgba(125, 211, 252, 0.46) !important;
   box-shadow: 0 18px 54px rgba(14, 116, 144, 0.14) !important;
   backdrop-filter: blur(18px) saturate(1.18) !important;
   -webkit-backdrop-filter: blur(18px) saturate(1.18) !important;
+}
+body:not(.personal-home-page) .glass-card h1,
+body:not(.personal-home-page) .glass-card h2,
+body:not(.personal-home-page) .glass-card h3,
+body:not(.personal-home-page) .service-glass-card h1,
+body:not(.personal-home-page) .service-glass-card h2,
+body:not(.personal-home-page) .service-glass-card h3,
+body:not(.personal-home-page) .whychoose-glass-card h1,
+body:not(.personal-home-page) .whychoose-glass-card h2,
+body:not(.personal-home-page) .whychoose-glass-card h3,
+body:not(.personal-home-page) .about-glass-card h1,
+body:not(.personal-home-page) .about-glass-card h2,
+body:not(.personal-home-page) .about-glass-card h3,
+body:not(.personal-home-page) .dc-glass-panel h1,
+body:not(.personal-home-page) .dc-glass-panel h2,
+body:not(.personal-home-page) .dc-glass-panel h3,
+body:not(.personal-home-page) .tc-list-panel h1,
+body:not(.personal-home-page) .tc-list-panel h2,
+body:not(.personal-home-page) .tc-list-panel h3,
+body:not(.personal-home-page) .tc-detail-panel h1,
+body:not(.personal-home-page) .tc-detail-panel h2,
+body:not(.personal-home-page) .tc-detail-panel h3,
+body:not(.personal-home-page) .tc-trade-dialog h1,
+body:not(.personal-home-page) .tc-trade-dialog h2,
+body:not(.personal-home-page) .tc-trade-dialog h3,
+body:not(.personal-home-page) .tc-orders-dialog h1,
+body:not(.personal-home-page) .tc-orders-dialog h2,
+body:not(.personal-home-page) .tc-orders-dialog h3,
+body:not(.personal-home-page) .tc-order-item h1,
+body:not(.personal-home-page) .tc-order-item h2,
+body:not(.personal-home-page) .tc-order-item h3,
+body:not(.personal-home-page) .zl-chat-panel h1,
+body:not(.personal-home-page) .zl-chat-panel h2,
+body:not(.personal-home-page) .zl-chat-panel h3,
+body:not(.personal-home-page) .zl-chat-panel strong {
+  color: #071527 !important;
+}
+body:not(.personal-home-page) .glass-card p,
+body:not(.personal-home-page) .service-glass-card p,
+body:not(.personal-home-page) .whychoose-glass-card p,
+body:not(.personal-home-page) .about-glass-card p,
+body:not(.personal-home-page) .dc-glass-panel p,
+body:not(.personal-home-page) .tc-list-panel p,
+body:not(.personal-home-page) .tc-detail-panel p,
+body:not(.personal-home-page) .tc-trade-dialog p,
+body:not(.personal-home-page) .tc-orders-dialog p,
+body:not(.personal-home-page) .tc-order-item p,
+body:not(.personal-home-page) .zl-chat-panel p,
+body:not(.personal-home-page) .zl-chat-panel span {
+  color: #334155 !important;
 }
 body.zl-is-authed .nav-btn,
 body.zl-is-authed .nav-link-wrapper,
@@ -2411,4 +2364,230 @@ body.zl-is-authed .navbar-cta-container,
 body.zl-is-authed .zl-menu,
 body.zl-is-authed .zl-actions {
   display: none !important;
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar,
+body:not(.personal-home-page) .header-container.scrolled .header-navbar-fixed.index-glass-navbar {
+  top: 12px !important;
+  left: 50% !important;
+  right: auto !important;
+  width: min(1180px, calc(100% - 1rem)) !important;
+  max-width: calc(100% - 1rem) !important;
+  transform: translateX(-50%) !important;
+  border: 1px solid rgba(134, 239, 172, .28) !important;
+  border-radius: 999px !important;
+  background: linear-gradient(135deg, rgba(5, 46, 22, .92), rgba(6, 95, 70, .76)), rgba(5, 46, 22, .76) !important;
+  box-shadow: 0 22px 70px rgba(3, 24, 13, .32) !important;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .hero-container,
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .container-fluid,
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .container-fluid {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: .75rem !important;
+  padding: .36rem .62rem .36rem .82rem !important;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .logo-container.header-logo {
+  max-width: none !important;
+  width: auto !important;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .logo-container.header-logo img {
+  width: auto !important;
+  max-width: 180px !important;
+  max-height: 32px !important;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .nav-link-wrapper {
+  position: static !important;
+  transform: none !important;
+  width: auto !important;
+  min-width: 0 !important;
+  justify-content: center !important;
+  overflow-x: auto !important;
+  scrollbar-width: thin;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-nav {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  justify-content: center !important;
+  gap: .45rem !important;
+  min-width: 0 !important;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-nav .nav-link,
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-nav .dropdown-toggle {
+  color: rgba(255, 255, 255, .92) !important;
+  background: rgba(255, 255, 255, .12) !important;
+  border-color: rgba(255, 255, 255, .18) !important;
+  text-shadow: none !important;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-cta-container {
+  width: auto !important;
+  min-width: 0 !important;
+  justify-content: flex-end !important;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .btn-nav-login-green,
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-cta-container .btn-nav-contact {
+  color: #fff !important;
+  background: linear-gradient(135deg, #0d5c2e, #1a7a3e, #2ecc71) !important;
+  border-color: rgba(200, 255, 220, .45) !important;
+}
+
+footer .footer-content-container {
+  display: flex;
+  align-items: stretch;
+}
+
+.zl-chat-panel {
+  max-width: calc(100vw - 1rem);
+  max-height: min(68vh, 580px);
+}
+
+.zl-chat-actions {
+  min-width: 0;
+}
+
+.zl-chat-actions input {
+  min-width: 0;
+}
+
+body.personal-home-page .zl-chat-fab {
+  right: .75rem;
+  bottom: 5.75rem;
+}
+
+body.personal-home-page .zl-chat-panel {
+  right: .5rem;
+  bottom: 9.35rem;
+  width: min(360px, calc(100vw - 1rem));
+  max-height: 48vh;
+}
+
+@media (max-width: 991.98px) {
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar,
+  body:not(.personal-home-page) .header-container.scrolled .header-navbar-fixed.index-glass-navbar {
+    top: 8px !important;
+    border-radius: 26px !important;
+  }
+
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .container-fluid {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: .5rem .75rem !important;
+    padding: .55rem .75rem !important;
+  }
+
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .nav-link-wrapper {
+    order: 3 !important;
+    flex: 1 1 100% !important;
+    justify-content: flex-start !important;
+  }
+
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-nav {
+    justify-content: flex-start !important;
+  }
+
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-cta-container {
+    margin-left: auto !important;
+    flex: 0 0 auto !important;
+    display: flex !important;
+    gap: .4rem !important;
+  }
+
+  footer .footer-content-container,
+  footer .footer-copyright-container {
+    flex-direction: column !important;
+  }
+
+  footer .footer-contact-container,
+  footer .footer-info-container,
+  footer .footer-cta-container {
+    width: 100% !important;
+    padding: 2rem 0 !important;
+  }
+
+  footer .footer-info-container {
+    border-width: 1px 0 !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  body {
+    zoom: .7;
+    overflow-x: hidden !important;
+  }
+
+  body.personal-home-page {
+    zoom: .7;
+  }
+
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar,
+  body:not(.personal-home-page) .header-container.scrolled .header-navbar-fixed.index-glass-navbar {
+    top: 6px !important;
+    border-radius: 22px !important;
+  }
+
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .container-fluid {
+    padding: .5rem .62rem !important;
+  }
+
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-cta-container {
+    margin-left: 0 !important;
+    flex-wrap: wrap !important;
+  }
+
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-cta-container .btn {
+    padding: .42rem .64rem !important;
+    font-size: .74rem !important;
+  }
+
+  footer .footer-mini-gallery {
+    width: 100% !important;
+  }
+
+  footer #newsletter-form,
+  footer .form {
+    width: 100%;
+  }
+
+  .zl-chat-fab {
+    right: .75rem;
+    bottom: .75rem;
+    width: 48px;
+    height: 48px;
+  }
+
+  .zl-chat-panel {
+    right: .5rem;
+    bottom: 4.25rem;
+    width: calc(100vw - 1rem);
+    max-height: 58vh;
+  }
+
+  .zl-chat-actions {
+    flex-wrap: wrap;
+  }
+
+  .zl-chat-actions input {
+    flex: 1 1 100%;
+  }
 }

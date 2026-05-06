@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
@@ -111,12 +111,13 @@
       border: 1px solid rgba(255,255,255,.16);
       border-radius: 24px;
       padding: 1rem;
-      background: rgba(255,255,255,.10);
+      background: linear-gradient(145deg, rgba(255,255,255,.94), rgba(240,249,255,.78));
       backdrop-filter: blur(12px);
       align-self: stretch;
+      color: #0f2744;
     }
-    .account-status-card small { display: block; color: rgba(255,255,255,.65); }
-    .account-status-card b { display: block; margin-top: .25rem; font-size: 1.8rem; color: #bae6fd; }
+    .account-status-card small { display: block; color: #64748b; }
+    .account-status-card b { display: block; margin-top: .25rem; font-size: 1.8rem; color: #0284c7; }
     .account-quick-actions { display: flex; flex-wrap: wrap; gap: .55rem; margin-top: 1.15rem; }
     .account-btn, .account-toolbar button {
       display: inline-flex;
@@ -998,7 +999,7 @@
                     <div class="footer-copyright-wrapper">
                         <div class="hero-container">
                             <div class="footer-copyright-container">
-                                <p class="copyright-text">版权所有 © 2026 中粮天下。权威信息请以中粮集团有限公司官网为准。<a href="https://www.cofco.com/" target="_blank" rel="noopener noreferrer">中粮集团官网</a></p>
+                                <p class="copyright-text">版权所有 © 2026 中粮天下</p>
                                 <div class="legallink-container">
                                     <a href="#" class="legallink">条款与条件</a>
                                     <a href="#" class="legallink">隐私政策</a>
@@ -1054,7 +1055,7 @@
             row.style.justifyContent = role === 'user' ? 'flex-end' : 'flex-start';
             row.innerHTML = '<span style="max-width:82%;display:inline-block;padding:.42rem .58rem;border-radius:10px;background:' +
               (role === 'user' ? 'rgba(45,212,191,.22)' : 'rgba(148,211,255,.2)') +
-              ';color:#e7f4ff;font-size:.8rem;line-height:1.45;">' + text + '</span>';
+              ';color:#0f2744;font-size:.8rem;line-height:1.45;">' + text + '</span>';
             listEl.appendChild(row);
             listEl.scrollTop = listEl.scrollHeight;
           }
