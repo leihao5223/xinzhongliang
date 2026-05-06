@@ -1017,19 +1017,18 @@
       }
 
       function safeRedirectPath(raw) {
-        if (!raw || typeof raw !== 'string') return '/personal-home.html';
+        if (!raw || typeof raw !== 'string') return '/index.html';
         try {
           raw = decodeURIComponent(raw.trim());
         } catch (_) {
           raw = '';
         }
-        if (!raw.startsWith('/') || raw.startsWith('//')) return '/personal-home.html';
+        if (!raw.startsWith('/') || raw.startsWith('//')) return '/index.html';
         return raw.slice(0, 512);
       }
 
-      function goAfterAuth() {
-        var qs = new URLSearchParams(window.location.search);
-        window.location.href = safeRedirectPath(qs.get('redirect'));
+      function goHomeAfterAuth() {
+        window.location.href = '/index.html';
       }
 
       function persistSession(token, userObj) {
@@ -1114,7 +1113,7 @@
             if (document.getElementById('remember-me').checked) localStorage.setItem(REM_NAME_KEY, nick);
             else localStorage.removeItem(REM_NAME_KEY);
             showAuthOk('登录成功，正在跳转…');
-            setTimeout(goAfterAuth, 200);
+            setTimeout(goHomeAfterAuth, 200);
           })
           .catch(function (err) {
             showAuthErr(err.message || String(err));
@@ -1161,7 +1160,7 @@
             if (!data.success || !data.token || !data.user) throw new Error(data.message || '注册失败');
             persistSession(data.token, data.user);
             showAuthOk('注册成功，正在进入…');
-            setTimeout(goAfterAuth, 280);
+            setTimeout(goHomeAfterAuth, 280);
           })
           .catch(function (err) {
             showAuthErr(err.message || String(err));
