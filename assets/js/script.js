@@ -10,7 +10,7 @@ jQuery(function ($) {
 });
 
 /* =====================
-   Animate on Scroll �������أ�https://www.bootstrapmb.com 
+   Animate on Scroll
 ===================== */
 function initAnimate() {
     var $elements = $('[data-animate]');
@@ -152,7 +152,7 @@ function initMobileVideoAutoplay() {
                 v.setAttribute('muted', 'muted');
                 v.setAttribute('playsinline', 'playsinline');
                 v.setAttribute('webkit-playsinline', 'webkit-playsinline');
-                if (typeof v.load === 'function') v.load();
+                if (v.readyState === 0 && typeof v.load === 'function') v.load();
                 var p = v.play && v.play();
                 if (p && typeof p.catch === 'function') p.catch(function () {});
             } catch (_) {}

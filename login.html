@@ -794,9 +794,8 @@
   <!-- 静态图片兜底背景（比视频更轻量，Vercel 不卡顿） -->
   <div class="video-bg-fallback" aria-hidden="true"></div>
   <!-- 视频背景（加载完成后覆盖在图片之上） -->
-  <video class="video-bg" id="intro-video" autoplay muted loop playsinline poster="assets/images/zhongliang-wheat-field.jpg">
+  <video class="video-bg" id="intro-video" autoplay muted loop playsinline poster="assets/images/zhongliang-wheat-field.jpg" data-media-page="login" data-media-slot="login-bg">
     <source src="assets/videos/intro.mp4" type="video/mp4">
-    <source src="/steris/assets/videos/intro.mp4" type="video/mp4">
   </video>
 
   <!-- 黑屏遮罩 -->
@@ -934,6 +933,7 @@
   <!-- 跳过按钮 -->
   <button class="skip-btn" id="skip-btn">跳过</button>
 
+  <script src="assets/js/media-schedule.js?v=1"></script>
   <script>
     (function() {
       const video        = document.getElementById('intro-video');
@@ -1055,7 +1055,7 @@
       setTimeout(function() {
         if (skipped) return;
         showLogin();
-      }, 20400);
+      }, isMobileView() ? 9600 : 16000);
 
       // 延迟显示跳过按钮
       setTimeout(function() {
@@ -1083,13 +1083,13 @@
       }
 
       function safeRedirectPath(raw) {
-        if (!raw || typeof raw !== 'string') return '/steris/personal-home.html';
+        if (!raw || typeof raw !== 'string') return '/personal-home.html';
         try {
           raw = decodeURIComponent(raw.trim());
         } catch (_) {
           raw = '';
         }
-        if (!raw.startsWith('/') || raw.startsWith('//')) return '/steris/personal-home.html';
+        if (!raw.startsWith('/') || raw.startsWith('//')) return '/personal-home.html';
         return raw.slice(0, 512);
       }
 

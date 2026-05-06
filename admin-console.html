@@ -93,6 +93,7 @@
           <a class="admin-nav-item" href="#market" onclick="showSec('market')"><i class="fa-solid fa-chart-line"></i> 行情控制</a>
           <a class="admin-nav-item" href="#articles" onclick="showSec('articles')"><i class="fa-solid fa-newspaper"></i> 文章管理</a>
           <a class="admin-nav-item" href="#settings" onclick="showSec('settings')"><i class="fa-solid fa-sliders"></i> 前端设置</a>
+          <a class="admin-nav-item" href="#media" onclick="showSec('media')"><i class="fa-solid fa-video"></i> 视频排期</a>
         </div>
       </nav>
 
@@ -174,6 +175,32 @@
         <div id="sec-market" class="hidden"><div class="admin-card"><h3>行情控制</h3><p class="muted">功能开发中...</p></div></div>
         <div id="sec-articles" class="hidden"><div class="admin-card"><h3>文章管理</h3><p class="muted">功能开发中...</p></div></div>
         <div id="sec-settings" class="hidden"><div class="admin-card"><h3>前端设置</h3><p class="muted">功能开发中...</p></div></div>
+        <div id="sec-media" class="hidden">
+          <div class="admin-card">
+            <h3>前台视频排期</h3>
+            <p class="muted" style="font-size:.82rem;">设置登录页、首页顶部、品牌广告在指定时间段播放哪个视频。留空起止时间表示长期生效。</p>
+            <div class="admin-toolbar">
+              <select id="media-page" style="min-width:110px;">
+                <option value="login">登录页</option>
+                <option value="home">首页</option>
+                <option value="advert">广告</option>
+              </select>
+              <select id="media-slot" style="min-width:120px;">
+                <option value="login-bg">登录背景</option>
+                <option value="hero-bg">首页顶部</option>
+                <option value="brand-ad">品牌广告</option>
+              </select>
+              <input id="media-title" placeholder="标题" style="min-width:160px;">
+              <input id="media-video" placeholder="/assets/videos/intro.mp4" style="min-width:260px;flex:1;">
+              <input id="media-poster" placeholder="/assets/images/zhongliang-wheat-field.jpg" style="min-width:260px;flex:1;">
+              <input id="media-from" type="datetime-local">
+              <input id="media-to" type="datetime-local">
+              <input id="media-priority" type="number" value="10" style="width:80px;">
+              <button id="media-add" class="btn-blue">新增/保存</button>
+            </div>
+            <div id="media-list" class="admin-list" style="max-height:420px;"></div>
+          </div>
+        </div>
       </div>
     </section>
   </main>
@@ -258,6 +285,7 @@
     let mockPRules = [{ id: 'p1', productId: 1, productName: '黄大豆1号', result: '赢', profitRate: 0.95 }];
     let mockERules = [{ id: 'e1', productId: 3, productName: '豆粕', result: '输', profitRate: 0.90 }];
     let mockOverride = { label: '正常结算', secondsLeft: 0 };
+    let mediaSchedules = [];
 
     function toast(msg) {
       let t = document.getElementById('admin-toast');
@@ -278,6 +306,8 @@
         if (url === '/api/admin/product-settlement' && (!opt.method || opt.method === 'GET')) return { rules: mockPRules, products: mockProducts };
         if (url === '/api/admin/entrust-control' && (!opt.method || opt.method === 'GET')) return { rules: mockERules, products: mockProducts };
         if (url === '/api/admin/trade-orders?limit=20' && (!opt.method || opt.method === 'GET')) return { list: mockOrders, totalUsers: 1248, totalBalance: 8563200.50, pendingWithdraw: 3 };
+        if (url === '/api/admin/media-schedules' && (!opt.method || opt.method === 'GET')) return { list: mediaSchedules };
+        if (url === '/api/admin/media-schedules' && opt.method === 'PUT') { mediaSchedules = (opt.json && opt.json.list) || mediaSchedules; return { list: mediaSchedules }; }
         if (opt.method === 'POST' || opt.method === 'DELETE') {
           return { success: true };
         }
@@ -316,9 +346,46 @@
       document.querySelectorAll('.admin-nav-item').forEach((el) => el.classList.remove('active'));
       const nav = document.querySelector('.admin-nav-item[href="#' + name + '"]');
       if (nav) nav.classList.add('active');
+      if (name === 'media') loadMediaSchedules().catch((e) => { loginMsg.textContent = e.message; });
     }
 
     window.showSec = showSec;
+
+    async function loadMediaSchedules() {
+      const res = await api('/api/admin/media-schedules');
+      mediaSchedules = Array.isArray(res.list) ? res.list : [];
+      renderMediaSchedules();
+    }
+
+    async function saveMediaSchedules() {
+      const res = await api('/api/admin/media-schedules', { method: 'PUT', json: { list: mediaSchedules } });
+      mediaSchedules = Array.isArray(res.list) ? res.list : mediaSchedules;
+      renderMediaSchedules();
+    }
+
+    function renderMediaSchedules() {
+      const list = document.getElementById('media-list');
+      if (!list) return;
+      list.innerHTML = (mediaSchedules || []).map((row) => `
+        <div class="admin-list-row" style="display:block;">
+          <div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center;">
+            <strong>${row.title || row.id}</strong>
+            <button data-del-media="${row.id}">删除</button>
+          </div>
+          <div style="opacity:.82;margin-top:.25rem;">${row.pageKey}/${row.slotKey} · 优先级 ${row.priority || 0} · ${row.enabled === false ? '停用' : '启用'}</div>
+          <div style="opacity:.78;margin-top:.2rem;word-break:break-all;">${row.videoUrl || ''}</div>
+          <div style="opacity:.68;margin-top:.2rem;">${row.startsAt || '立即'} → ${row.endsAt || '长期'}</div>
+        </div>
+      `).join('') || '<p class="muted">暂无排期</p>';
+      list.querySelectorAll('[data-del-media]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const id = btn.getAttribute('data-del-media');
+          mediaSchedules = mediaSchedules.filter((row) => row.id !== id);
+          await saveMediaSchedules();
+          toast('视频排期已删除');
+        });
+      });
+    }
 
     async function loadDashboard() {
       const [overrideRes, productRes, entrustRes, ordersRes] = await Promise.all([
@@ -464,6 +531,23 @@
     }
 
     document.getElementById('ac-login-btn')?.addEventListener('click', login);
+    document.getElementById('media-add')?.addEventListener('click', async () => {
+      const row = {
+        id: 'media_' + Date.now(),
+        pageKey: val('media-page'),
+        slotKey: val('media-slot'),
+        title: val('media-title') || '前台视频',
+        videoUrl: val('media-video') || '/assets/videos/intro.mp4',
+        posterUrl: val('media-poster') || '/assets/images/zhongliang-wheat-field.jpg',
+        startsAt: val('media-from'),
+        endsAt: val('media-to'),
+        priority: Number(val('media-priority')) || 0,
+        enabled: true,
+      };
+      mediaSchedules = [row].concat(mediaSchedules || []);
+      await saveMediaSchedules();
+      toast('视频排期已保存');
+    });
     if (token) {
       secLogin.classList.add('hidden'); secDashboard.classList.remove('hidden');
       showSec('dashboard');

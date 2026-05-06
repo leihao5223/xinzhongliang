@@ -426,7 +426,7 @@
   <button type="button" class="advert-top-play" id="advert-top-play" aria-label="播放完整宣传视频" title="完整视频">▶</button>
   <div class="advert-fullscreen-video-wrap" id="advert-fullscreen-video-wrap" role="dialog" aria-modal="true" aria-label="宣传视频全屏播放">
     <button type="button" class="advert-fullscreen-close" id="advert-fullscreen-close" aria-label="关闭视频">×</button>
-    <video id="advert-fullscreen-video" controls playsinline preload="metadata" src="assets/videos/intro.mp4"></video>
+    <video id="advert-fullscreen-video" controls playsinline preload="metadata" src="assets/videos/intro.mp4" data-media-page="advert" data-media-slot="brand-ad"></video>
   </div>
 
   <!-- ===== 开场黑幕 ===== -->
@@ -442,7 +442,7 @@
 
   <!-- ===== 场景一：自然广袤 ===== -->
   <div class="scene" id="scene-0">
-    <video class="scene-media" id="vid-0" autoplay muted loop playsinline>
+    <video class="scene-media" id="vid-0" autoplay muted loop playsinline data-media-page="advert" data-media-slot="brand-ad">
       <source src="assets/videos/intro.mp4" type="video/mp4">
     </video>
     <div class="scene-overlay"></div>
@@ -493,7 +493,7 @@
   <!-- ===== 场景五：美好生活 ===== -->
   <div class="scene" id="scene-4">
     <video class="scene-media" id="vid-4" autoplay muted loop playsinline>
-      <source src="../../4475800-hd_1920_1080_30fps.mp4" type="video/mp4">
+      <source src="assets/videos/4475800-hd_1920_1080_30fps.mp4" type="video/mp4">
     </video>
     <div class="scene-overlay"></div>
     <div class="scene-text">
@@ -517,7 +517,7 @@
   <!-- ===== 场景七：品牌结尾 ===== -->
   <div class="scene" id="scene-6">
     <video class="scene-media" id="vid-6" autoplay muted loop playsinline>
-      <source src="../../4460023-hd_1920_1080_30fps.mp4" type="video/mp4">
+      <source src="assets/videos/4475800-hd_1920_1080_30fps.mp4" type="video/mp4">
     </video>
     <div class="scene-overlay dark"></div>
     <div class="glow-orb" style="top:40%;left:50%;width:600px;height:600px;background:radial-gradient(circle, rgba(26,122,62,0.1) 0%, transparent 70%);"></div>
@@ -562,6 +562,7 @@
     <source src="assets/music/epic-bg.mp3" type="audio/mpeg">
   </audio>
 
+  <script src="assets/js/media-schedule.js?v=1"></script>
   <script>
     (function() {
       /* ========== 场景配置 ========== */

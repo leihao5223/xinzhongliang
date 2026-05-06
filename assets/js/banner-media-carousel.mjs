@@ -2,6 +2,7 @@
  * 首页首屏右下角相册：优先 `public/video` 列表 API，其次 manifest；同步全屏背景。
  */
 const VIDEO_LIST_API = '/api/public/videos';
+const ACTIVE_MEDIA_API = '/api/site/active-media?pageKey=home&slotKey=hero-bg';
 const MANIFEST_URL = '/media-gallery-manifest.json';
 const AUTO_ADVANCE_MS = 10000;
 
@@ -16,29 +17,14 @@ function titleFromUrl(u) {
   }
 }
 
-/** API 不可用时兜底（与 `app/web/public/video` 当前文件一致、按名字排序） */
+/** API 不可用时兜底：使用当前项目实际存在的轻量优先视频，避免 /video/* 404 */
 const FALLBACK_VIDEO_SLIDES = [
-  '12040588_3840_2160_30fps.mp4',
-  '12070517-hd_1080_1920_30fps.mp4',
+  '9809102-hd_720_1280_30fps.mp4',
   '12534911_1080_1920_60fps.mp4',
-  '12583636_2160_3840_30fps.mp4',
-  '13346784_2160_3840_60fps.mp4',
-  '13350182_2160_3840_30fps.mp4',
-  '13402309_2160_3840_30fps.mp4',
-  '13582609_1080_1920_30fps.mp4',
-  '13932488_1920_1080_30fps.mp4',
-  '14208820_1920_1080_30fps.mp4',
-  '14595493_1920_1080_30fps.mp4',
   '14827961_1080_1920_60fps.mp4',
   '4475800-hd_1920_1080_30fps.mp4',
-  '5538176-uhd_2160_4096_25fps.mp4',
-  '5538178-uhd_4096_2160_25fps.mp4',
-  '5910560-uhd_3840_2160_24fps.mp4',
-  '5982477-uhd_3840_2160_30fps.mp4',
-  '6181812-hd_1080_1920_30fps.mp4',
-  '9809102-hd_720_1280_30fps.mp4',
 ].map((name) => {
-  const url = '/video/' + name;
+  const url = 'assets/videos/' + name;
   return { url, type: 'video', title: titleFromUrl(url), caption: '' };
 });
 
@@ -57,7 +43,11 @@ function dedupeSlidesByUrl(slides) {
 function normalizeSlideUrl(u) {
   const s = String(u || '').trim();
   if (!s) return '';
-  return s.startsWith('/') ? s : '/' + s.replace(/^\.\//, '');
+  return s.startsWith('/') || /^https?:\/\//i.test(s) ? s : s.replace(/^\.\//, '');
+}
+
+function isVideoUrl(u) {
+  return /\.(mp4|webm|mov|m4v)(?:$|\?)/i.test(String(u || '').split('#')[0]);
 }
 
 /** 根路径媒体在 /steris/index.html 下须用绝对 URL，否则易请求到 /steris/pexels… 导致 404 */
@@ -75,20 +65,37 @@ function escAttr(s) {
 }
 
 async function loadSlides() {
+  const scheduled = [];
+  try {
+    const res = await fetch(ACTIVE_MEDIA_API, { cache: 'no-store' });
+    if (res.ok) {
+      const data = await res.json();
+      const item = data && data.item;
+      if (item && isVideoUrl(item.videoUrl)) {
+        scheduled.push({
+          url: normalizeSlideUrl(item.videoUrl),
+          type: 'video',
+          title: item.title || '当前推荐影像',
+          caption: '',
+        });
+      }
+    }
+  } catch (_) {}
+
   try {
     const r = await fetch(VIDEO_LIST_API, { cache: 'no-store' });
     if (r.ok) {
       const data = await r.json();
       const raw = Array.isArray(data.items) ? data.items : [];
       const slides = raw
-        .filter((it) => it && it.url && /^\/video\//i.test(normalizeSlideUrl(it.url)))
+        .filter((it) => it && it.url && isVideoUrl(normalizeSlideUrl(it.url)))
         .map((it) => ({
           url: normalizeSlideUrl(it.url),
           type: 'video',
           title: (it.title && String(it.title)) || titleFromUrl(it.url),
           caption: (it.caption && String(it.caption)) || '',
         }));
-      if (slides.length) return dedupeSlidesByUrl(slides);
+      if (slides.length) return dedupeSlidesByUrl([...scheduled, ...slides]).slice(0, 6);
     }
   } catch (e) {
     console.warn('[banner-media-carousel] video list API failed', e);
@@ -100,20 +107,20 @@ async function loadSlides() {
     const data = await res.json();
     if (!Array.isArray(data.items) || data.items.length === 0) throw new Error('empty manifest');
     const slides = data.items
-      .filter((it) => it && it.url && /^\/video\//i.test(normalizeSlideUrl(it.url)))
+      .filter((it) => it && it.url && isVideoUrl(normalizeSlideUrl(it.url)))
       .map((it) => ({
         url: normalizeSlideUrl(it.url),
         type: 'video',
         title: it.title || titleFromUrl(it.url),
         caption: it.caption || '',
       }));
-    if (slides.length) return dedupeSlidesByUrl(slides);
-    throw new Error('no /video/ entries in manifest');
+    if (slides.length) return dedupeSlidesByUrl([...scheduled, ...slides]).slice(0, 6);
+    throw new Error('no video entries in manifest');
   } catch (e) {
     console.warn('[banner-media-carousel] manifest load failed', e);
   }
 
-  return dedupeSlidesByUrl(FALLBACK_VIDEO_SLIDES);
+  return dedupeSlidesByUrl([...scheduled, ...FALLBACK_VIDEO_SLIDES]).slice(0, 6);
 }
 
 function buildCarousel(slides) {
@@ -185,8 +192,9 @@ function syncHeroBackdrop(slide) {
   // 视频：若 source 未改变且已就绪，避免重复 reload 导致闪烁
   const srcEl = video.querySelector('source');
   const nextSrc = normalizeSlideUrl(slide.url);
-  const currentSrc = srcEl ? normalizeSlideUrl(srcEl.src) : '';
-  if (currentSrc === nextSrc && video.classList.contains('is-ready')) {
+  const currentAbs = video.currentSrc || (srcEl && srcEl.src) || '';
+  const nextAbs = absoluteMediaUrl(nextSrc);
+  if (currentAbs === nextAbs && video.classList.contains('is-ready')) {
     // 同一段视频，只需确保继续播放
     video.muted = true;
     video.play().catch(() => {});
@@ -195,7 +203,7 @@ function syncHeroBackdrop(slide) {
 
   cover.classList.remove('is-visible');
   cover.style.backgroundImage = '';
-  if (srcEl) srcEl.src = nextSrc;
+  if (srcEl) srcEl.src = nextAbs;
   video.load();
   video.muted = true;
   video.play().catch(() => {});

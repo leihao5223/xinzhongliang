@@ -24,13 +24,13 @@
     .about-section-title {
         font-size: 2.4rem;
         font-weight: 700;
-        color: #f0f4f8;
+        color: #0f172a;
         margin: 0.8rem 0 1rem;
         letter-spacing: 2px;
     }
     .about-section-desc {
         font-size: 1.05rem;
-        color: #a8b8d0;
+        color: #475569;
         max-width: 800px;
         margin: 0 auto;
         line-height: 1.8;
@@ -51,11 +51,11 @@
     }
     .glass-card {
         display: block;
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(15, 118, 110, 0.12);
         border-radius: 20px;
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
         overflow: hidden;
         text-decoration: none;
         color: inherit;
@@ -87,13 +87,13 @@
     .glass-card-body h3 {
         font-size: 1.25rem;
         font-weight: 700;
-        color: #f0f4f8;
+        color: #0f172a;
         margin-bottom: 0.6rem;
         letter-spacing: 1px;
     }
     .glass-card-body p {
         font-size: 0.92rem;
-        color: #9ab;
+        color: #475569;
         line-height: 1.7;
         margin-bottom: 1.2rem;
     }
@@ -474,50 +474,6 @@
     <script src="assets/data/grain-products-fallback.js?v=1"></script>
     <script src="assets/js/dc-heritage-core.js?v=4"></script>
     <script src="assets/js/zhongliang-animations.js"></script>
-
-    <!-- ==================== 视频循环播放器 ==================== -->
-    <script>
-    (function() {
-        const videoEl = document.getElementById('banner-hero-video');
-        if (!videoEl) return;
-
-        const VIDEO_LIST = [
-            'assets/videos/intro.mp4',
-        ];
-
-        let currentIndex = 0;
-        videoEl.removeAttribute('loop');
-
-        function loadVideo(index) {
-            if (index >= VIDEO_LIST.length) index = 0;
-            currentIndex = index;
-            const url = VIDEO_LIST[index];
-            const ext = url.split('.').pop().split('?')[0].toLowerCase();
-            const mimeMap = { 'mp4': 'video/mp4', 'webm': 'video/webm', 'ogg': 'video/ogg' };
-            const sourceEl = videoEl.querySelector('source');
-            if (sourceEl) {
-                sourceEl.src = url;
-                sourceEl.type = mimeMap[ext] || 'video/mp4';
-            } else {
-                videoEl.src = url;
-            }
-            videoEl.load();
-            videoEl.play().catch(() => {});
-        }
-
-        videoEl.addEventListener('ended', function() {
-            loadVideo(currentIndex + 1);
-        });
-
-        videoEl.addEventListener('error', function() {
-            loadVideo(currentIndex + 1);
-        });
-
-        if (VIDEO_LIST.length > 0) {
-            loadVideo(0);
-        }
-    })();
-    </script>
 
     <!-- ==================== 品牌广告弹窗（iframe 加载完整 advert.html） ==================== -->
     <script>
