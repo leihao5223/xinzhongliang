@@ -2,8 +2,12 @@
  * 首页首屏右下角相册：优先 `public/video` 列表 API，其次 manifest；同步全屏背景。
  */
 const VIDEO_LIST_API = '/api/public/videos';
+const ACTIVE_MEDIA_API = '/api/site/active-media?pageKey=home&slotKey=hero-bg';
 const MANIFEST_URL = '/media-gallery-manifest.json';
-const AUTO_ADVANCE_MS = 10000;
+const AUTO_ADVANCE_MS = 5 * 60 * 1000;
+
+/** 本地未放置素材网 / 接口无数据时，保证首屏仍有可播放地址（可替换为自有 CDN） */
+const REMOTE_HERO_FALLBACK = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
 
 function titleFromUrl(u) {
   try {
@@ -16,29 +20,14 @@ function titleFromUrl(u) {
   }
 }
 
-/** API 不可用时兜底（与 `app/web/public/video` 当前文件一致、按名字排序） */
+/** API 不可用时兜底：使用当前项目实际存在的轻量优先视频，避免 /video/* 404 */
 const FALLBACK_VIDEO_SLIDES = [
-  '12040588_3840_2160_30fps.mp4',
-  '12070517-hd_1080_1920_30fps.mp4',
+  '9809102-hd_720_1280_30fps.mp4',
   '12534911_1080_1920_60fps.mp4',
-  '12583636_2160_3840_30fps.mp4',
-  '13346784_2160_3840_60fps.mp4',
-  '13350182_2160_3840_30fps.mp4',
-  '13402309_2160_3840_30fps.mp4',
-  '13582609_1080_1920_30fps.mp4',
-  '13932488_1920_1080_30fps.mp4',
-  '14208820_1920_1080_30fps.mp4',
-  '14595493_1920_1080_30fps.mp4',
   '14827961_1080_1920_60fps.mp4',
   '4475800-hd_1920_1080_30fps.mp4',
-  '5538176-uhd_2160_4096_25fps.mp4',
-  '5538178-uhd_4096_2160_25fps.mp4',
-  '5910560-uhd_3840_2160_24fps.mp4',
-  '5982477-uhd_3840_2160_30fps.mp4',
-  '6181812-hd_1080_1920_30fps.mp4',
-  '9809102-hd_720_1280_30fps.mp4',
 ].map((name) => {
-  const url = '/video/' + name;
+  const url = 'assets/videos/' + name;
   return { url, type: 'video', title: titleFromUrl(url), caption: '' };
 });
 
@@ -57,7 +46,11 @@ function dedupeSlidesByUrl(slides) {
 function normalizeSlideUrl(u) {
   const s = String(u || '').trim();
   if (!s) return '';
-  return s.startsWith('/') ? s : '/' + s.replace(/^\.\//, '');
+  return s.startsWith('/') || /^https?:\/\//i.test(s) ? s : s.replace(/^\.\//, '');
+}
+
+function isVideoUrl(u) {
+  return /\.(mp4|webm|mov|m4v)(?:$|\?)/i.test(String(u || '').split('#')[0]);
 }
 
 /** 根路径媒体在 /steris/index.html 下须用绝对 URL，否则易请求到 /steris/pexels… 导致 404 */
@@ -75,20 +68,42 @@ function escAttr(s) {
 }
 
 async function loadSlides() {
+  const scheduled = [];
+  try {
+    const res = await fetch(ACTIVE_MEDIA_API, { cache: 'no-store' });
+    if (res.ok) {
+      const data = await res.json();
+      const item = data && data.item;
+      if (item && isVideoUrl(item.videoUrl)) {
+        scheduled.push({
+          url: normalizeSlideUrl(item.videoUrl),
+          type: 'video',
+          title: item.title || '当前推荐影像',
+          caption: '',
+        });
+      }
+    }
+  } catch (_) {}
+
   try {
     const r = await fetch(VIDEO_LIST_API, { cache: 'no-store' });
     if (r.ok) {
       const data = await r.json();
       const raw = Array.isArray(data.items) ? data.items : [];
       const slides = raw
-        .filter((it) => it && it.url && /^\/video\//i.test(normalizeSlideUrl(it.url)))
+        .filter((it) => it && it.url && isVideoUrl(normalizeSlideUrl(it.url)))
         .map((it) => ({
           url: normalizeSlideUrl(it.url),
           type: 'video',
           title: (it.title && String(it.title)) || titleFromUrl(it.url),
           caption: (it.caption && String(it.caption)) || '',
         }));
-      if (slides.length) return dedupeSlidesByUrl(slides);
+      if (slides.length)
+        return dedupeSlidesByUrl([
+          ...slides,
+          ...scheduled,
+          { url: REMOTE_HERO_FALLBACK, type: 'video', title: '精选影像', caption: '' },
+        ]);
     }
   } catch (e) {
     console.warn('[banner-media-carousel] video list API failed', e);
@@ -100,20 +115,32 @@ async function loadSlides() {
     const data = await res.json();
     if (!Array.isArray(data.items) || data.items.length === 0) throw new Error('empty manifest');
     const slides = data.items
-      .filter((it) => it && it.url && /^\/video\//i.test(normalizeSlideUrl(it.url)))
+      .filter((it) => it && it.url && isVideoUrl(normalizeSlideUrl(it.url)))
       .map((it) => ({
         url: normalizeSlideUrl(it.url),
         type: 'video',
         title: it.title || titleFromUrl(it.url),
         caption: it.caption || '',
       }));
-    if (slides.length) return dedupeSlidesByUrl(slides);
-    throw new Error('no /video/ entries in manifest');
-  } catch (e) {
-    console.warn('[banner-media-carousel] manifest load failed', e);
-  }
+    if (slides.length)
+      return dedupeSlidesByUrl([
+        ...slides,
+        ...scheduled,
+        { url: REMOTE_HERO_FALLBACK, type: 'video', title: '精选影像', caption: '' },
+      ]);
+    throw new Error('no video entries in manifest');
+  } catch (_) {}
 
-  return dedupeSlidesByUrl(FALLBACK_VIDEO_SLIDES);
+  return dedupeSlidesByUrl([
+    ...FALLBACK_VIDEO_SLIDES,
+    ...scheduled,
+    {
+      url: REMOTE_HERO_FALLBACK,
+      type: 'video',
+      title: '精选影像',
+      caption: '',
+    },
+  ]);
 }
 
 function buildCarousel(slides) {
@@ -126,7 +153,7 @@ function buildCarousel(slides) {
       const abs = escAttr(absoluteMediaUrl(s.url));
       const media =
         s.type === 'video'
-          ? `<video src="${abs}" data-pll-video muted playsinline preload="metadata"></video>`
+          ? `<video src="${abs}" data-pll-video muted loop playsinline preload="auto"></video>`
           : `<img src="${abs}" alt="${escAttr(s.title)}" width="640" height="400" decoding="async" fetchpriority="low" />`;
       return `
       <div class="pll-carousel-slide ${i === 0 ? 'active' : ''}" data-index="${i}" role="tabpanel" id="pll-panel-${i + 1}" aria-labelledby="pll-dot-${i + 1}" ${i !== 0 ? 'inert' : ''}>
@@ -155,12 +182,35 @@ function syncVideos(slidesEl, activeIndex) {
     if (!v) return;
     if (i === activeIndex) {
       v.muted = true;
+      v.loop = true;
+      v.autoplay = true;
+      v.setAttribute('muted', 'muted');
+      v.setAttribute('loop', 'loop');
+      v.setAttribute('playsinline', 'playsinline');
+      v.setAttribute('webkit-playsinline', 'webkit-playsinline');
       v.play().catch(() => {});
     } else {
       v.pause();
       v.currentTime = 0;
     }
   });
+}
+
+function forceHeroAutoplay(video) {
+  if (!video) return;
+  video.muted = true;
+  video.defaultMuted = true;
+  video.loop = true;
+  video.autoplay = true;
+  video.playsInline = true;
+  video.setAttribute('muted', 'muted');
+  video.setAttribute('loop', 'loop');
+  video.setAttribute('autoplay', 'autoplay');
+  video.setAttribute('playsinline', 'playsinline');
+  video.setAttribute('webkit-playsinline', 'webkit-playsinline');
+  if (video.readyState >= 2) {
+    video.play().catch(() => {});
+  }
 }
 
 function syncHeroBackdrop(slide) {
@@ -177,33 +227,66 @@ function syncHeroBackdrop(slide) {
     } catch (_) {}
     video.classList.remove('is-ready');
     video.style.opacity = '0';
-    cover.style.backgroundImage = 'url(' + JSON.stringify(url) + ')';
-    cover.classList.add('is-visible');
+    cover.style.backgroundImage = '';
+    cover.classList.remove('is-visible');
+    return;
+  }
+
+  // 视频：若 source 未改变且已就绪，避免重复 reload 导致闪烁
+  const srcEl = video.querySelector('source');
+  const nextSrc = normalizeSlideUrl(slide.url);
+  const currentAbs = video.currentSrc || (srcEl && srcEl.src) || '';
+  const nextAbs = absoluteMediaUrl(nextSrc);
+  if (currentAbs === nextAbs && video.classList.contains('is-ready')) {
+    // 同一段视频，只需确保继续播放
+    forceHeroAutoplay(video);
+    video.play().catch(() => {});
     return;
   }
 
   cover.classList.remove('is-visible');
   cover.style.backgroundImage = '';
-  const srcEl = video.querySelector('source');
-  if (srcEl) srcEl.src = normalizeSlideUrl(slide.url);
+  if (srcEl) srcEl.src = nextAbs;
   video.load();
-  video.muted = true;
+  forceHeroAutoplay(video);
   video.play().catch(() => {});
   video.classList.remove('is-ready');
   video.style.opacity = '0';
-  video.addEventListener(
-    'canplay',
-    function () {
+
+  // 清除旧的 canplay 监听器，防止堆积
+  if (video._bannerCanplayHandler) {
+    video.removeEventListener('canplay', video._bannerCanplayHandler);
+  }
+  video._bannerCanplayHandler = function () {
+    video.classList.add('is-ready');
+    video.style.opacity = '1';
+    forceHeroAutoplay(video);
+  };
+  video.addEventListener('canplay', video._bannerCanplayHandler, { once: true });
+
+  if (video._bannerVideoErrorHandler) {
+    video.removeEventListener('error', video._bannerVideoErrorHandler);
+  }
+  video._bannerVideoErrorHandler = function () {
+    const el = video.querySelector('source');
+    var cur = (el && el.src) || video.currentSrc || '';
+    if (cur.indexOf('flower.mp4') !== -1) {
       video.classList.add('is-ready');
       video.style.opacity = '1';
-    },
-    { once: true },
-  );
+      return;
+    }
+    if (el) el.src = REMOTE_HERO_FALLBACK;
+    else video.src = REMOTE_HERO_FALLBACK;
+    video.load();
+    forceHeroAutoplay(video);
+  };
+  video.addEventListener('error', video._bannerVideoErrorHandler, { once: true });
 }
 
 function revealDefaultHeroVideo() {
   const video = document.getElementById('banner-hero-video');
   if (!video) return;
+  forceHeroAutoplay(video);
   video.classList.add('is-ready');
   video.style.opacity = '1';
 }
@@ -235,6 +318,19 @@ async function init() {
   let autoTimer = null;
   let progressTimer = null;
   let isHovering = false;
+  const heroVideo = document.getElementById('banner-hero-video');
+  if (heroVideo) {
+    forceHeroAutoplay(heroVideo);
+    heroVideo.addEventListener('ended', () => {
+      heroVideo.currentTime = 0;
+      forceHeroAutoplay(heroVideo);
+    });
+    heroVideo.addEventListener('pause', () => {
+      if (document.visibilityState !== 'hidden') {
+        window.setTimeout(() => forceHeroAutoplay(heroVideo), 120);
+      }
+    });
+  }
 
   function goTo(index) {
     const slideEls = carousel.querySelectorAll('.pll-carousel-slide');
@@ -326,12 +422,19 @@ async function init() {
       scheduleAutoAdvance();
       syncVideos(carousel, current);
       syncHeroBackdrop(slides[current]);
+      forceHeroAutoplay(heroVideo);
     }
   });
 
   syncVideos(carousel, current);
   syncHeroBackdrop(slides[current]);
   scheduleAutoAdvance();
+  window.setInterval(() => {
+    if (document.visibilityState !== 'hidden') {
+      syncVideos(carousel, current);
+      forceHeroAutoplay(heroVideo);
+    }
+  }, 3000);
 
   setTimeout(() => {
     const v = document.getElementById('banner-hero-video');

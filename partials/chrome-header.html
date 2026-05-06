@@ -1,156 +1,21 @@
-    <!-- Header Section（全局统一：与首页同构 + 全站「页面」入口） -->
-    <header>
-        <div class="header-container">
-
-            <!-- Header Info -->
-            <div class="header-info-wrapper">
-                <div class="hero-container">
-                    <div class="header-info-container">
-                        <div class="header-info">
-                            <div class="header-info-item">
-                                <i class="fa-solid fa-envelope accent-color"></i>
-                                <span class="header-info-text">ir@cofco.com</span>
-                            </div>
-                            <div class="header-info-item">
-                                <i class="fa-solid fa-phone accent-color"></i>
-                                <span class="header-info-text">+86-10-85006688</span>
-                            </div>
-                        </div>
-                        <div class="header-social">
-                            <a href="#" class="social-icon">
-                                <i class="fa-brands fa-facebook-f"></i>
-                            </a>
-                            <a href="#" class="social-icon">
-                                <i class="fa-brands fa-instagram"></i>
-                            </a>
-                            <a href="#" class="social-icon">
-                                <i class="fa-brands fa-twitter"></i>
-                            </a>
-                            <a href="#" class="social-icon">
-                                <i class="fa-brands fa-youtube"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
+<nav class="zl-nav" aria-label="主导航">
+        <div class="zl-nav__inner">
+            <div class="zl-brand-stack">
+                <a class="zl-brand" href="index.html">
+                    <img src="assets/images/zhongliang-logo-light.svg" alt="中粮天下">
+                </a>
             </div>
-
-            <!-- Header Navbar -->
-            <div class="header-navbar-fixed index-glass-navbar">
-                <div class="hero-container">
-                    <nav class="navbar navbar-expand-lg">
-                        <div class="container-fluid p-0">
-                            <div class="logo-container header-logo">
-                                <a class="navbar-brand" href="index.html"><img src="assets/images/zhongliang-logo-light.svg" class="img-fluid" alt="中粮天下"></a>
-                            </div>
-                            <div class="nav-link-wrapper">
-                                <button class="btn nav-btn" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                                aria-controls="navbarNav" aria-expanded="false" aria-label="切换导航">
-                                    <i class="fa-solid fa-bars"></i>
-                                </button>
-                                <div class="collapse navbar-collapse" id="navbarNav">
-                                    <ul class="navbar-nav">
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="index.html">首页</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="about.html">公司介绍</a>
-                                        </li>
-                                        <li class="nav-item dropdown">
-                                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                                                aria-expanded="false">
-                                                交易中心 <i class="fa-solid fa-angle-down"></i>
-                                            </a>
-                                            <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item" href="product.html">交易中心</a></li>
-                                            </ul>
-                                        </li>
-                                        <li class="nav-item dropdown">
-                                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                                                aria-expanded="false">
-                                                资讯 <i class="fa-solid fa-angle-down"></i>
-                                            </a>
-                                            <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item" href="blog.html">资讯列表</a></li>
-                                                <li><a class="dropdown-item" href="single-post.html">文章详情</a></li>
-                                            </ul>
-                                        </li>
-                                        <li class="nav-item dropdown">
-                                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                                                aria-expanded="false">
-                                                个人主页 <i class="fa-solid fa-angle-down"></i>
-                                            </a>
-                                            <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item" href="personal-home.html">个人主页</a></li>
-                                                <li><a class="dropdown-item" href="contact.html">联系我们</a></li>
-                                                <li><a class="dropdown-item" href="case-studies.html">合作专题</a></li>
-                                                <li><a class="dropdown-item" href="faq.html">常见问题</a></li>
-                                                <li><a class="dropdown-item" href="team.html">团队介绍</a></li>
-                                                <li><a class="dropdown-item" href="admin-console.html">后台控台</a></li>
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="navbar-cta-container d-flex flex-row align-items-center gspace-2">
-                                <a href="login.html" class="btn btn-nav-login-green">账号登录</a>
-                                <a href="contact.html" class="btn btn-animated btn-animated--post-3 btn-nav-contact">
-                                    <span>联系客服</span>
-                                    <i class="fa-solid fa-chevron-right"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </nav>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Sidebar Section -->
-    <aside>
-        <div class="sidebar-overlay"></div>
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo-container sidebar-logo">
-                    <img src="assets/images/zhongliang-logo-dark.svg" alt="中粮天下" class="img-fluid">
-                </div>
-                <button class="close-btn btn-white-accent"><span>关</span></button>
-            </div>
-            <ul class="menu">
-                <li><a href="index.html">首页</a></li>
-                <li><a href="about.html">公司介绍</a></li>
-                <li class="sidebar-dropdown">
-                    <div class="dropdown-header">
-                        <a href="#">交易中心</a>
-                        <button class="sidebar-dropdown-btn"><i class="fa-solid fa-chevron-down"></i></button>
-                    </div>
-                    <ul class="sidebar-dropdown-menu">
-                        <li><a href="product.html">交易中心</a></li>
-                    </ul>
-                </li>
-                <li class="sidebar-dropdown">
-                    <div class="dropdown-header">
-                        <a href="#">资讯</a>
-                        <button class="sidebar-dropdown-btn"><i class="fa-solid fa-chevron-down"></i></button>
-                    </div>
-                    <ul class="sidebar-dropdown-menu">
-                        <li><a href="blog.html">资讯列表</a></li>
-                        <li><a href="single-post.html">文章详情</a></li>
-                    </ul>
-                </li>
-                <li class="sidebar-dropdown">
-                    <div class="dropdown-header">
-                        <a href="#">个人主页</a>
-                        <button class="sidebar-dropdown-btn"><i class="fa-solid fa-chevron-down"></i></button>
-                    </div>
-                    <ul class="sidebar-dropdown-menu">
-                        <li><a href="personal-home.html">个人主页</a></li>
-                        <li><a href="contact.html">联系我们</a></li>
-                        <li><a href="case-studies.html">合作专题</a></li>
-                        <li><a href="faq.html">常见问题</a></li>
-                        <li><a href="team.html">团队介绍</a></li>
-                        <li><a href="admin-console.html">后台控台</a></li>
-                    </ul>
-                </li>
+            <ul class="zl-menu">
+            <li><a href="index.html">首页</a></li>
+            <li><a href="about.html">公司介绍</a></li>
+            <li><a href="product.html">交易中心</a></li>
+            <li><a href="blog.html">资讯</a></li>
+            <li><a href="personal-home.html">个人主页</a></li>
             </ul>
+            <div class="zl-actions">
+                <a class="zl-btn zl-btn--ghost" href="login.html">账号登录</a>
+                <a class="zl-btn zl-btn--primary" href="login.html#signup">注册</a>
+            </div>
         </div>
-    </aside>
+    </nav>
+

@@ -3,7 +3,7 @@
   if (!main || !/product\.html$/i.test(location.pathname)) return;
 
   const TOKEN_KEYS = ['zhongliang_token', 'zl_token', 'token'];
-  const token = TOKEN_KEYS.map((k) => localStorage.getItem(k)).find((v) => v && v.trim());
+  const token = TOKEN_KEYS.map((k) => localStorage.getItem(k)).find((v) => v && v.trim()) || '';
 
   async function api(url, opt = {}) {
     const headers = { ...(opt.headers || {}) };
@@ -42,8 +42,49 @@
       const seed = Number(p.id || 1) * 997;
       const base = 10 + (seed % 500);
       const change = ((seed * 13) % 1000) / 100 - 5;
-      return { ...p, livePrice: base, changePct: change };
+      return { ...p, livePrice: base, changePct: change, _base: base };
     });
+  }
+
+  function tickPrice(p) {
+    // 随机游走：每秒在 [-0.08, +0.08] 之间波动，保留两位小数
+    const delta = (Math.random() - 0.5) * 0.16;
+    let next = Number(p.livePrice) + delta;
+    // 围绕基准价做有界波动，防止漂移太远
+    const min = p._base * 0.92;
+    const max = p._base * 1.08;
+    if (next < min) next = min + Math.random() * 0.05;
+    if (next > max) next = max - Math.random() * 0.05;
+    p.livePrice = next;
+    // 同步微调涨跌幅
+    const drift = ((next - p._base) / p._base) * 100;
+    p.changePct = Number((drift + (Math.random() - 0.5) * 0.3).toFixed(2));
+    return p;
+  }
+
+  function startLiveTicks() {
+    setInterval(() => {
+      if (!products.length) return;
+      products.forEach(tickPrice);
+      // 更新列表中各卡片的价格与涨跌幅
+      listRoot.querySelectorAll('.dc-proj-block').forEach((el) => {
+        const idx = Number(el.getAttribute('data-idx'));
+        const p = products[idx];
+        if (!p) return;
+        const liveEl = el.querySelector('.dc-proj-live');
+        const pctEl = el.querySelector('.dc-proj-pct');
+        if (liveEl) liveEl.textContent = formatNum(p.livePrice);
+        if (pctEl) {
+          const pctStr = (p.changePct >= 0 ? '+' : '') + p.changePct.toFixed(2) + '%';
+          pctEl.textContent = pctStr;
+          pctEl.className = p.changePct >= 0 ? 'dc-proj-pct is-up' : 'dc-proj-pct is-down';
+        }
+      });
+      // 更新详情面板的价格描述
+      if (active && descEl) {
+        descEl.textContent = `${active.summary || ''} · 最新价 ${formatNum(active.livePrice)}，涨跌幅 ${(active.changePct >= 0 ? '+' : '') + active.changePct.toFixed(2)}%`;
+      }
+    }, 1000);
   }
 
   function upDownSplit(p) {
@@ -58,55 +99,76 @@
     return { up, down: 100 - up };
   }
 
+  function classifyOrders(list) {
+    const settled = [];
+    const running = [];
+    (list || []).forEach((o) => {
+      const s = String(o.status || '').toLowerCase();
+      if (s.includes('settled') || s.includes('closed') || s.includes('done')) settled.push(o);
+      else running.push(o);
+    });
+    return { running, settled };
+  }
+
+  function orderDirectionText(order) {
+    const d = String(order.direction || '').toLowerCase();
+    if (d === 'short') return '买跌';
+    return '买涨';
+  }
+
   main.innerHTML = `
-    <section class="section banner-inner" style="position:relative;overflow:hidden;">
-      <video class="banner-inner-video" autoplay muted loop playsinline>
-        <source src="https://videos.pexels.com/video-files/4612364/4612364-hd_1920_1080_30fps.mp4" type="video/mp4">
-      </video>
-      <div class="banner-inner-overlay"></div>
-      <div class="effect-particles-bg" data-count="14" style="z-index:1;"></div>
-      <div class="effect-hud" aria-hidden="true" style="opacity:0.35;">
-        <div class="effect-hud__scanlines"></div>
-        <div class="effect-hud__corners"></div>
-        <div class="effect-hud__status" style="top:16px;left:18px;font-size:0.55rem;gap:1rem;">
-          <span><span class="effect-hud__dot"></span>系统在线</span>
-        </div>
-      </div>
+    <section class="section data-comparison-section data-comparison-section--dark-glass" id="trade-hub">
       <div class="hero-container">
-        <div class="banner-inner-content">
-          <h1 class="banner-inner-title effect-glow-text">交易中心</h1>
-          <p class="banner-inner-excerpt">全球粮源实时行情，一键交易，安全透明。</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="section data-comparison-section data-comparison-section--dark-glass" id="heritage-metrics">
-      <div class="hero-container">
-        <div class="sub-heading animate-box animated-delay-slow animate__animated" data-animate="animate__fadeIn" style="margin-bottom:1.5rem;">
-          <i class="fa-solid fa-circle"></i>
-          <h4 class="accent-color">实时行情</h4>
-        </div>
-        <h2 class="animate-box animated animate__animated" data-animate="animate__fadeInLeft" style="margin-bottom:2.5rem;">精选农产品行情与交易</h2>
-
-        <div class="data-comparison-card dc-glass-trio" id="dataComparisonCardHome">
-          <div class="dc-glass-duo">
-            <div class="dc-glass-panel dc-glass-panel--legacy animate-box animated animate__animated" data-animate="animate__fadeInUp">
-              <div class="dc-legacy-projects-inner" aria-label="产品列表">
-                <div class="dc-legacy-scroll">
-                  <div id="dc-legacy-root"></div>
-                </div>
-              </div>
+        <div class="tc-grid">
+          <div class="tc-list-panel animate-box animated animate__animated" data-animate="animate__fadeInUp">
+            <div id="tc-product-list"></div>
+          </div>
+          <div class="tc-detail-panel animate-box animated animate__animated" data-animate="animate__fadeInUp">
+            <h3 id="tc-trend-title" class="dc-trend-title">产品走势</h3>
+            <p id="tc-product-desc" class="tc-product-desc"></p>
+            <div class="dc-chart-shell">
+              <iframe id="dc-chart-frame" class="dc-chart-frame" title="产品走势" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
             </div>
-            <div class="dc-glass-panel dc-glass-panel--trend animate-box animated animate__animated" data-animate="animate__fadeInUp">
-              <h3 id="dc-trend-title" class="dc-trend-title">加载中…</h3>
-              <div class="dc-chart-shell">
-                <iframe id="dc-chart-frame" class="dc-chart-frame" title="产品走势" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
-              </div>
+            <div class="tc-action-bar">
+              <button type="button" data-order-kind="market" data-direction="long">买涨</button>
+              <button type="button" data-order-kind="market" data-direction="short">买跌</button>
+              <button type="button" data-order-kind="entrust" data-direction="long">委买</button>
             </div>
           </div>
+          <aside id="tc-orders-panel" class="tc-orders-panel animate-box animated animate__animated" data-animate="animate__fadeInUp" aria-label="订单记录">
+            <div class="tc-orders-panel-head">
+              <div>
+                <h3>订单记录</h3>
+                <p id="tc-orders-balance" class="tc-balance">当前可用余额：--</p>
+              </div>
+            </div>
+            <div class="tc-orders-tabs">
+              <button type="button" data-tab="running" class="is-active">进行中</button>
+              <button type="button" data-tab="settled">已结算</button>
+            </div>
+            <div id="tc-orders-list" class="tc-orders-list"></div>
+          </aside>
         </div>
       </div>
     </section>
+
+    <div id="tc-detail-sheet" class="tc-detail-sheet" aria-hidden="true">
+      <div class="tc-detail-body">
+        <div class="tc-detail-head">
+          <strong id="tc-sheet-title">产品详情</strong>
+          <button type="button" id="tc-close-detail">关闭</button>
+        </div>
+        <p id="tc-sheet-desc" class="tc-product-desc" style="margin:0 0 .65rem;"></p>
+        <div class="dc-chart-shell">
+          <iframe id="tc-sheet-chart" class="dc-chart-frame" title="产品详情走势" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+        </div>
+        <div class="tc-action-bar">
+          <button type="button" data-order-kind="market" data-direction="long">买涨</button>
+          <button type="button" data-order-kind="market" data-direction="short">买跌</button>
+          <button type="button" data-order-kind="entrust" data-direction="long">委买</button>
+        </div>
+      </div>
+    </div>
 
     <div id="tc-trade-modal" class="tc-trade-modal" aria-hidden="true">
       <div class="tc-trade-dialog">
@@ -126,43 +188,101 @@
 
   const style = document.createElement('style');
   style.textContent = `
-    .tc-trade-modal{position:fixed;inset:0;background:rgba(3,8,16,.72);display:none;align-items:center;justify-content:center;z-index:50;padding:1rem}
+    .tc-trade-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:6000;padding:1rem}
     .tc-trade-modal.is-open{display:flex}
-    .tc-trade-dialog{position:relative;width:min(460px,100%);background:#e8f9eb;border-radius:14px;padding:1rem 1rem 1.1rem;border:1px solid rgba(26,122,62,.25)}
-    .tc-trade-dialog h3{font-size:1.05rem;margin:0 0 .4rem;color:#123a2b}
-    .tc-balance{margin:0 0 .7rem;color:#1f5d46;font-size:.84rem}
-    .tc-modal-close{position:absolute;right:.6rem;top:.5rem;border:0;background:transparent;font-size:1.6rem;line-height:1;color:#194f39;cursor:pointer}
+    .tc-trade-dialog{position:relative;width:min(460px,100%);max-height:calc(100vh - 2rem);overflow:auto;background:#ffffff;border-radius:14px;padding:1rem 1rem 1.1rem;border:1px solid rgba(0,0,0,.1);box-shadow:0 8px 32px rgba(0,0,0,.12)}
+    .tc-trade-dialog h3{font-size:1.05rem;margin:0 0 .4rem;color:#1a1a1a}
+    .tc-balance{margin:0 0 .7rem;color:#555555;font-size:.84rem}
+    .tc-modal-close{position:absolute;right:.6rem;top:.5rem;border:0;background:transparent;font-size:1.6rem;line-height:1;color:#777777;cursor:pointer}
     .tc-form{display:flex;flex-direction:column;gap:.55rem}
     .tc-quick-amounts{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem}
-    .tc-quick-amounts button{border:1px solid rgba(148,211,255,.3);background:rgba(4,22,42,.45);color:#d7ebff;border-radius:10px;padding:.45rem;font-size:.8rem;cursor:pointer}
-    .tc-form input{background:#fff;color:#163323;border:1px solid rgba(26,122,62,.25);border-radius:10px;padding:.55rem}
+    .tc-quick-amounts button{border:1px solid rgba(0,0,0,.1);background:#f0f0f0;color:#333333;border-radius:10px;padding:.45rem;font-size:.8rem;cursor:pointer}
+    .tc-form input{background:#ffffff;color:#1a1a1a;border:1px solid rgba(0,0,0,.15);border-radius:10px;padding:.55rem}
     .tc-form button{border:0;border-radius:10px;padding:.6rem;color:#fff;background:linear-gradient(135deg,#0d5c2e,#1a7a3e,#2ecc71);cursor:pointer}
-    .tc-msg{margin:.55rem 0 0;color:#1f5d46;font-size:.82rem}
-    .dc-proj-block{position:relative;padding:.85rem .9rem;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);margin-bottom:.7rem;cursor:pointer;transition:all .35s ease}
-    .dc-proj-block:hover{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.1)}
-    .dc-proj-block.is-active{border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.12);box-shadow:0 12px 40px rgba(0,0,0,.25)}
+    .tc-msg{margin:.55rem 0 0;color:#555555;font-size:.82rem}
+    .tc-grid{display:grid;grid-template-columns:minmax(220px,.82fr) minmax(360px,1.45fr) minmax(280px,.92fr);gap:1.35rem;align-items:stretch;margin-top:1rem;max-width:100%}
+    .tc-list-panel,.tc-detail-panel,.tc-orders-panel{height:min(640px,calc(100vh - 190px));min-height:500px;background:rgba(255,255,255,.82);border:1px solid rgba(125,211,252,.34);border-radius:16px;padding:.85rem;box-shadow:0 18px 54px rgba(14,116,144,.14);backdrop-filter:blur(18px) saturate(1.12);-webkit-backdrop-filter:blur(18px) saturate(1.12)}
+    .tc-list-panel{overflow:auto}
+    .tc-detail-panel{display:flex;flex-direction:column;min-width:0}
+    .tc-product-desc{margin:0 0 .8rem;color:#555555;font-size:.88rem}
+    .dc-proj-block{position:relative;padding:.85rem .9rem;border-radius:14px;background:#ffffff;border:1px solid rgba(0,0,0,.08);margin-bottom:.7rem;cursor:pointer;transition:all .35s ease}
+    .dc-proj-block:hover{border-color:rgba(0,0,0,.15);background:#fafafa}
+    .dc-proj-block.is-active{border-color:rgba(0,0,0,.2);background:#f5f5f5;box-shadow:0 4px 16px rgba(0,0,0,.08)}
     .dc-proj-title{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin:0 0 .25rem}
-    .dc-proj-name{font-size:.95rem;color:#f0f4f8;font-weight:600}
-    .dc-proj-live{font-size:.9rem;color:#90d9ff;font-weight:700}
+    .dc-proj-name{font-size:.95rem;color:#1a1a1a;font-weight:600}
+    .dc-proj-live{font-size:.9rem;color:#00796b;font-weight:700}
     .dc-proj-pct{font-size:.82rem;font-weight:700;margin-left:auto}
-    .dc-proj-pct.is-up{color:#34d399}
-    .dc-proj-pct.is-down{color:#f87171}
-    .dc-proj-desc{font-size:.82rem;color:#9ab;margin:0 0 .5rem}
+    .dc-proj-pct.is-up{color:#22c55e}
+    .dc-proj-pct.is-down{color:#ef4444}
+    .dc-proj-desc{font-size:.82rem;color:#555555;margin:0 0 .5rem}
     .dc-proj-ratios{display:flex;flex-direction:column;gap:.35rem}
-    .dc-ratio-head{display:flex;justify-content:space-between;font-size:.75rem;color:#cbd5e1}
-    .dc-ratio-track2{height:4px;border-radius:2px;background:rgba(255,255,255,.12);overflow:hidden}
+    .dc-ratio-head{display:flex;justify-content:space-between;font-size:.75rem;color:#666666}
+    .dc-ratio-track2{height:4px;border-radius:2px;background:rgba(0,0,0,.08);overflow:hidden}
     .dc-ratio-fill2{display:block;height:100%;border-radius:2px}
     .dc-ratio-fill2--green{background:linear-gradient(90deg,#34d399,#22c55e)}
     .dc-ratio-fill2--red{background:linear-gradient(90deg,#f87171,#ef4444)}
-    .tc-buy-btn{display:inline-flex;align-items:center;gap:.35rem;margin-top:.45rem;padding:.32rem .85rem;border:0;border-radius:999px;font-size:.78rem;color:#fff;background:linear-gradient(135deg,#0d5c2e,#1a7a3e,#2ecc71);cursor:pointer}
-    .tc-mobile-chart{display:none;margin-top:.55rem;border-radius:10px;overflow:hidden;border:1px solid rgba(148,211,255,.25)}
-    .tc-mobile-chart iframe{width:100%;height:210px;border:0;background:#0f172a}
-    @media (max-width: 992px){.tc-mobile-chart{display:block}}
+    .tc-card-actions{display:flex;gap:.45rem;margin-top:.65rem}
+    .tc-card-actions button{border:0;border-radius:999px;padding:.35rem .8rem;font-size:.76rem;color:#fff;cursor:pointer}
+    .tc-card-actions .tc-open-detail{background:linear-gradient(135deg,#1d4ed8,#2563eb,#38bdf8)}
+    .tc-card-actions .tc-open-buy{background:linear-gradient(135deg,#0d5c2e,#1a7a3e,#2ecc71)}
+    .tc-detail-panel .dc-chart-shell{flex:1;min-height:0}
+    .tc-detail-panel .dc-chart-frame{height:100%}
+    .tc-detail-sheet{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:58;align-items:flex-end}
+    .tc-detail-sheet.is-open{display:flex}
+    .tc-detail-body{width:100%;max-height:92vh;overflow:auto;background:#ffffff;border-top-left-radius:18px;border-top-right-radius:18px;padding:1rem;box-shadow:0 -4px 24px rgba(0,0,0,.12)}
+    .tc-detail-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;color:#1a1a1a}
+    .tc-detail-head button{border:0;background:transparent;color:#777777}
+    .tc-action-bar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.55rem;margin-top:.85rem}
+    .tc-action-bar button{min-width:0;border:0;border-radius:999px;padding:.58rem .6rem;font-size:.82rem;color:#fff;cursor:pointer;white-space:nowrap}
+    .tc-action-bar button[data-direction="long"][data-order-kind="market"]{background:linear-gradient(135deg,#0d5c2e,#1a7a3e,#2ecc71)}
+    .tc-action-bar button[data-direction="short"]{background:linear-gradient(135deg,#6b1f1f,#ef4444,#f97316)}
+    .tc-action-bar button[data-order-kind="entrust"]{background:linear-gradient(135deg,#164f8b,#2563eb,#38bdf8)}
+    .tc-orders-panel{position:sticky;top:112px;display:flex;flex-direction:column;overflow:hidden}
+    .tc-orders-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:.8rem}
+    .tc-orders-panel h3{margin:0 0 .25rem;color:#0f172a;font-size:1.05rem}
+    .tc-orders-panel .tc-balance{margin:0;color:#475569}
+    .tc-orders-tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem;margin:.7rem 0}
+    .tc-orders-tabs button{border:1px solid rgba(125,211,252,.45);background:rgba(255,255,255,.72);color:#0369a1;border-radius:14px;padding:.52rem;font-weight:800}
+    .tc-orders-tabs button.is-active{border-color:#38bdf8;color:#075985;background:linear-gradient(135deg,rgba(224,242,254,.95),rgba(186,230,253,.72))}
+    .tc-orders-list{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:.6rem;padding-right:.15rem}
+    .tc-order-item{background:#fff;border:1px solid #dbe2eb;border-radius:14px;padding:.65rem .8rem}
+    .tc-order-item h4{margin:0 0 .2rem;font-size:.95rem;color:#1a1a1a}
+    .tc-order-item p{margin:0;color:#555555;font-size:.8rem;line-height:1.5}
+    .tc-order-item .tc-order-pnl{font-size:1.08rem;font-weight:700;margin-top:.32rem}
+    .tc-order-item .tc-order-pnl.is-win{color:#22c55e}
+    .tc-order-item .tc-order-pnl.is-loss{color:#ef4444}
+    @media (max-width: 1180px){
+      .tc-grid{grid-template-columns:minmax(220px,.9fr) minmax(0,1.35fr)}
+      .tc-list-panel,.tc-detail-panel{height:560px;min-height:480px}
+      .tc-orders-panel{grid-column:1 / -1;position:relative;top:auto;height:auto;min-height:320px;max-height:460px}
+      .tc-orders-list{max-height:320px}
+    }
+    @media (max-width: 760px){
+      .tc-grid{grid-template-columns:1fr;gap:1rem;margin-top:.5rem}
+      .tc-list-panel,.tc-detail-panel,.tc-orders-panel{width:100%;height:auto;min-height:0;max-height:none;padding:.75rem;border-radius:14px}
+      .tc-list-panel{max-height:none;overflow:visible}
+      .tc-detail-panel{display:flex;min-height:430px}
+      .tc-detail-panel .dc-chart-shell{min-height:300px;flex:0 0 auto}
+      .tc-detail-panel .dc-chart-frame{height:300px}
+      .tc-orders-panel{position:relative;top:auto;min-height:320px}
+      .tc-orders-list{max-height:52vh}
+      .tc-card-actions,.tc-action-bar{grid-template-columns:repeat(3,minmax(0,1fr));gap:.45rem}
+      .tc-card-actions button,.tc-action-bar button{padding:.56rem .35rem;font-size:.78rem}
+      .dc-proj-title{align-items:flex-start}
+      .dc-proj-pct{margin-left:0}
+      .tc-quick-amounts{grid-template-columns:repeat(2,1fr)}
+    }
+    @media (max-width: 420px){
+      .tc-card-actions{display:grid;grid-template-columns:1fr 1fr}
+      .tc-action-bar{grid-template-columns:1fr}
+      .tc-action-bar button{width:100%}
+    }
   `;
   document.head.appendChild(style);
 
-  const legacyRoot = document.getElementById('dc-legacy-root');
-  const titleEl = document.getElementById('dc-trend-title');
+  const listRoot = document.getElementById('tc-product-list');
+  const titleEl = document.getElementById('tc-trend-title');
+  const descEl = document.getElementById('tc-product-desc');
   const iframe = document.getElementById('dc-chart-frame');
   const modal = document.getElementById('tc-trade-modal');
   const closeModalBtn = document.getElementById('tc-close-modal');
@@ -171,13 +291,24 @@
   const quickAmountsEl = document.getElementById('tc-quick-amounts');
   const orderForm = document.getElementById('tc-order-form');
   const msg = document.getElementById('tc-msg');
+  const detailSheet = document.getElementById('tc-detail-sheet');
+  const detailSheetTitle = document.getElementById('tc-sheet-title');
+  const detailSheetDesc = document.getElementById('tc-sheet-desc');
+  const detailSheetChart = document.getElementById('tc-sheet-chart');
+  const detailSheetClose = document.getElementById('tc-close-detail');
+  const ordersPanel = document.getElementById('tc-orders-panel');
+  const ordersBalance = document.getElementById('tc-orders-balance');
+  const ordersList = document.getElementById('tc-orders-list');
+  const ordersTabs = ordersPanel.querySelectorAll('.tc-orders-tabs button');
   let active = null;
   let products = [];
   let summary = null;
+  let ordersCache = [];
+  let currentOrdersTab = 'running';
   const quickAmountOptions = [1000, 2000, 5000, 10000, 20000, 50000];
 
   function renderList(list) {
-    legacyRoot.innerHTML = list.map((p, idx) => {
+    listRoot.innerHTML = list.map((p, idx) => {
       const last = idx === list.length - 1 ? ' dc-proj-block--last' : '';
       const price = formatNum(p.livePrice);
       const pctStr = (p.changePct >= 0 ? '+' : '') + p.changePct.toFixed(2) + '%';
@@ -207,21 +338,22 @@
               <span class="dc-ratio-fill2 dc-ratio-fill2--red" style="width:${split.down}%"></span>
             </div>
           </div>
-          <button type="button" class="tc-buy-btn" data-buy-id="${p.id}">购买</button>
-          ${active && active.id === p.id ? '<div class="tc-mobile-chart"><iframe id="tc-mobile-chart-frame" title="移动端走势"></iframe></div>' : ''}
+          <div class="tc-card-actions">
+            <button type="button" class="tc-open-detail" data-id="${p.id}">查看详情</button>
+            <button type="button" class="tc-open-buy" data-id="${p.id}">购买</button>
+          </div>
         </div>
       `;
     }).join('');
 
-    legacyRoot.querySelectorAll('.dc-proj-block').forEach((el) => {
+    listRoot.querySelectorAll('.dc-proj-block').forEach((el) => {
       function activate() {
-        legacyRoot.querySelectorAll('.dc-proj-block').forEach((x) => x.classList.remove('is-active'));
+        listRoot.querySelectorAll('.dc-proj-block').forEach((x) => x.classList.remove('is-active'));
         el.classList.add('is-active');
         const i = Number(el.getAttribute('data-idx'));
         if (Number.isFinite(i) && list[i]) setChartForProduct(list[i]);
       }
-      el.addEventListener('click', (e) => {
-        if (e.target.closest('.tc-buy-btn')) return;
+      el.addEventListener('click', () => {
         activate();
       });
       el.addEventListener('keydown', (e) => {
@@ -229,26 +361,52 @@
       });
     });
 
-    legacyRoot.querySelectorAll('.tc-buy-btn').forEach((btn) => {
+    listRoot.querySelectorAll('.tc-open-buy').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const p = products.find((x) => String(x.id) === btn.getAttribute('data-buy-id'));
+        const p = products.find((x) => String(x.id) === String(btn.getAttribute('data-id')));
         if (!p) return;
         active = p;
         openTradeModal();
       });
     });
+
+    listRoot.querySelectorAll('.tc-open-detail,.tc-open-detail-inline').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const p = products.find((x) => String(x.id) === String(btn.getAttribute('data-id')));
+        if (!p) return;
+        active = p;
+        openDetailSheet();
+      });
+    });
+
   }
 
   function setChartForProduct(p) {
     if (!p) return;
-    if (titleEl) titleEl.textContent = `${p.name} · 走势`;
+    if (titleEl) titleEl.textContent = p.name || '产品走势';
+    if (descEl) descEl.textContent = `${p.summary || ''} · 最新价 ${formatNum(p.livePrice)}，涨跌幅 ${(p.changePct >= 0 ? '+' : '') + p.changePct.toFixed(2)}%`;
     const t = String(p.chartSourceType || 'tradingview').toLowerCase();
     const web = String(p.chartWebsiteUrl || '').trim();
     if (t === 'website' && web) { iframe.src = web; return; }
     iframe.src = tvEmbedUrl(p.marketSymbol);
-    const mobileChart = document.getElementById('tc-mobile-chart-frame');
-    if (mobileChart) mobileChart.src = iframe.src;
+  }
+
+  function openDetailSheet() {
+    if (!active) return;
+    detailSheetTitle.textContent = active.name + ' · 详情';
+    detailSheetDesc.textContent = `${active.summary || ''} · 最新价 ${formatNum(active.livePrice)}，涨跌幅 ${(active.changePct >= 0 ? '+' : '') + active.changePct.toFixed(2)}%`;
+    const t = String(active.chartSourceType || 'tradingview').toLowerCase();
+    const web = String(active.chartWebsiteUrl || '').trim();
+    detailSheetChart.src = t === 'website' && web ? web : tvEmbedUrl(active.marketSymbol);
+    detailSheet.classList.add('is-open');
+    detailSheet.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeDetailSheet() {
+    detailSheet.classList.remove('is-open');
+    detailSheet.setAttribute('aria-hidden', 'true');
   }
 
   function renderQuickAmounts() {
@@ -262,7 +420,8 @@
 
   function openTradeModal() {
     if (!active) return;
-    modalTitle.textContent = `${active.name || active.id} · 交易`;
+    const kind = orderForm.getAttribute('data-order-kind') === 'entrust' ? '委买' : (orderForm.getAttribute('data-direction') === 'short' ? '买跌' : '买涨');
+    modalTitle.textContent = `${active.name || active.id} · ${kind}`;
     balanceEl.textContent = `可用余额：${formatNum(summary?.available)} 元`;
     msg.textContent = '';
     modal.classList.add('is-open');
@@ -274,28 +433,92 @@
     modal.setAttribute('aria-hidden', 'true');
   }
 
-  orderForm?.addEventListener('submit', async (e) => {
+  function renderOrders() {
+    const split = classifyOrders(ordersCache);
+    const list = currentOrdersTab === 'settled' ? split.settled : split.running;
+    ordersList.innerHTML = list.length
+      ? list.map((o) => {
+          const pnl = Number(o.profit || o.pnl || 0);
+          const pnlCls = pnl >= 0 ? 'is-win' : 'is-loss';
+          const statusText = currentOrdersTab === 'settled' ? '已结算' : '进行中';
+          return `
+            <article class="tc-order-item">
+              <h4>${esc(o.productName || o.productId || '产品')} · ${orderDirectionText(o)}</h4>
+              <p>${statusText} · ${esc(o.createdAt || o.created_at || '--')}</p>
+              <p>本金 ${formatNum(o.amount || o.principal || 0)} 元</p>
+              <p class="tc-order-pnl ${pnlCls}">${pnl >= 0 ? '盈利' : '亏损'} ${formatNum(pnl)} 元</p>
+            </article>
+          `;
+        }).join('')
+      : `<article class="tc-order-item"><p>暂无订单记录</p></article>`;
+  }
+
+  async function refreshOrders() {
+    try {
+      const res = await api('/api/orders');
+      ordersCache = Array.isArray(res) ? res : (res.list || []);
+    } catch (_) {
+      ordersCache = [];
+    }
+    renderOrders();
+  }
+
+  function openOrdersModal() {
+    ordersBalance.textContent = `当前可用余额：${formatNum(summary?.available)} 元`;
+    refreshOrders();
+  }
+
+  function closeOrdersModal() {
+    refreshOrders();
+  }
+
+  orderForm && orderForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!active) return;
     msg.textContent = '提交中...';
     try {
       const amount = Number(document.getElementById('tc-amount').value || 0);
       const tradePassword = document.getElementById('tc-trade-pw').value;
+      const orderKind = orderForm.getAttribute('data-order-kind') || 'market';
+      const direction = orderForm.getAttribute('data-direction') || 'long';
       const data = await api('/api/trade/order', {
         method: 'POST',
-        json: { productId: active.id, amount, direction: 'buy', tradePassword, durationSec: 600 },
+        json: { productId: active.id, amount, direction, orderKind, tradePassword, durationSec: 600 },
       });
       msg.textContent = data.message || '下单成功';
       if (token) summary = await api('/api/me/summary');
-      setTimeout(closeTradeModal, 650);
+      await refreshOrders();
+      setTimeout(() => {
+        closeTradeModal();
+        openOrdersModal();
+      }, 550);
     } catch (err) {
       msg.textContent = err.message;
     }
   });
 
-  closeModalBtn?.addEventListener('click', closeTradeModal);
-  modal?.addEventListener('click', (e) => { if (e.target === modal) closeTradeModal(); });
+  closeModalBtn && closeModalBtn.addEventListener('click', closeTradeModal);
+  modal && modal.addEventListener('click', (e) => { if (e.target === modal) closeTradeModal(); });
   renderQuickAmounts();
+
+  document.querySelectorAll('.tc-action-bar button').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (!active) return;
+      orderForm.setAttribute('data-order-kind', btn.getAttribute('data-order-kind') || 'market');
+      orderForm.setAttribute('data-direction', btn.getAttribute('data-direction') || 'long');
+      openTradeModal();
+    });
+  });
+  detailSheetClose && detailSheetClose.addEventListener('click', closeDetailSheet);
+  detailSheet && detailSheet.addEventListener('click', (e) => { if (e.target === detailSheet) closeDetailSheet(); });
+  ordersTabs.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      ordersTabs.forEach((b) => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      currentOrdersTab = btn.getAttribute('data-tab') || 'running';
+      renderOrders();
+    });
+  });
 
   (async () => {
     try {
@@ -313,8 +536,10 @@
       active = products[0] || null;
       renderList(products);
       if (active) setChartForProduct(active);
+      if (token) refreshOrders();
+      startLiveTicks();
     } catch (err) {
-      if (legacyRoot) legacyRoot.innerHTML = `<p style="color:#ffd6d6;padding:1rem;">${esc(err.message)}</p>`;
+      if (listRoot) listRoot.innerHTML = `<p style="color:#ffd6d6;padding:1rem;">${esc(err.message)}</p>`;
     }
   })();
 })();

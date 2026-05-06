@@ -32,7 +32,7 @@
       min-height: 370px;
       border-radius: 18px;
       overflow: hidden;
-      border: 1px solid rgba(255,255,255,.32);
+      border: 1px solid rgba(129,199,132,.35);
       box-shadow: 0 14px 40px rgba(11,27,45,.22);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
@@ -42,7 +42,7 @@
       content:"";
       position:absolute;
       inset:0;
-      background: radial-gradient(120% 90% at 50% 0%, rgba(255,255,255,.22), rgba(15,23,42,.58));
+      background: radial-gradient(120% 90% at 50% 0%, rgba(232,245,233,.28), rgba(15,23,42,.58));
       z-index:1;
     }
     .blog-glass-card.has-cover::after{

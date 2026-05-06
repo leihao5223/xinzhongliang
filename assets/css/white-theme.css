@@ -1,0 +1,901 @@
+/* ====================================
+   全局白色主题覆盖 + 浅绿色玻璃拟态
+   ==================================== */
+
+/* ---------- 根变量覆盖 ---------- */
+:root {
+  --primary: #1a1a1a;
+  --secondary: #ffffff;
+  --text-color: #4a4a4a;
+}
+
+/* ---------- Body & HTML ---------- */
+body {
+  background-color: #ffffff !important;
+  color: #1a1a1a !important;
+}
+
+/* ---------- 各页面内联 body 背景重置 ---------- */
+body.personal-home-page {
+  background-color: #ffffff !important;
+}
+
+/* ---------- Section 基础背景 ---------- */
+section {
+  background-color: #ffffff;
+}
+
+/* ---------- 首页关键区块 ---------- */
+.about-showcase-section {
+  background: #ffffff !important;
+}
+.about-section-title {
+  color: #1a1a1a !important;
+}
+.about-section-desc {
+  color: #555555 !important;
+}
+
+/* 玻璃卡片：浅绿色拟态 */
+.glass-card {
+  background: rgba(232, 245, 233, 0.88) !important;
+  border: 1px solid rgba(129, 199, 132, 0.35) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
+}
+.glass-card:hover {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1) !important;
+  border-color: rgba(129, 199, 132, 0.5) !important;
+}
+.glass-card-body h3 {
+  color: #1a1a1a !important;
+}
+.glass-card-body p {
+  color: #555555 !important;
+}
+.glass-card-link {
+  color: #00796b !important;
+}
+.glass-card:hover .glass-card-link {
+  color: #00a896 !important;
+}
+
+.service-section-header h2 {
+  color: #1a1a1a !important;
+}
+.service-glass-card {
+  background: rgba(232, 245, 233, 0.88) !important;
+  border: 1px solid rgba(129, 199, 132, 0.35) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
+}
+.service-glass-card:hover {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1) !important;
+  border-color: rgba(129, 199, 132, 0.5) !important;
+}
+.service-glass-body h5 {
+  color: #1a1a1a !important;
+}
+.service-glass-body p {
+  color: #555555 !important;
+}
+
+.whychoose-glass-card {
+  background: rgba(232, 245, 233, 0.88) !important;
+  border: 1px solid rgba(129, 199, 132, 0.35) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
+}
+.whychoose-glass-card:hover {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1) !important;
+  border-color: rgba(129, 199, 132, 0.5) !important;
+}
+.whychoose-glass-card h3 {
+  color: #1a1a1a !important;
+}
+.whychoose-glass-card p {
+  color: #555555 !important;
+}
+.whychoose-glass-card .whychooseus-icon {
+  background: rgba(0, 121, 107, 0.08) !important;
+  border-color: rgba(0, 121, 107, 0.15) !important;
+  color: #00796b !important;
+}
+
+.coop-glass-section .case-content-background {
+  background-color: rgba(220, 237, 221, 0.6) !important;
+  border: 1px solid rgba(129, 199, 132, 0.25) !important;
+}
+.coop-glass-section .case-desc p {
+  color: #555555 !important;
+}
+.coop-glass-section .case-tag {
+  color: #00796b !important;
+  border-color: rgba(0, 121, 107, 0.3) !important;
+  background: rgba(0, 121, 107, 0.06) !important;
+}
+
+/* ---------- 数据中心板块 ---------- */
+.data-comparison-section--dark-glass {
+  background: rgba(220, 237, 221, 0.5) !important;
+}
+.data-comparison-section--dark-glass h2 {
+  color: #1a1a1a !important;
+}
+.dc-glass-panel {
+  background: rgba(232, 245, 233, 0.88) !important;
+  border: 1px solid rgba(129, 199, 132, 0.35) !important;
+}
+.dc-trend-title {
+  color: #1a1a1a !important;
+}
+.comparison-table-title {
+  color: #1a1a1a !important;
+}
+.comparison-table--on-glass thead th {
+  color: #1a1a1a !important;
+  background: rgba(220, 237, 221, 0.7) !important;
+}
+.comparison-table--on-glass tbody td {
+  color: #333333 !important;
+  border-color: rgba(129, 199, 132, 0.2) !important;
+}
+.dc-glass-footnote {
+  color: #888888 !important;
+}
+.dc-proj-name {
+  color: #1a1a1a !important;
+}
+.dc-proj-desc {
+  color: #555555 !important;
+}
+.dc-ratio-label {
+  color: #666666 !important;
+}
+.dc-ratio-val {
+  color: #444444 !important;
+}
+.dc-ratio-track2 {
+  background: rgba(129, 199, 132, 0.2) !important;
+}
+
+/* ---------- 公司概览 ---------- */
+.company-overview__content h2 {
+  color: #1a1a1a !important;
+}
+.company-overview__stat {
+  color: #1a1a1a !important;
+}
+.company-overview-card {
+  background: rgba(232, 245, 233, 0.88) !important;
+  border: 1px solid rgba(129, 199, 132, 0.35) !important;
+}
+.company-overview-card h6 {
+  color: #555555 !important;
+}
+
+/* ---------- 为何选择我们 ---------- */
+.whychooseus-title-container h2 {
+  color: #1a1a1a !important;
+}
+.whychooseus-title-container p {
+  color: #555555 !important;
+}
+.whychooseus-feature h3 {
+  color: #1a1a1a !important;
+}
+.whychooseus-feature p {
+  color: #555555 !important;
+}
+
+/* ---------- 联系我们 CTA ---------- */
+.contact-cta-banner {
+  background: rgba(220, 237, 221, 0.5) !important;
+}
+.contact-cta-title {
+  color: #1a1a1a !important;
+}
+.contact-cta-description {
+  color: #555555 !important;
+}
+
+/* ---------- Footer ---------- */
+.footer-container {
+  background: #07111f !important;
+}
+.footer-info-text {
+  color: rgba(226, 232, 240, 0.82) !important;
+}
+.footer-contact-text {
+  color: rgba(226, 232, 240, 0.82) !important;
+}
+.footer-link {
+  color: #f8fafc !important;
+}
+.footer-link:hover {
+  color: #38bdf8 !important;
+}
+.copyright-text {
+  color: rgba(226, 232, 240, 0.82) !important;
+}
+.copyright-text a {
+  color: #38bdf8 !important;
+}
+.legallink {
+  color: rgba(226, 232, 240, 0.82) !important;
+}
+
+/* ---------- Header / Nav ---------- */
+.index-glass-navbar {
+  background: rgba(232, 245, 233, 0.96) !important;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06) !important;
+}
+.header-container.scrolled .header-navbar-fixed {
+  background-color: rgba(232, 245, 233, 0.98) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08) !important;
+}
+.nav-link {
+  color: #333333 !important;
+}
+.nav-link:hover {
+  color: #00796b !important;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  background: rgba(232, 245, 233, 0.95) !important;
+}
+.sidebar .menu a {
+  color: #333333 !important;
+}
+.sidebar-dropdown-menu {
+  background: rgba(220, 237, 221, 0.9) !important;
+}
+
+/* ---------- 产品页（交易中心）---------- */
+.tc-list-panel,
+.tc-detail-panel {
+  background: rgba(232, 245, 233, 0.88) !important;
+  border: 1px solid rgba(129, 199, 132, 0.35) !important;
+}
+.tc-product-desc {
+  color: #555555 !important;
+}
+.dc-proj-block {
+  background: rgba(232, 245, 233, 0.88) !important;
+  border: 1px solid rgba(129, 199, 132, 0.35) !important;
+}
+.dc-proj-block:hover {
+  background: rgba(220, 237, 221, 0.95) !important;
+  border-color: rgba(129, 199, 132, 0.5) !important;
+}
+.dc-proj-block.is-active {
+  background: rgba(210, 230, 212, 0.95) !important;
+  border-color: rgba(129, 199, 132, 0.6) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+}
+.tc-action-bar button[data-order-kind="entrust"] {
+  background: linear-gradient(135deg, #1565c0, #2563eb, #38bdf8) !important;
+}
+.tc-trade-dialog {
+  background: rgba(232, 245, 233, 0.95) !important;
+  border-color: rgba(129, 199, 132, 0.4) !important;
+}
+.tc-trade-dialog h3 {
+  color: #1a1a1a !important;
+}
+.tc-balance {
+  color: #555555 !important;
+}
+.tc-form input {
+  background: #ffffff !important;
+  color: #1a1a1a !important;
+  border-color: rgba(129, 199, 132, 0.4) !important;
+}
+.tc-quick-amounts button {
+  background: rgba(220, 237, 221, 0.8) !important;
+  color: #333333 !important;
+  border-color: rgba(129, 199, 132, 0.3) !important;
+}
+.tc-order-entry {
+  background: rgba(220, 237, 221, 0.8) !important;
+  color: #333333 !important;
+  border-color: rgba(129, 199, 132, 0.35) !important;
+}
+.tc-orders-dialog {
+  background: rgba(232, 245, 233, 0.95) !important;
+}
+.tc-order-item {
+  background: rgba(232, 245, 233, 0.9) !important;
+  border-color: rgba(129, 199, 132, 0.3) !important;
+}
+.tc-order-item h4 {
+  color: #1a1a1a !important;
+}
+.tc-order-item p {
+  color: #555555 !important;
+}
+
+/* ---------- About / 公司介绍页 ---------- */
+.banner-inner-content h1 {
+  color: #ffffff !important;
+}
+.banner-inner-excerpt {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+.about-showcase-lead {
+  color: #333333 !important;
+}
+.about-stat--showcase {
+  color: #1a1a1a !important;
+}
+.chevron-circle-list--glass li {
+  color: #333333 !important;
+}
+.about-glass-card {
+  background: linear-gradient(145deg, rgba(232, 245, 233, 0.82) 0%, rgba(220, 237, 221, 0.55) 100%) !important;
+  border: 1px solid rgba(129, 199, 132, 0.4) !important;
+}
+
+/* ---------- 合作专题 / 生态伙伴 ---------- */
+.section-eco-partners {
+  background: #ffffff !important;
+}
+.partnership-title {
+  color: #1a1a1a !important;
+}
+.eco-partners-intro {
+  color: #555555 !important;
+}
+.eco-partner-card {
+  background: rgba(232, 245, 233, 0.88) !important;
+  border: 1px solid rgba(129, 199, 132, 0.35) !important;
+}
+.eco-partner-name {
+  color: #333333 !important;
+}
+
+/* ---------- 通用动画 reveal 文字 ---------- */
+[data-animate] {
+  color: inherit;
+}
+
+/* ---------- 聊天面板 ---------- */
+.zl-chat-panel {
+  background: rgba(232, 245, 233, 0.92) !important;
+  border: 1px solid rgba(129, 199, 132, 0.35) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+}
+.zl-chat-head {
+  background: rgba(220, 237, 221, 0.9) !important;
+  color: #1a1a1a !important;
+  border-bottom: 1px solid rgba(129, 199, 132, 0.25) !important;
+}
+.zl-chat-body {
+  background: rgba(232, 245, 233, 0.85) !important;
+}
+.zl-chat-actions {
+  background: rgba(220, 237, 221, 0.9) !important;
+  border-top: 1px solid rgba(129, 199, 132, 0.25) !important;
+}
+.zl-chat-actions input {
+  background: #ffffff !important;
+  color: #1a1a1a !important;
+  border-color: rgba(129, 199, 132, 0.4) !important;
+}
+.zl-chat-fab {
+  background: #00796b !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* ---------- 博客 / 文章 ---------- */
+.blog-meta,
+.blog-link,
+.blog-cta {
+  color: #555555 !important;
+}
+
+/* ---------- 移动端菜单按钮 ---------- */
+.nav-btn {
+  color: #ffffff !important;
+  background-color: #00796b !important;
+}
+
+/* ---------- Login 页面保持深色（其本身为沉浸式登录页） ---------- */
+html:has(.video-bg),
+body:has(.video-bg) {
+  background: #000 !important;
+}
+
+/* ---------- 响应式微调 ---------- */
+@media (max-width: 768px) {
+  .index-glass-navbar {
+    background: rgba(186, 230, 253, 0.92) !important;
+  }
+}
+
+/* ---------- 统一天空蓝玻璃态（覆盖早期绿色主题） ---------- */
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar,
+body:not(.personal-home-page) .header-container.scrolled .header-navbar-fixed,
+body:not(.personal-home-page) .header-container.scrolled .header-navbar-fixed.index-glass-navbar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  z-index: 5000 !important;
+  transform: none !important;
+  scale: 1 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  background:
+    linear-gradient(135deg, rgba(14, 116, 144, 0.66), rgba(37, 99, 235, 0.46)),
+    rgba(186, 230, 253, 0.2) !important;
+  border-bottom: 1px solid rgba(125, 211, 252, 0.48) !important;
+  box-shadow: 0 18px 50px rgba(14, 116, 144, 0.22) !important;
+  backdrop-filter: blur(18px) saturate(1.24) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.24) !important;
+}
+body:not(.personal-home-page) .header-container.scrolled .header-info-wrapper {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .nav-btn {
+  display: none !important;
+}
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-collapse,
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-nav {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  height: auto !important;
+  transform: none !important;
+}
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .container-fluid,
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar,
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .nav-link-wrapper {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+}
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .nav-link-wrapper {
+  min-width: 0 !important;
+  overflow-x: auto !important;
+}
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-nav .nav-link,
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-nav .dropdown-toggle {
+  color: #0f2744 !important;
+  background: rgba(224, 242, 254, 0.16) !important;
+  border-color: rgba(186, 230, 253, 0.38) !important;
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+  min-width: max-content !important;
+  padding: 0.45rem 0.8rem !important;
+  font-size: 0.9rem !important;
+}
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .btn-nav-login-green,
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-cta-container .btn-nav-contact,
+.zl-chat-fab {
+  background: linear-gradient(135deg, #38bdf8, #2563eb) !important;
+  border-color: rgba(224, 242, 254, 0.58) !important;
+  box-shadow: 0 10px 28px rgba(37, 99, 235, 0.28) !important;
+}
+body:not(.personal-home-page) .glass-card,
+body:not(.personal-home-page) .service-glass-card,
+body:not(.personal-home-page) .whychoose-glass-card,
+body:not(.personal-home-page) .about-glass-card,
+body:not(.personal-home-page) .dc-glass-panel,
+body:not(.personal-home-page) .tc-list-panel,
+body:not(.personal-home-page) .tc-detail-panel,
+body:not(.personal-home-page) .tc-trade-dialog,
+body:not(.personal-home-page) .tc-orders-dialog,
+body:not(.personal-home-page) .tc-order-item,
+body:not(.personal-home-page) .dc-proj-block,
+body:not(.personal-home-page) .zl-chat-panel {
+  background:
+    linear-gradient(145deg, rgba(224, 242, 254, 0.76), rgba(186, 230, 253, 0.44)) !important;
+  border-color: rgba(125, 211, 252, 0.48) !important;
+  box-shadow: 0 18px 54px rgba(14, 116, 144, 0.14) !important;
+}
+body.zl-is-authed .nav-btn,
+body.zl-is-authed .nav-link-wrapper,
+body.zl-is-authed .navbar-cta-container,
+body.zl-is-authed .zl-menu,
+body.zl-is-authed .zl-actions {
+  display: none !important;
+}
+
+/* ---------- 最终白色玻璃态覆盖：内部主底色统一白色系 ---------- */
+.glass-card,
+.service-glass-card,
+.whychoose-glass-card,
+.about-glass-card,
+.company-overview-card,
+.eco-partner-card,
+.dc-glass-panel,
+.tc-list-panel,
+.tc-detail-panel,
+.tc-trade-dialog,
+.tc-orders-dialog,
+.tc-order-item,
+.dc-proj-block,
+.zl-chat-panel,
+.contact-cta-banner,
+.sidebar,
+.sidebar-dropdown-menu,
+.coop-glass-section .case-content-background {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(240, 249, 255, 0.78)) !important;
+  border-color: rgba(125, 211, 252, 0.42) !important;
+  box-shadow: 0 18px 54px rgba(14, 116, 144, 0.12) !important;
+}
+.index-glass-navbar,
+.header-container.scrolled .header-navbar-fixed,
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar,
+body:not(.personal-home-page) .header-container.scrolled .header-navbar-fixed,
+body:not(.personal-home-page) .header-container.scrolled .header-navbar-fixed.index-glass-navbar {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(240, 249, 255, 0.76)) !important;
+  border-color: rgba(125, 211, 252, 0.44) !important;
+  box-shadow: 0 18px 50px rgba(14, 116, 144, 0.16) !important;
+}
+.zl-chat-head,
+.zl-chat-body,
+.zl-chat-actions {
+  background: rgba(255, 255, 255, 0.82) !important;
+  color: #0f2744 !important;
+}
+.zl-chat-actions input,
+.zl-chat-actions button {
+  background: rgba(255, 255, 255, 0.92) !important;
+  color: #0f2744 !important;
+}
+.data-comparison-section--dark-glass .dc-glass-panel,
+.data-comparison-section--dark-glass .comparison-table--on-glass thead th,
+.data-comparison-section--dark-glass .comparison-table--on-glass tbody td {
+  color: #0f2744 !important;
+}
+.glass-card h1,
+.glass-card h2,
+.glass-card h3,
+.service-glass-card h1,
+.service-glass-card h2,
+.service-glass-card h3,
+.whychoose-glass-card h1,
+.whychoose-glass-card h2,
+.whychoose-glass-card h3,
+.about-glass-card h1,
+.about-glass-card h2,
+.about-glass-card h3,
+.dc-glass-panel h1,
+.dc-glass-panel h2,
+.dc-glass-panel h3,
+.tc-list-panel h1,
+.tc-list-panel h2,
+.tc-list-panel h3,
+.tc-detail-panel h1,
+.tc-detail-panel h2,
+.tc-detail-panel h3,
+.tc-trade-dialog h1,
+.tc-trade-dialog h2,
+.tc-trade-dialog h3,
+.tc-orders-dialog h1,
+.tc-orders-dialog h2,
+.tc-orders-dialog h3,
+.tc-order-item h1,
+.tc-order-item h2,
+.tc-order-item h3,
+.zl-chat-panel h1,
+.zl-chat-panel h2,
+.zl-chat-panel h3,
+.zl-chat-panel strong {
+  color: #071527 !important;
+}
+.glass-card p,
+.service-glass-card p,
+.whychoose-glass-card p,
+.about-glass-card p,
+.dc-glass-panel p,
+.tc-list-panel p,
+.tc-detail-panel p,
+.tc-trade-dialog p,
+.tc-orders-dialog p,
+.tc-order-item p,
+.zl-chat-panel p,
+.zl-chat-panel span {
+  color: #334155 !important;
+}
+
+/* ---------- 深色三栏页脚（用户指定截图风格） ---------- */
+footer .section-none,
+footer .bg-primary-accent,
+footer .footer-container {
+  background: #07111f !important;
+}
+footer .footer-container {
+  color: #f8fafc !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+footer .footer-content-container {
+  background: #07111f !important;
+}
+footer .footer-contact-container,
+footer .footer-info-container,
+footer .footer-cta-container {
+  color: #f8fafc !important;
+}
+footer .footer-info-container {
+  border-color: rgba(148, 163, 184, 0.24) !important;
+}
+footer h5,
+footer .footer-link,
+footer .footer-contact-text,
+footer .footer-info-text,
+footer .secondary-accent,
+footer .copyright-text,
+footer .legallink {
+  color: #f8fafc !important;
+}
+footer .footer-info-text,
+footer .secondary-accent,
+footer .footer-contact-text,
+footer .copyright-text {
+  color: rgba(226, 232, 240, 0.82) !important;
+}
+footer .contact-icon,
+footer .footer-link:hover,
+footer .legallink:hover {
+  color: #38bdf8 !important;
+}
+footer .footer-copyright-wrapper,
+footer .footer-divider {
+  border-color: rgba(148, 163, 184, 0.24) !important;
+}
+footer .form input,
+footer input[type="email"] {
+  background: rgba(255, 255, 255, 0.94) !important;
+  color: #071527 !important;
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar,
+body:not(.personal-home-page) .header-container.scrolled .header-navbar-fixed.index-glass-navbar {
+  top: 12px !important;
+  left: 50% !important;
+  right: auto !important;
+  width: min(1180px, calc(100% - 1rem)) !important;
+  max-width: calc(100% - 1rem) !important;
+  transform: translateX(-50%) !important;
+  border: 1px solid rgba(134, 239, 172, .28) !important;
+  border-radius: 999px !important;
+  background: linear-gradient(135deg, rgba(5, 46, 22, .92), rgba(6, 95, 70, .76)), rgba(5, 46, 22, .76) !important;
+  box-shadow: 0 22px 70px rgba(3, 24, 13, .32) !important;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .hero-container,
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .container-fluid,
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .container-fluid {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: .75rem !important;
+  padding: .36rem .62rem .36rem .82rem !important;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .logo-container.header-logo {
+  max-width: none !important;
+  width: auto !important;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .logo-container.header-logo img {
+  width: auto !important;
+  max-width: 180px !important;
+  max-height: 32px !important;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .nav-link-wrapper {
+  position: static !important;
+  transform: none !important;
+  width: auto !important;
+  min-width: 0 !important;
+  justify-content: center !important;
+  overflow-x: auto !important;
+  scrollbar-width: thin;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-nav {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  justify-content: center !important;
+  gap: .45rem !important;
+  min-width: 0 !important;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-nav .nav-link,
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-nav .dropdown-toggle {
+  color: rgba(255, 255, 255, .92) !important;
+  background: rgba(255, 255, 255, .12) !important;
+  border-color: rgba(255, 255, 255, .18) !important;
+  text-shadow: none !important;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-cta-container {
+  width: auto !important;
+  min-width: 0 !important;
+  justify-content: flex-end !important;
+}
+
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .btn-nav-login-green,
+body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-cta-container .btn-nav-contact {
+  color: #fff !important;
+  background: linear-gradient(135deg, #0d5c2e, #1a7a3e, #2ecc71) !important;
+  border-color: rgba(200, 255, 220, .45) !important;
+}
+
+body:not(.personal-home-page) .glass-card,
+body:not(.personal-home-page) .service-glass-card,
+body:not(.personal-home-page) .whychoose-glass-card,
+body:not(.personal-home-page) .about-glass-card,
+body:not(.personal-home-page) .company-overview-card,
+body:not(.personal-home-page) .eco-partner-card,
+body:not(.personal-home-page) .contact-cta-banner,
+body:not(.personal-home-page) .sidebar {
+  color: #071527 !important;
+}
+
+body:not(.personal-home-page) .glass-card p,
+body:not(.personal-home-page) .service-glass-card p,
+body:not(.personal-home-page) .whychoose-glass-card p,
+body:not(.personal-home-page) .about-glass-card p,
+body:not(.personal-home-page) .company-overview-card p,
+body:not(.personal-home-page) .eco-partner-card p,
+body:not(.personal-home-page) .contact-cta-banner p,
+body:not(.personal-home-page) .sidebar p,
+body:not(.personal-home-page) .sidebar a {
+  color: #334155 !important;
+}
+
+footer .footer-content-container {
+  display: flex;
+  align-items: stretch;
+}
+
+.zl-chat-panel {
+  max-width: calc(100vw - 1rem);
+  max-height: min(68vh, 580px);
+}
+
+.zl-chat-actions,
+.zl-chat-actions input {
+  min-width: 0;
+}
+
+body.personal-home-page .zl-chat-fab {
+  right: .75rem;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+}
+
+body.personal-home-page .zl-chat-panel {
+  right: calc(0.75rem + 56px + 0.65rem);
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+  width: min(360px, calc(100vw - 1rem));
+  max-height: 48vh;
+}
+
+@media (max-width: 991.98px) {
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar,
+  body:not(.personal-home-page) .header-container.scrolled .header-navbar-fixed.index-glass-navbar {
+    top: 8px !important;
+    border-radius: 26px !important;
+  }
+
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .container-fluid {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: .5rem .75rem !important;
+    padding: .55rem .75rem !important;
+  }
+
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .nav-link-wrapper {
+    order: 3 !important;
+    flex: 1 1 100% !important;
+    justify-content: flex-start !important;
+  }
+
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-nav {
+    justify-content: flex-start !important;
+  }
+
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-cta-container {
+    margin-left: auto !important;
+    flex: 0 0 auto !important;
+    display: flex !important;
+    gap: .4rem !important;
+  }
+
+  footer .footer-content-container,
+  footer .footer-copyright-container {
+    flex-direction: column !important;
+  }
+
+  footer .footer-contact-container,
+  footer .footer-info-container,
+  footer .footer-cta-container {
+    width: 100% !important;
+    padding: 2rem 0 !important;
+  }
+
+  footer .footer-info-container {
+    border-width: 1px 0 !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar,
+  body:not(.personal-home-page) .header-container.scrolled .header-navbar-fixed.index-glass-navbar {
+    top: 6px !important;
+    border-radius: 22px !important;
+  }
+
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .container-fluid {
+    padding: .5rem .62rem !important;
+  }
+
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-cta-container {
+    margin-left: 0 !important;
+    flex-wrap: wrap !important;
+  }
+
+  body:not(.personal-home-page) .header-navbar-fixed.index-glass-navbar .navbar-cta-container .btn {
+    padding: .42rem .64rem !important;
+    font-size: .74rem !important;
+  }
+
+  footer .footer-mini-gallery {
+    width: 100% !important;
+  }
+
+  footer #newsletter-form,
+  footer .form {
+    width: 100%;
+  }
+
+  .zl-chat-fab {
+    right: .75rem;
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+  }
+
+  .zl-chat-panel {
+    right: calc(0.75rem + 48px + 0.55rem);
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
+    width: calc(100vw - 1rem);
+    max-height: 58vh;
+  }
+
+  .zl-chat-actions {
+    flex-wrap: wrap;
+  }
+
+  .zl-chat-actions input {
+    flex: 1 1 100%;
+  }
+}

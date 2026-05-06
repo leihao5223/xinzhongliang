@@ -3,43 +3,299 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>产品中心 - 中粮天下</title>
+    <title>交易中心 - 中粮天下</title>
     <link rel="stylesheet" href="assets/css/main.css?v=zhongliang5">
     <link rel="stylesheet" href="assets/css/responsive.css?v=zhongliang5">
     <link rel="stylesheet" href="assets/css/steris-effects.css?v=18">
     <link rel="icon" href="assets/images/zhongliang-favicon.svg?v=1" type="image/svg+xml">
-<style>
-    .banner-inner-video {
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: 0.75;
-    }
-    .banner-inner-overlay {
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-      background: linear-gradient(180deg, rgba(11,17,24,0.35) 0%, rgba(11,17,24,0.75) 100%);
-    }
-    .banner-inner .hero-container {
-      position: relative;
-      z-index: 2;
-    }
-    .banner-inner .effect-hud {
-      z-index: 3;
-    }
+    <style>
+        /* ========== 全局修正 ========== */
+        body {
+            margin: 0;
+            padding: 0;
+            background: #071527;
+            overflow-x: hidden;
+        }
+
+        .trading-bg-video,
+        .trading-bg-fallback {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -3;
+            pointer-events: none;
+        }
+
+        .trading-bg-fallback {
+            background: url("assets/images/zhongliang-port-containers.jpg") center/cover no-repeat;
+            z-index: -4;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            pointer-events: none;
+            background:
+                linear-gradient(180deg, rgba(7, 21, 39, .28), rgba(7, 21, 39, .62)),
+                radial-gradient(circle at 50% 8%, rgba(125, 211, 252, .2), transparent 34rem);
+        }
+
+        .effect-top-hud,
+        .header-info-wrapper {
+            display: none !important;
+        }
+
+        .header-navbar-fixed {
+            position: fixed !important;
+            top: 12px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            z-index: 1040 !important;
+            width: min(1180px, calc(100% - 1rem)) !important;
+            border: 1px solid rgba(134, 239, 172, .28) !important;
+            border-radius: 999px !important;
+            background: linear-gradient(135deg, rgba(5, 46, 22, .9), rgba(6, 95, 70, .72)), rgba(5, 46, 22, .72) !important;
+            backdrop-filter: blur(18px) saturate(1.18) !important;
+            -webkit-backdrop-filter: blur(18px) saturate(1.18) !important;
+            box-shadow: 0 22px 70px rgba(3, 24, 13, .32) !important;
+        }
+
+        .header-navbar-fixed .hero-container,
+        .header-navbar-fixed .container-fluid,
+        .header-navbar-fixed .navbar {
+            width: 100% !important;
+            max-width: none !important;
+        }
+
+        .header-navbar-fixed .container-fluid {
+            position: relative !important;
+            display: grid !important;
+            grid-template-columns: auto 1fr auto !important;
+            align-items: center !important;
+            gap: 1rem !important;
+            min-height: 46px !important;
+            padding: .36rem .62rem .36rem .82rem !important;
+        }
+
+        .header-logo img {
+            height: 26px !important;
+            width: auto !important;
+        }
+
+        .nav-link-wrapper {
+            position: absolute !important;
+            left: 50% !important;
+            top: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+        }
+
+        .navbar-collapse,
+        .navbar-nav {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
+        .navbar-nav {
+            gap: .65rem !important;
+            margin: 0 !important;
+        }
+
+        .navbar-nav .dropdown-menu,
+        .navbar-nav .fa-angle-down,
+        .nav-btn {
+            display: none !important;
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, .9) !important;
+            border-radius: 999px !important;
+            padding: .35rem .82rem !important;
+            font-size: .88rem !important;
+            font-weight: 850 !important;
+        }
+
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link[aria-expanded="true"] {
+            color: #fff !important;
+            background: rgba(255, 255, 255, .12) !important;
+        }
+
+        .navbar-cta-container {
+            justify-self: end !important;
+        }
+
+        .navbar-cta-container .btn {
+            min-height: 32px !important;
+            border-radius: 999px !important;
+            padding: .48rem .92rem !important;
+            font-weight: 800 !important;
+        }
+
+        .btn-nav-login-green {
+            color: #062013 !important;
+            background: linear-gradient(135deg, #d9ff8d, #63e6be) !important;
+            border: 0 !important;
+        }
+
+        .btn-nav-contact {
+            color: #fff !important;
+            background: rgba(255, 255, 255, .12) !important;
+            border: 1px solid rgba(255,255,255,.18) !important;
+        }
+
+        /* 给 main 留出顶栏高度（80px 是适配你这个模板的高度） */
+        main {
+            padding-top: 112px !important;
+            min-height: 100vh;
+        }
+
+        /* 侧边栏遮罩也要下移 */
+        .sidebar-overlay {
+            top: 80px !important;
+        }
+
+        @media (max-width: 1100px) {
+            .header-navbar-fixed {
+                position: fixed !important;
+                top: 8px !important;
+                width: calc(100% - 1rem) !important;
+                border-radius: 26px !important;
+            }
+            .header-navbar-fixed .container-fluid {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                align-items: center !important;
+                gap: .5rem .75rem !important;
+                padding: .55rem .75rem !important;
+            }
+            .logo-container.header-logo {
+                max-width: none !important;
+                flex: 0 0 auto !important;
+            }
+            .nav-link-wrapper {
+                position: static !important;
+                transform: none !important;
+                order: 3 !important;
+                flex: 1 1 100% !important;
+                width: 100% !important;
+                min-width: 0 !important;
+                justify-content: flex-start !important;
+                overflow-x: auto !important;
+                scrollbar-width: thin;
+            }
+            .nav-btn {
+                display: none !important;
+            }
+            .navbar-collapse,
+            .navbar-nav {
+                display: flex !important;
+                flex-wrap: nowrap !important;
+            }
+            .navbar-nav {
+                justify-content: flex-start !important;
+                gap: .45rem !important;
+            }
+            .navbar-nav .nav-link {
+                white-space: nowrap !important;
+                padding: .4rem .72rem !important;
+            }
+            .navbar-cta-container {
+                display: flex !important;
+                flex: 0 0 auto !important;
+                width: auto !important;
+                margin-left: auto !important;
+                gap: .4rem !important;
+            }
+            main {
+                padding-top: 142px !important;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .header-navbar-fixed {
+                top: 6px !important;
+                border-radius: 22px !important;
+            }
+            .header-navbar-fixed .container-fluid {
+                padding: .5rem .62rem !important;
+            }
+            .navbar-cta-container {
+                margin-left: 0 !important;
+                flex-wrap: wrap !important;
+            }
+            .navbar-cta-container .btn {
+                padding: .44rem .68rem !important;
+                font-size: .75rem !important;
+            }
+            main {
+                padding-top: 166px !important;
+            }
+            .trading-container {
+                padding: 0 .75rem;
+            }
+        }
+
+        /* ========== 交易平台容器 ========== */
+        .trading-platform {
+            padding: 6vh 0 2.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .trading-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* ========== 移除旧页面的 banner-inner 等残留样式 ========== */
+        .banner-inner,
+        .banner-inner-video,
+        .banner-inner-overlay,
+        .banner-inner-content {
+            display: none !important;
+        }
+
+        /* ========== 提亮交易模块文字（JS 动态生成内容适配白底） ========== */
+        .tc-list-panel,
+        .tc-detail-panel,
+        .tc-detail-body,
+        .tc-trade-dialog,
+        .tc-orders-dialog {
+            color: #0f172a;
+        }
+
+        .dc-proj-title,
+        .dc-proj-name,
+        .dc-trend-title {
+            color: #1a1a1a;
+        }
+
+        .dc-proj-desc,
+        .tc-product-desc {
+            color: #555555;
+        }
     </style>
 </head>
 <body>
-    <!-- 全局顶部HUD扫描线 -->
+    <div class="trading-bg-fallback" aria-hidden="true"></div>
+    <video class="trading-bg-video" autoplay muted loop playsinline preload="metadata" poster="assets/images/zhongliang-port-containers.jpg" aria-hidden="true">
+        <source src="assets/videos/trading-bg.mp4" type="video/mp4">
+    </video>
+    <!-- 全局顶部 HUD 扫描线 -->
     <div class="effect-top-hud"></div>
-    <!-- Header Section（全局统一：与首页同构 + 全站「页面」入口） -->
+
+    <!-- ==================== Header（固定顶栏） ==================== -->
     <header>
         <div class="header-container">
-
             <!-- Header Info -->
             <div class="header-info-wrapper">
                 <div class="hero-container">
@@ -55,30 +311,24 @@
                             </div>
                         </div>
                         <div class="header-social">
-                            <a href="#" class="social-icon">
-                                <i class="fa-brands fa-facebook-f"></i>
-                            </a>
-                            <a href="#" class="social-icon">
-                                <i class="fa-brands fa-instagram"></i>
-                            </a>
-                            <a href="#" class="social-icon">
-                                <i class="fa-brands fa-twitter"></i>
-                            </a>
-                            <a href="#" class="social-icon">
-                                <i class="fa-brands fa-youtube"></i>
-                            </a>
+                            <a href="#" class="social-icon"><i class="fa-brands fa-facebook-f"></i></a>
+                            <a href="#" class="social-icon"><i class="fa-brands fa-instagram"></i></a>
+                            <a href="#" class="social-icon"><i class="fa-brands fa-twitter"></i></a>
+                            <a href="#" class="social-icon"><i class="fa-brands fa-youtube"></i></a>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Header Navbar -->
+            <!-- 固定导航栏（关键类名：header-navbar-fixed + index-glass-navbar） -->
             <div class="header-navbar-fixed index-glass-navbar">
                 <div class="hero-container">
                     <nav class="navbar navbar-expand-lg">
                         <div class="container-fluid p-0">
                             <div class="logo-container header-logo">
-                                <a class="navbar-brand" href="index.html"><img src="assets/images/zhongliang-logo-light.svg" class="img-fluid" alt="中粮天下"></a>
+                                <a class="navbar-brand" href="index.html">
+                                    <img src="assets/images/zhongliang-logo-light.svg" class="img-fluid" alt="中粮天下">
+                                </a>
                             </div>
                             <div class="nav-link-wrapper">
                                 <button class="btn nav-btn" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -87,15 +337,10 @@
                                 </button>
                                 <div class="collapse navbar-collapse" id="navbarNav">
                                     <ul class="navbar-nav">
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="index.html">首页</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="about.html">公司介绍</a>
-                                        </li>
+                                        <li class="nav-item"><a class="nav-link" href="index.html">首页</a></li>
+                                        <li class="nav-item"><a class="nav-link" href="about.html">公司介绍</a></li>
                                         <li class="nav-item dropdown">
-                                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                                                aria-expanded="false">
+                                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                 交易中心 <i class="fa-solid fa-angle-down"></i>
                                             </a>
                                             <ul class="dropdown-menu">
@@ -103,8 +348,7 @@
                                             </ul>
                                         </li>
                                         <li class="nav-item dropdown">
-                                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                                                aria-expanded="false">
+                                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                 资讯 <i class="fa-solid fa-angle-down"></i>
                                             </a>
                                             <ul class="dropdown-menu">
@@ -113,8 +357,7 @@
                                             </ul>
                                         </li>
                                         <li class="nav-item dropdown">
-                                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                                                aria-expanded="false">
+                                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                 个人主页 <i class="fa-solid fa-angle-down"></i>
                                             </a>
                                             <ul class="dropdown-menu">
@@ -123,7 +366,6 @@
                                                 <li><a class="dropdown-item" href="case-studies.html">合作专题</a></li>
                                                 <li><a class="dropdown-item" href="faq.html">常见问题</a></li>
                                                 <li><a class="dropdown-item" href="team.html">团队介绍</a></li>
-                                                <li><a class="dropdown-item" href="admin-console.html">后台控台</a></li>
                                             </ul>
                                         </li>
                                     </ul>
@@ -143,7 +385,7 @@
         </div>
     </header>
 
-    <!-- Sidebar Section -->
+    <!-- ==================== 侧边栏（移动端菜单） ==================== -->
     <aside>
         <div class="sidebar-overlay"></div>
         <div class="sidebar">
@@ -186,376 +428,37 @@
                         <li><a href="case-studies.html">合作专题</a></li>
                         <li><a href="faq.html">常见问题</a></li>
                         <li><a href="team.html">团队介绍</a></li>
-                        <li><a href="admin-console.html">后台控台</a></li>
                     </ul>
                 </li>
             </ul>
         </div>
     </aside>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <!-- Main Section -->
+    <!-- ==================== 主内容区（交易中心） ==================== -->
     <main>
-<!-- Banner Inner Section -->
-        <section class="section banner-inner" style="position:relative;overflow:hidden;">
-        <video class="banner-inner-video" autoplay muted loop playsinline>
-            <source src="https://videos.pexels.com/video-files/4612364/4612364-hd_1920_1080_30fps.mp4" type="video/mp4">
-        </video>
-        <div class="banner-inner-overlay"></div>
-            <div class="effect-particles-bg" data-count="14" style="z-index:1;"></div>
-<!-- 科技 HUD 装饰 -->
-            <div class="effect-hud" aria-hidden="true" style="opacity:0.35;">
-                <div class="effect-hud__scanlines"></div>
-                <div class="effect-hud__corners"></div>
-                <div class="effect-hud__status" style="top:16px;left:18px;font-size:0.55rem;gap:1rem;">
-                    <span><span class="effect-hud__dot"></span>系统在线</span>
-                </div>
+        <div class="trading-platform">
+            <div class="trading-container">
+                <!--
+                    这里的内容完全由 assets/js/trading-center-page.js 动态生成，
+                    包括：
+                      - 产品列表（左侧）
+                      - 实时走势图（右侧）
+                      - 买涨/买跌/委买 操作栏
+                      - 悬浮详情弹窗
+                      - 下单确认弹窗
+                      - 订单记录弹窗（进行中/已结算）
+                    你不需要在这里写任何 HTML，JS 会自动构建一切。
+                -->
             </div>
-            <div class="hero-container">
-                <div class="banner-inner-content">
-                    <h1 class="banner-inner-title effect-glow-text">产品中心</h1>
-                    <p class="banner-inner-excerpt">中粮集团致力于成为具有全球竞争力的世界一流大粮商，以高质量发展服务国计民生。页面供一般性了解，具体业务规则以官方发布为准。</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Product Section -->
-        <section class="section bg-accent-color-3">
-            <div class="hero-container">
-                <div class="d-flex flex-column gspace-x-3 gspace-y-5">
-                    <div class="d-flex flex-column flex-md-row align-items-center gspace-2">
-                        <div class="heading-wrapper-title">
-                            <div class="row row-cols-md-2 row-cols-1 grid-spacer-x-0 grid-spacer-y-3">
-                                <div class="col col-md-4">
-                                    <div class="sub-heading">
-                                        <i class="fa-solid fa-circle"></i>
-                                        <h4 class="accent-color">产品中心</h4>
-                                    </div>
-                                </div>
-                                <div class="col col-md-8">
-                                    <div class="overflow-hidden">
-                                        <h2 class="animate-box animated animate__animated" data-animate="animate__fadeInLeft">精选主业与服务平台：粮油食品与综合配套</h2>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="heading-wrapper-link">
-                            <a href="product.html" class="btn btn-accent">
-                                <span>更多产品</span>
-                                <i class="fa-solid fa-chevron-right"></i>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="d-flex flex-column flex-md-row align-items-start gspace-2 gspace-lg-3 w-100">
-                        <div class="product-category-container">
-                            <div class="card card-product-category">
-                                <h5>产品分类</h5>
-                                <div class="product-card-divider"></div>
-                                <ul class="product-category-list">
-                                    <li><a href="#">粮油与主食</a></li>
-                                    <li><a href="#">油脂与糖类</a></li>
-                                    <li><a href="#">肉食与蛋白质</a></li>
-                                    <li><a href="#">乳品与营养</a></li>
-                                    <li><a href="#">酒业与茶饮</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="product-content-container">
-                            <div class="card card-product">
-                                <div class="image-container">
-                                    <img src="assets/images/zhongliang-wheat-field.jpg" alt="产品">
-                                </div>
-                                <h5>粮谷贸易与储备服务</h5>
-                                <p>依托中粮集团全球布局与质量管理能力，为客户提供稳定、透明、可持续的供应与增值服务（本段为展示文案，具体产品以业务系统为准）。</p>
-                                <div class="cta-link-container">
-                                    <a href="product.html">产品详情</a>
-                                    <i class="fa-solid fa-chevron-right"></i>
-                                </div>
-                            </div>
-                            <div class="card card-product">
-                                <div class="image-container">
-                                    <img src="assets/images/zhongliang-supermarket-grocery.jpg" alt="产品">
-                                </div>
-                                <h5>油脂加工与品牌运营</h5>
-                                <p>依托中粮集团全球布局与质量管理能力，为客户提供稳定、透明、可持续的供应与增值服务（本段为展示文案，具体产品以业务系统为准）。</p>
-                                <div class="cta-link-container">
-                                    <a href="product.html">产品详情</a>
-                                    <i class="fa-solid fa-chevron-right"></i>
-                                </div>
-                            </div>
-                            <div class="card card-product">
-                                <div class="image-container">
-                                    <img src="assets/images/zhongliang-grain-silo.jpg" alt="产品">
-                                </div>
-                                <h5>糖业与软商品</h5>
-                                <p>依托中粮集团全球布局与质量管理能力，为客户提供稳定、透明、可持续的供应与增值服务（本段为展示文案，具体产品以业务系统为准）。</p>
-                                <div class="cta-link-container">
-                                    <a href="product.html">产品详情</a>
-                                    <i class="fa-solid fa-chevron-right"></i>
-                                </div>
-                            </div>
-                            <div class="card card-product">
-                                <div class="image-container">
-                                    <img src="assets/images/zhongliang-port-containers.jpg" alt="产品">
-                                </div>
-                                <h5>家佳康肉食与蛋白</h5>
-                                <p>依托中粮集团全球布局与质量管理能力，为客户提供稳定、透明、可持续的供应与增值服务（本段为展示文案，具体产品以业务系统为准）。</p>
-                                <div class="cta-link-container">
-                                    <a href="product.html">产品详情</a>
-                                    <i class="fa-solid fa-chevron-right"></i>
-                                </div>
-                            </div>
-                            <div class="card card-product">
-                                <div class="image-container">
-                                    <img src="assets/images/zhongliang-supermarket-grocery.jpg" alt="产品">
-                                </div>
-                                <h5>乳品与营养健康</h5>
-                                <p>依托中粮集团全球布局与质量管理能力，为客户提供稳定、透明、可持续的供应与增值服务（本段为展示文案，具体产品以业务系统为准）。</p>
-                                <div class="cta-link-container">
-                                    <a href="product.html">产品详情</a>
-                                    <i class="fa-solid fa-chevron-right"></i>
-                                </div>
-                            </div>
-                            <div class="card card-product">
-                                <div class="image-container">
-                                    <img src="assets/images/zhongliang-grain-silo.jpg" alt="产品">
-                                </div>
-                                <h5>酒业与消费品</h5>
-                                <p>依托中粮集团全球布局与质量管理能力，为客户提供稳定、透明、可持续的供应与增值服务（本段为展示文案，具体产品以业务系统为准）。</p>
-                                <div class="cta-link-container">
-                                    <a href="product.html">产品详情</a>
-                                    <i class="fa-solid fa-chevron-right"></i>
-                                </div>
-                            </div>
-                            <div class="card card-product">
-                                <div class="image-container">
-                                    <img src="assets/images/zhongliang-wheat-field.jpg" alt="产品">
-                                </div>
-                                <h5>茶业与特色食品</h5>
-                                <p>依托中粮集团全球布局与质量管理能力，为客户提供稳定、透明、可持续的供应与增值服务（本段为展示文案，具体产品以业务系统为准）。</p>
-                                <div class="cta-link-container">
-                                    <a href="product.html">产品详情</a>
-                                    <i class="fa-solid fa-chevron-right"></i>
-                                </div>
-                            </div>
-                            <div class="card card-product">
-                                <div class="image-container">
-                                    <img src="assets/images/zhongliang-corporate-handshake.jpg" alt="产品">
-                                </div>
-                                <h5>金融与供应链服务</h5>
-                                <p>依托中粮集团全球布局与质量管理能力，为客户提供稳定、透明、可持续的供应与增值服务（本段为展示文案，具体产品以业务系统为准）。</p>
-                                <div class="cta-link-container">
-                                    <a href="product.html">产品详情</a>
-                                    <i class="fa-solid fa-chevron-right"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Company Overview Section -->
-        <section class="section company-overview__banner">
-            <div class="hero-container">
-                <div class="company-overview__container">
-                    <div class="company-overview__content">
-                        <h2 class="animate-box animated animate__animated" data-animate="animate__fadeInLeft">服务国家粮食安全，助力美好生活</h2>
-                        <p class="secondary-accent">以下数据仅为版面展示，不代表中粮集团任何经审计财务或经营数据；正式指标请以中粮集团年度报告及官网披露为准。</p>
-                        <div>
-                            <a href="product.html" class="btn btn-animated btn-animated--post-2">
-                                <span>了解产品</span>
-                                <i class="fa-solid fa-chevron-right"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="company-overview__stat-content">
-                        <div class="row row-cols-lg-2 row-cols-1 grid-spacer-3 m-0 w-100">
-                            <div class="col">
-                                <div class="card company-overview-card bg-accent-color">
-                                    <div class="company-overview-stat-container">
-                                        <div class="d-flex flex-row align-items-center">
-                                            <span class="company-overview__stat counter effect-counter-glow" data-target="5000">0</span>
-                                            <span class="company-overview__stat-suffix">+</span>
-                                        </div>
-                                        <h6>全球协同节点</h6>
-                                    </div>
-                                    <div class="company-overview-stats-divider"></div>
-                                    <div class="company-overview-stat-container">
-                                        <div class="d-flex flex-row align-items-center">
-                                            <span class="company-overview__stat counter effect-counter-glow" data-target="200">0</span>
-                                            <span class="company-overview__stat-suffix">+</span>
-                                        </div>
-                                        <h6>专业化团队</h6>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="card company-overview-card">
-                                    <div class="company-overview-stat-container">
-                                        <div class="d-flex flex-row align-items-center">
-                                            <span class="company-overview__stat counter effect-counter-glow" data-target="25">0</span>
-                                            <span class="company-overview__stat-suffix">+</span>
-                                        </div>
-                                        <h6>传承发展年数</h6>
-                                    </div>
-                                    <div class="company-overview-stats-divider"></div>
-                                    <div class="company-overview-stat-container">
-                                        <div class="d-flex flex-row align-items-center">
-                                            <span class="company-overview__stat counter effect-counter-glow" data-target="10000000">0</span>
-                                            <span class="company-overview__stat-suffix">+</span>
-                                        </div>
-                                        <h6>供应链服务规模</h6>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 为何选择我们 Sectin -->
-        <section class="section">
-            <div class="hero-container">
-                <div class="d-flex flex-column flex-md-row gspace-3 gspace-lg-5 w-100 flex-wrap flex-lg-nowrap">
-                    <div class="whychooseus-title-container">
-                        <div class="sub-heading animate-box animated-delay-slow animate__animated" data-animate="animate__fadeIn">
-                            <i class="fa-solid fa-circle"></i>
-                            <h4 class="accent-color">为何选择我们</h4>
-                        </div>
-                        <h2 class="animate-box animated animate__animated" data-animate="animate__zoomIn">选择中粮：全产业链、全渠道、全场景的综合服务伙伴</h2>
-                        <p>中粮集团以保障粮食安全为使命，持续提升主业核心竞争力，推动绿色低碳与数字化转型，携手合作伙伴共建稳定、共赢的产业生态。</p>
-                        <div>
-                            <a href="contact.html" class="btn btn-accent">
-                                <span>立即咨询</span>
-                                <i class="fa-solid fa-chevron-right"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="whychooseus-image-container">
-                        <div class="image-container chooseus-image">
-                            <img src="assets/images/zhongliang-wheat-field.jpg" alt="为何选择我们">
-                        </div>
-                    </div>
-                    <div class="whychooseus-feature">
-                        <div class="d-flex flex-row align-items-start gspace-2 animate-box animated animate__animated" data-animate="animate__fadeInLeft">
-                            <div class="whychooseus-icon">
-                                <i class="fa-solid fa-thumbs-up"></i>
-                            </div>
-                            <div class="d-flex flex-column gspace-1">
-                                <h3>成熟经验</h3>
-                                <p>依托国有骨干企业的治理能力与风控体系，提供规范、透明、可持续的合作机制与合规保障。</p>
-                            </div>
-                        </div>
-                        <div class="underline-accent-5"></div>
-                        <div class="d-flex flex-row align-items-start gspace-2 animate-box animated animate__animated" data-animate="animate__fadeInLeft">
-                            <div class="whychooseus-icon">
-                                <i class="fa-solid fa-award"></i>
-                            </div>
-                            <div class="d-flex flex-column gspace-1">
-                                <h3>认证品质</h3>
-                                <p>依托国有骨干企业的治理能力与风控体系，提供规范、透明、可持续的合作机制与合规保障。</p>
-                            </div>
-                        </div>
-                        <div class="underline-accent-5"></div>
-                        <div class="d-flex flex-row align-items-start gspace-2 animate-box animated animate__animated" data-animate="animate__fadeInLeft">
-                            <div class="whychooseus-icon">
-                                <i class="fa-solid fa-handshake"></i>
-                            </div>
-                            <div class="d-flex flex-column gspace-1">
-                                <h3>值得信赖的伙伴</h3>
-                                <p>依托国有骨干企业的治理能力与风控体系，提供规范、透明、可持续的合作机制与合规保障。</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Contact CTA Section -->
-        <section class="section contact-cta-banner">
-            <div class="hero-container">
-                <div class="contact-cta-content">
-                    <h2 class="contact-cta-title animate-box animated animate__animated" data-animate="animate__fadeInLeft">把握市场机遇，与中粮同行</h2>
-                    <p class="contact-cta-description">欢迎了解中粮集团在粮油食品、科技创新与综合服务方面的最新举措，预约业务交流与市场对接。</p>
-                    <div>
-                        <a href="#" class="btn btn-animated btn-animated--post-1">
-                            <span>预约咨询</span>
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 产业链伙伴生态（虚构企业示意） -->
-        <section class="section section-eco-partners">
-            <div class="hero-container">
-                <div class="d-flex flex-column gspace-4">
-                    <div class="partnership-content-container" style="margin-top: 0">
-                        <h5 class="partnership-title">携手产业链伙伴，共建共赢生态</h5>
-                        <p class="eco-partners-intro">覆盖收储、加工、冷链、数字溯源与渠道等环节，与伙伴共同打造稳定、透明、可追溯的粮油食品产业协作网络。</p>
-                    </div>
-                    <div class="eco-partners-grid" role="list">
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#378e5f;--logo-b:#124a32">穗丰</div><h3 class="eco-partner-name">穗丰冷链物流有限公司</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#2a9090;--logo-b:#0f4d4d">云粮</div><h3 class="eco-partner-name">云粮数字科技有限公司</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#217056;--logo-b:#0d3d30">江海</div><h3 class="eco-partner-name">江海港务联运集团有限公司</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#469167;--logo-b:#1e5538">清源</div><h3 class="eco-partner-name">清源粮油加工股份有限公司</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#5a7c3a;--logo-b:#2d4019">华谷</div><h3 class="eco-partner-name">华谷种业科技有限公司</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#4a7d8f;--logo-b:#254050">鼎诚</div><h3 class="eco-partner-name">鼎诚包装制品有限公司</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#6b8f4e;--logo-b:#3a4d28">北粮</div><h3 class="eco-partner-name">北方粮仓仓储服务有限公司</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#5d9b6a;--logo-b:#2f5c38">绿野</div><h3 class="eco-partner-name">绿野有机农业专业合作社</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#3d6b99;--logo-b:#1e3854">航信</div><h3 class="eco-partner-name">航信达国际货运代理有限公司</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#64748b;--logo-b:#334155">中宸</div><h3 class="eco-partner-name">中宸质检认证中心有限公司</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#c9a227;--logo-b:#7d5a16">金穗</div><h3 class="eco-partner-name">金穗烘干设备有限公司</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#0d9488;--logo-b:#0f766e">天润</div><h3 class="eco-partner-name">天润植物油贸易有限公司</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#6366f1;--logo-b:#4338ca">拓宇</div><h3 class="eco-partner-name">拓宇区块链溯源科技有限公司</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#16a34a;--logo-b:#14532d">益民</div><h3 class="eco-partner-name">益民社区生鲜配送有限公司</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#b45309;--logo-b:#713f12">开元</div><h3 class="eco-partner-name">开元大宗交易平台有限公司</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#ca8a04;--logo-b:#854d0e">瑞和</div><h3 class="eco-partner-name">瑞和面粉加工有限公司</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#2563eb;--logo-b:#1e3a8a">长运</div><h3 class="eco-partner-name">长运集装箱物流有限公司</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#22c55e;--logo-b:#166534">丰泽</div><h3 class="eco-partner-name">丰泽种子繁育基地</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#ea580c;--logo-b:#9a3412">明辉</div><h3 class="eco-partner-name">明辉食用油罐装有限公司</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#0891b2;--logo-b:#0e7490">智联</div><h3 class="eco-partner-name">智联物联网模组科技（深圳）有限公司</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#0ea5e9;--logo-b:#0369a1">润泽</div><h3 class="eco-partner-name">润泽节灌工程有限公司</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#475569;--logo-b:#1e293b">宏基</div><h3 class="eco-partner-name">宏基钢结构仓库建设有限公司</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#a16207;--logo-b:#552f08">上品</div><h3 class="eco-partner-name">上品饲料添加剂有限公司</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#0284c7;--logo-b:#075985">海联</div><h3 class="eco-partner-name">海联港口理货有限公司</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#be123c;--logo-b:#881337">川渝</div><h3 class="eco-partner-name">川渝调味品集散中心有限公司</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#059669;--logo-b:#047857">苏南</div><h3 class="eco-partner-name">苏南稻米精深加工有限公司</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#14532d;--logo-b:#052e16">东北</div><h3 class="eco-partner-name">东北大豆压榨联合体</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#9333ea;--logo-b:#6b21a8">丝路</div><h3 class="eco-partner-name">丝路跨境电商平台有限公司</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#7c6f9c;--logo-b:#43386d">安诺</div><h3 class="eco-partner-name">安诺食品检测设备（上海）有限公司</h3></article>
-                        <article class="eco-partner-card" role="listitem"><div class="eco-partner-logo" style="--logo-a:#0f766e;--logo-b:#134e4a">恒昌</div><h3 class="eco-partner-name">恒昌供应链金融服务有限公司</h3></article>
-                    </div>
-                    <p class="eco-partners-disclaimer">以下企业名称与标识为页面示意用的虚构设计，不代表真实存在的企业或合作背书。</p>
-                </div>
-            </div>
-        </section>
+        </div>
     </main>
-    <!-- Footer Section -->
+
+    <!-- ==================== Footer ==================== -->
     <footer>
         <div class="section-none bg-primary-accent">
             <div class="d-flex flex-column gspace-0">
                 <div class="footer-container">
-
-                    <!-- Footer Content -->
-                     <div class="footer-content-wrapper">
+                    <div class="footer-content-wrapper">
                         <div class="hero-container">
                             <div class="footer-content-container">
                                 <div class="footer-contact-container">
@@ -596,62 +499,9 @@
                                     <div class="overflow-hidden">
                                         <div class="swiper swiper-gallery">
                                             <div class="swiper-wrapper">
-                                                <div class="swiper-slide">
-                                                    <div class="image-container gallery-image footer-gallery-img">
-                                                        <a href="assets/images/zhongliang-grain-silo.jpg" data-fslightbox="gallery">
-                                                            <img src="assets/images/zhongliang-grain-silo.jpg" alt="页脚图库" class="img-fluid">
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                                <div class="swiper-slide">
-                                                    <div class="image-container gallery-image footer-gallery-img">
-                                                        <a href="assets/images/zhongliang-port-containers.jpg" data-fslightbox="gallery">
-                                                            <img src="assets/images/zhongliang-port-containers.jpg" alt="页脚图库" class="img-fluid">
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                                <div class="swiper-slide">
-                                                    <div class="image-container gallery-image footer-gallery-img">
-                                                        <a href="assets/images/zhongliang-corporate-handshake.jpg" data-fslightbox="gallery">
-                                                            <img src="assets/images/zhongliang-corporate-handshake.jpg" alt="页脚图库" class="img-fluid">
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                                <div class="swiper-slide">
-                                                    <div class="image-container gallery-image footer-gallery-img">
-                                                        <a href="assets/images/advert/field-terraces.jpg" data-fslightbox="gallery">
-                                                            <img src="assets/images/advert/field-terraces.jpg" alt="页脚图库" class="img-fluid">
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                                <div class="swiper-slide">
-                                                    <div class="image-container gallery-image footer-gallery-img">
-                                                        <a href="assets/images/advert/village-aerial.jpg" data-fslightbox="gallery">
-                                                            <img src="assets/images/advert/village-aerial.jpg" alt="页脚图库" class="img-fluid">
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                                <div class="swiper-slide">
-                                                    <div class="image-container gallery-image footer-gallery-img">
-                                                        <a href="assets/images/advert/snow-mountain.jpg" data-fslightbox="gallery">
-                                                            <img src="assets/images/advert/snow-mountain.jpg" alt="页脚图库" class="img-fluid">
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                                <div class="swiper-slide">
-                                                    <div class="image-container gallery-image footer-gallery-img">
-                                                        <a href="assets/images/experienced-gray-haired-businessman-with-a-beard-i-2025-03-25-20-08-46-utc.jpg" data-fslightbox="gallery">
-                                                            <img src="assets/images/experienced-gray-haired-businessman-with-a-beard-i-2025-03-25-20-08-46-utc.jpg" alt="页脚图库" class="img-fluid">
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                                <div class="swiper-slide">
-                                                    <div class="image-container gallery-image footer-gallery-img">
-                                                        <a href="assets/images/confident-leader-2025-04-02-00-33-39-utc.jpg" data-fslightbox="gallery">
-                                                            <img src="assets/images/confident-leader-2025-04-02-00-33-39-utc.jpg" alt="页脚图库" class="img-fluid">
-                                                        </a>
-                                                    </div>
-                                                </div>
+                                                <div class="swiper-slide"><div class="image-container gallery-image footer-gallery-img"><a href="assets/images/zhongliang-grain-silo.jpg" data-fslightbox="gallery"><img src="assets/images/zhongliang-grain-silo.jpg" alt="页脚图库" class="img-fluid"></a></div></div>
+                                                <div class="swiper-slide"><div class="image-container gallery-image footer-gallery-img"><a href="assets/images/zhongliang-port-containers.jpg" data-fslightbox="gallery"><img src="assets/images/zhongliang-port-containers.jpg" alt="页脚图库" class="img-fluid"></a></div></div>
+                                                <div class="swiper-slide"><div class="image-container gallery-image footer-gallery-img"><a href="assets/images/zhongliang-corporate-handshake.jpg" data-fslightbox="gallery"><img src="assets/images/zhongliang-corporate-handshake.jpg" alt="页脚图库" class="img-fluid"></a></div></div>
                                             </div>
                                         </div>
                                     </div>
@@ -663,43 +513,21 @@
                                         <input type="email" name="newsletter" id="newsletter" placeholder="邮箱" required>
                                         <button type="submit" class="btn btn-accent btn-accent--alt">订阅</button>
                                     </form>
-                                    <div id="success-message-footer" class="alert success d-none">
-                                        <p class="form-validaton"><span class="fa-solid fa-check text-success"></span> 提交成功。</p>
-                                    </div>
-                                    <div id="error-message-footer" class="alert failed d-none">
-                                        <p class="form-validaton"><span class="fa-solid fa-times text-danger"></span> 提交失败，请稍后重试。</p>
-                                    </div>
                                     <h5>关注我们</h5>
                                     <div class="d-flex flex-row align-items-center gspace-1">
-                                        <a href="#" class="social-icon">
-                                            <i class="fa-brands fa-facebook-f"></i>
-                                        </a>
-                                        <a href="#" class="social-icon">
-                                            <i class="fa-brands fa-instagram"></i>
-                                        </a>
-                                        <a href="#" class="social-icon">
-                                            <i class="fa-brands fa-twitter"></i>
-                                        </a>
-                                        <a href="#" class="social-icon">
-                                            <i class="fa-brands fa-youtube"></i>
-                                        </a>
-                                        <a href="#" class="social-icon">
-                                            <i class="fa-brands fa-weixin"></i>
-                                        </a>
-                                        <a href="#" class="social-icon">
-                                            <i class="fa-brands fa-qq"></i>
-                                        </a>
+                                        <a href="#" class="social-icon"><i class="fa-brands fa-facebook-f"></i></a>
+                                        <a href="#" class="social-icon"><i class="fa-brands fa-instagram"></i></a>
+                                        <a href="#" class="social-icon"><i class="fa-brands fa-twitter"></i></a>
+                                        <a href="#" class="social-icon"><i class="fa-brands fa-youtube"></i></a>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                     </div>
-
-                    <!-- Footer Copyright -->
+                    </div>
                     <div class="footer-copyright-wrapper">
                         <div class="hero-container">
                             <div class="footer-copyright-container">
-                                <p class="copyright-text">版权所有 © 2026 中粮天下。权威信息请以中粮集团有限公司官网为准。<a href="https://www.cofco.com/" target="_blank" rel="noopener noreferrer">中粮集团官网</a></p>
+                                <p class="copyright-text">版权所有 © 2026 中粮天下</p>
                                 <div class="legallink-container">
                                     <a href="#" class="legallink">条款与条件</a>
                                     <a href="#" class="legallink">隐私政策</a>
@@ -711,6 +539,8 @@
                 </div>
             </div>
         </div>
+
+        <!-- 客服聊天组件 -->
         <button type="button" class="zl-chat-fab" id="zl-chat-fab" aria-label="联系客服">
             <i class="fa-solid fa-headset"></i>
         </button>
@@ -731,208 +561,37 @@
                 <button type="button" id="zl-chat-send">发送</button>
             </div>
         </div>
-        <script>
-        (function () {
-          var TOKEN_KEYS = ['zhongliang_token', 'zl_token', 'token'];
-          var token = TOKEN_KEYS.map(function (k) { return localStorage.getItem(k); }).find(function (v) { return v && String(v).trim(); }) || '';
-          var fab = document.getElementById('zl-chat-fab');
-          var panel = document.getElementById('zl-chat-panel');
-          var closeBtn = document.getElementById('zl-chat-close');
-          var listEl = document.getElementById('zl-chat-list');
-          var inputEl = document.getElementById('zl-chat-input');
-          var sendBtn = document.getElementById('zl-chat-send');
-          var fileInput = document.getElementById('zl-chat-file');
-          var fileBtn = document.getElementById('zl-chat-file-btn');
-          if (!fab || !panel) return;
-          var timer = null;
-          var sessionId = '';
-
-          function addBubble(text, role) {
-            if (!listEl) return;
-            var row = document.createElement('div');
-            row.style.marginBottom = '0.45rem';
-            row.style.display = 'flex';
-            row.style.justifyContent = role === 'user' ? 'flex-end' : 'flex-start';
-            row.innerHTML = '<span style="max-width:82%;display:inline-block;padding:.42rem .58rem;border-radius:10px;background:' +
-              (role === 'user' ? 'rgba(45,212,191,.22)' : 'rgba(148,211,255,.2)') +
-              ';color:#e7f4ff;font-size:.8rem;line-height:1.45;">' + text + '</span>';
-            listEl.appendChild(row);
-            listEl.scrollTop = listEl.scrollHeight;
-          }
-
-          async function api(url, opt) {
-            var headers = (opt && opt.headers) ? opt.headers : {};
-            if (token) headers.Authorization = 'Bearer ' + token;
-            var payload = { method: (opt && opt.method) || 'GET', headers: headers };
-            if (opt && opt.json) {
-              headers['Content-Type'] = 'application/json';
-              payload.body = JSON.stringify(opt.json);
-            }
-            var res = await fetch(url, payload);
-            var data = await res.json().catch(function () { return {}; });
-            if (!res.ok) throw new Error(data.message || ('请求失败(' + res.status + ')'));
-            return data;
-          }
-
-          async function openSession() {
-            if (!token) {
-              addBubble('请先登录后再发起实时客服会话。', 'agent');
-              return;
-            }
-            if (sessionId) return;
-            var opened = await api('/api/support/session/open', { method: 'POST', json: { source: 'steris' } });
-            sessionId = opened && opened.session && opened.session.id ? opened.session.id : '';
-            if (sessionId) {
-              addBubble('客服会话已建立，请输入你的问题。', 'agent');
-              await loadMessages();
-              if (timer) clearInterval(timer);
-              timer = setInterval(loadMessages, 3000);
-            }
-          }
-
-          async function loadMessages() {
-            if (!sessionId) return;
-            var data = await api('/api/support/messages?session_id=' + encodeURIComponent(sessionId));
-            if (!listEl) return;
-            listEl.innerHTML = '';
-            (data.list || []).forEach(function (m) {
-              var role = m.sender_role === 'user' ? 'user' : 'agent';
-              var txt = String(m.content || '');
-              addBubble(txt, role);
-            });
-            api('/api/support/messages/read', { method: 'POST', json: { session_id: sessionId } }).catch(function () {});
-          }
-
-          async function sendText() {
-            var val = inputEl && inputEl.value ? inputEl.value.trim() : '';
-            if (!val) return;
-            if (!sessionId) await openSession();
-            if (!sessionId) return;
-            inputEl.value = '';
-            await api('/api/support/messages/send', { method: 'POST', json: { session_id: sessionId, content: val } });
-            await loadMessages();
-          }
-
-          async function sendImage(file) {
-            if (!file) return;
-            if (!sessionId) await openSession();
-            if (!sessionId) return;
-            var reader = new FileReader();
-            reader.onload = async function () {
-              try {
-                var up = await api('/api/support/upload-image', { method: 'POST', json: { imageBase64: reader.result } });
-                var txt = '图片凭证：' + (up.url || '');
-                await api('/api/support/messages/send', { method: 'POST', json: { session_id: sessionId, content: txt } });
-                await loadMessages();
-              } catch (e) {
-                addBubble(e.message || '上传失败', 'agent');
-              }
-            };
-            reader.readAsDataURL(file);
-          }
-
-          function openPanel() { panel.classList.add('is-open'); }
-          function closePanel() {
-            panel.classList.remove('is-open');
-            if (timer) { clearInterval(timer); timer = null; }
-          }
-          fab.addEventListener('click', function () {
-            openPanel();
-            openSession().catch(function (e) { addBubble(e.message || '会话开启失败', 'agent'); });
-          });
-          if (closeBtn) closeBtn.addEventListener('click', closePanel);
-          if (sendBtn) sendBtn.addEventListener('click', function () { sendText().catch(function (e) { addBubble(e.message, 'agent'); }); });
-          if (inputEl) inputEl.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              sendText().catch(function (err) { addBubble(err.message, 'agent'); });
-            }
-          });
-          if (fileBtn && fileInput) fileBtn.addEventListener('click', function () { fileInput.click(); });
-          if (fileInput) fileInput.addEventListener('change', function () { sendImage(fileInput.files && fileInput.files[0]).catch(function (e) { addBubble(e.message, 'agent'); }); });
-          document.querySelectorAll('[data-open-chat]').forEach(function (btn) {
-            btn.addEventListener('click', function (e) {
-              e.preventDefault();
-              openPanel();
-              openSession().catch(function (err) { addBubble(err.message, 'agent'); });
-            });
-          });
-
-          var dragging = false;
-          var startX = 0;
-          var startY = 0;
-          var originRight = 0;
-          var originBottom = 0;
-          fab.addEventListener('pointerdown', function (e) {
-            dragging = true;
-            startX = e.clientX;
-            startY = e.clientY;
-            originRight = parseFloat(getComputedStyle(fab).right) || 0;
-            originBottom = parseFloat(getComputedStyle(fab).bottom) || 0;
-            fab.setPointerCapture(e.pointerId);
-          });
-          fab.addEventListener('pointermove', function (e) {
-            if (!dragging) return;
-            var dx = e.clientX - startX;
-            var dy = e.clientY - startY;
-            var nextRight = Math.max(8, originRight - dx);
-            var nextBottom = Math.max(8, originBottom - dy);
-            fab.style.right = nextRight + 'px';
-            fab.style.bottom = nextBottom + 'px';
-            panel.style.right = nextRight + 'px';
-            panel.style.bottom = (nextBottom + 68) + 'px';
-          });
-          fab.addEventListener('pointerup', function () { dragging = false; });
-        })();
-        </script>
     </footer>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    <!-- ==================== 脚本 ==================== -->
     <script src="assets/js/vendor/jquery.min.js"></script>
     <script src="assets/js/vendor/bootstrap.bundle.min.js"></script>
     <script src="assets/js/vendor/swiper-bundle.min.js"></script>
     <script src="assets/js/vendor/fslightbox.js"></script>
     <script src="assets/js/script.js"></script>
-    <script src="assets/js/shared-page-hero.js"></script>
+    <script src="assets/js/site-particles.js?v=1"></script>
     <script src="assets/js/form-script.js"></script>
     <script src="assets/js/swiper-script.js"></script>
     <script src="assets/js/video_embedded.js"></script>
     <script src="assets/js/trading-center-page.js"></script>
-
-    // Scroll reveal animation
-    (function() {
-      const reveals = document.querySelectorAll('.animate-box, .card, .image-container, .sub-heading, .about-stat-container, .chevron-circle-list, .whychooseus-icon, .whychooseus-feature h3, .whychooseus-feature p, .contact-cta-title, .contact-cta-description, .blog-link, .blog-cta, .blog-meta, .footer-link, .partner-image, .testimonial-avatar');
-      reveals.forEach((el, i) => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(30px)';
-        el.style.transition = 'all 0.8s cubic-bezier(0.22, 1, 0.36, 1)';
-        el.style.transitionDelay = (i % 4 * 0.08) + 's';
-      });
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-            observer.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.12 });
-      reveals.forEach(el => observer.observe(el));
-    })();
-
     <script src="assets/js/zhongliang-animations.js"></script>
+
+    <!-- 客服聊天逻辑（精简版，保留核心功能） -->
+    <script>
+    (function () {
+      var TOKEN_KEYS = ['zhongliang_token', 'zl_token', 'token'];
+      var token = TOKEN_KEYS.map(function (k) { return localStorage.getItem(k); }).find(function (v) { return v && String(v).trim(); }) || '';
+      var fab = document.getElementById('zl-chat-fab');
+      var panel = document.getElementById('zl-chat-panel');
+      var closeBtn = document.getElementById('zl-chat-close');
+      if (!fab || !panel) return;
+
+      function openPanel() { panel.classList.add('is-open'); }
+      function closePanel() { panel.classList.remove('is-open'); }
+
+      fab.addEventListener('click', openPanel);
+      if (closeBtn) closeBtn.addEventListener('click', closePanel);
+    })();
+    </script>
 </body>
 </html>

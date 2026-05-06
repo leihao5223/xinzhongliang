@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 72" role="img" aria-labelledby="lg1 lg2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 72" role="img" aria-labelledby="lg1 lg2">
   <title id="lg1">中粮天下</title>
   <desc id="lg2">中粮集团数字化产业服务平台</desc>
   <defs>
@@ -38,6 +38,5 @@
     <circle cx="10" cy="24" r="1.5" fill="#ffd88a" opacity="0.7"/>
     <circle cx="46" cy="24" r="1.5" fill="#c8102e" opacity="0.7"/>
   </g>
-  <text x="76" y="32" fill="#ffffff" font-family="'Noto Sans SC', system-ui, 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="22" font-weight="700" letter-spacing="0.1em">中粮天下</text>
-  <text x="76" y="50" fill="#b8c5d6" font-family="'Noto Sans SC', system-ui, 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="9.5" font-weight="500" letter-spacing="0.2em">COFCO DIGITAL PLATFORM</text>
+  <text x="76" y="43" fill="#ffffff" font-family="'Noto Sans SC', system-ui, 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="34" font-weight="800" letter-spacing="0.06em">中粮天下</text>
 </svg>

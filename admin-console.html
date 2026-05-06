@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="assets/css/main.css?v=zhongliang5">
   <link rel="stylesheet" href="assets/css/responsive.css?v=zhongliang5">
   <link rel="stylesheet" href="assets/css/steris-effects.css?v=18">
+  <link rel="stylesheet" href="assets/css/white-theme.css?v=1">
   <link rel="icon" href="assets/images/zhongliang-favicon.svg?v=1" type="image/svg+xml">
   <style>
     :root { color-scheme: dark; }
@@ -92,6 +93,7 @@
           <a class="admin-nav-item" href="#market" onclick="showSec('market')"><i class="fa-solid fa-chart-line"></i> 行情控制</a>
           <a class="admin-nav-item" href="#articles" onclick="showSec('articles')"><i class="fa-solid fa-newspaper"></i> 文章管理</a>
           <a class="admin-nav-item" href="#settings" onclick="showSec('settings')"><i class="fa-solid fa-sliders"></i> 前端设置</a>
+          <a class="admin-nav-item" href="#media" onclick="showSec('media')"><i class="fa-solid fa-video"></i> 视频排期</a>
         </div>
       </nav>
 
@@ -166,13 +168,74 @@
           </div>
         </div>
 
-        <div id="sec-finance" class="hidden"><div class="admin-card"><h3>充提审核</h3><p class="muted">功能开发中...</p></div></div>
-        <div id="sec-orders" class="hidden"><div class="admin-card"><h3>订单管理</h3><p class="muted">功能开发中...</p></div></div>
-        <div id="sec-products" class="hidden"><div class="admin-card"><h3>产品管理</h3><p class="muted">功能开发中...</p></div></div>
-        <div id="sec-users" class="hidden"><div class="admin-card"><h3>用户管理</h3><p class="muted">功能开发中...</p></div></div>
+        <div id="sec-finance" class="hidden">
+          <div class="admin-card">
+            <h3>充提审核</h3>
+            <div id="finance-list" class="admin-list" style="max-height:520px;"></div>
+          </div>
+        </div>
+        <div id="sec-orders" class="hidden">
+          <div class="admin-card">
+            <h3>订单管理</h3>
+            <div class="admin-toolbar">
+              <select id="orders-status"><option value="">全部</option><option value="open">进行中</option><option value="settled">已结算</option></select>
+              <button id="orders-refresh" class="btn-blue">刷新</button>
+            </div>
+            <div id="orders-list" class="admin-list" style="max-height:520px;"></div>
+          </div>
+        </div>
+        <div id="sec-products" class="hidden">
+          <div class="admin-card">
+            <h3>产品管理</h3>
+            <p class="muted" style="font-size:.82rem;">读取旧版 `/api/products`，高级编辑仍通过 CMS 产品接口保存。</p>
+            <div id="products-list" class="admin-list" style="max-height:520px;"></div>
+          </div>
+        </div>
+        <div id="sec-users" class="hidden">
+          <div class="admin-card">
+            <h3>用户管理</h3>
+            <div id="users-list" class="admin-list" style="max-height:520px;"></div>
+          </div>
+        </div>
         <div id="sec-market" class="hidden"><div class="admin-card"><h3>行情控制</h3><p class="muted">功能开发中...</p></div></div>
         <div id="sec-articles" class="hidden"><div class="admin-card"><h3>文章管理</h3><p class="muted">功能开发中...</p></div></div>
-        <div id="sec-settings" class="hidden"><div class="admin-card"><h3>前端设置</h3><p class="muted">功能开发中...</p></div></div>
+        <div id="sec-settings" class="hidden">
+          <div class="admin-card">
+            <h3>前端内容设置</h3>
+            <p class="muted" style="font-size:.82rem;">编辑首页核心文案 JSON，保存后首页会通过 `/api/site/sections` 自动读取。</p>
+            <textarea id="site-sections-json" style="width:100%;min-height:320px;border:1px solid rgba(148,211,255,.35);background:rgba(8,27,44,.55);color:#e7f4ff;border-radius:10px;padding:.75rem;font-family:Consolas,monospace;"></textarea>
+            <div class="admin-toolbar" style="margin-top:.6rem;">
+              <button id="site-sections-load" class="btn-blue">读取内容</button>
+              <button id="site-sections-save" class="btn-green">保存内容</button>
+            </div>
+          </div>
+        </div>
+        <div id="sec-media" class="hidden">
+          <div class="admin-card">
+            <h3>前台视频排期</h3>
+            <p class="muted" style="font-size:.82rem;">设置登录页、首页顶部、品牌广告在指定时间段播放哪个视频。留空起止时间表示长期生效。</p>
+            <div class="admin-toolbar">
+              <select id="media-page" style="min-width:110px;">
+                <option value="login">登录页</option>
+                <option value="home">首页</option>
+                <option value="advert">广告</option>
+              </select>
+              <select id="media-slot" style="min-width:120px;">
+                <option value="login-bg">登录背景</option>
+                <option value="hero-bg">首页顶部</option>
+                <option value="brand-ad">品牌广告</option>
+              </select>
+              <input id="media-title" placeholder="标题" style="min-width:160px;">
+              <input id="media-video" placeholder="/assets/videos/intro.mp4" style="min-width:260px;flex:1;">
+              <input id="media-poster" placeholder="/assets/images/zhongliang-wheat-field.jpg" style="min-width:260px;flex:1;">
+              <input id="media-from" type="datetime-local">
+              <input id="media-to" type="datetime-local">
+              <input id="media-priority" type="number" value="10" style="width:80px;">
+              <button id="media-add" class="btn-blue">新增/保存</button>
+            </div>
+            <div id="media-list" class="admin-list" style="max-height:420px;"></div>
+          </div>
+        </div>
       </div>
     </section>
   </main>
@@ -198,8 +261,19 @@
                     <a href="contact.html" class="footer-link">联系我们</a>
                     <a href="team.html" class="footer-link">团队介绍</a>
                   </div>
+                  <div class="footer-divider"></div>
+                  <div class="footer-mini-gallery">
+                    <img src="assets/images/zhongliang-grain-silo.jpg" alt="粮仓">
+                    <img src="assets/images/zhongliang-port-containers.jpg" alt="港口">
+                    <img src="assets/images/zhongliang-corporate-handshake.jpg" alt="合作">
+                  </div>
                 </div>
                 <div class="footer-cta-container">
+                  <h5>订阅电子报</h5>
+                  <form class="form">
+                    <input type="email" name="newsletter" placeholder="邮箱" required>
+                    <button type="submit" class="btn btn-accent btn-accent--alt">订阅</button>
+                  </form>
                   <h5>关注我们</h5>
                   <div class="d-flex flex-row align-items-center gspace-1">
                     <a href="#" class="social-icon"><i class="fa-brands fa-facebook-f"></i></a>
@@ -216,7 +290,7 @@
           <div class="footer-copyright-wrapper">
             <div class="hero-container">
               <div class="footer-copyright-container">
-                <p class="copyright-text">版权所有 © 2026 中粮天下。权威信息请以中粮集团有限公司官网为准。<a href="https://www.cofco.com/" target="_blank" rel="noopener noreferrer">中粮集团官网</a></p>
+                <p class="copyright-text">版权所有 © 2026 中粮天下</p>
                 <div class="legallink-container">
                   <a href="#" class="legallink">条款与条件</a>
                   <a href="#" class="legallink">隐私政策</a>
@@ -257,6 +331,7 @@
     let mockPRules = [{ id: 'p1', productId: 1, productName: '黄大豆1号', result: '赢', profitRate: 0.95 }];
     let mockERules = [{ id: 'e1', productId: 3, productName: '豆粕', result: '输', profitRate: 0.90 }];
     let mockOverride = { label: '正常结算', secondsLeft: 0 };
+    let mediaSchedules = [];
 
     function toast(msg) {
       let t = document.getElementById('admin-toast');
@@ -277,6 +352,8 @@
         if (url === '/api/admin/product-settlement' && (!opt.method || opt.method === 'GET')) return { rules: mockPRules, products: mockProducts };
         if (url === '/api/admin/entrust-control' && (!opt.method || opt.method === 'GET')) return { rules: mockERules, products: mockProducts };
         if (url === '/api/admin/trade-orders?limit=20' && (!opt.method || opt.method === 'GET')) return { list: mockOrders, totalUsers: 1248, totalBalance: 8563200.50, pendingWithdraw: 3 };
+        if (url === '/api/admin/media-schedules' && (!opt.method || opt.method === 'GET')) return { list: mediaSchedules };
+        if (url === '/api/admin/media-schedules' && opt.method === 'PUT') { mediaSchedules = (opt.json && opt.json.list) || mediaSchedules; return { list: mediaSchedules }; }
         if (opt.method === 'POST' || opt.method === 'DELETE') {
           return { success: true };
         }
@@ -315,9 +392,142 @@
       document.querySelectorAll('.admin-nav-item').forEach((el) => el.classList.remove('active'));
       const nav = document.querySelector('.admin-nav-item[href="#' + name + '"]');
       if (nav) nav.classList.add('active');
+      if (name === 'media') loadMediaSchedules().catch((e) => { loginMsg.textContent = e.message; });
+      if (name === 'finance') loadFinance().catch((e) => { loginMsg.textContent = e.message; });
+      if (name === 'orders') loadOrders().catch((e) => { loginMsg.textContent = e.message; });
+      if (name === 'products') loadProducts().catch((e) => { loginMsg.textContent = e.message; });
+      if (name === 'users') loadUsers().catch((e) => { loginMsg.textContent = e.message; });
+      if (name === 'settings') loadSiteSections().catch((e) => { loginMsg.textContent = e.message; });
     }
 
     window.showSec = showSec;
+
+    function fmtMoney(v) {
+      const n = Number(v);
+      return Number.isFinite(n) ? n.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '--';
+    }
+
+    async function loadFinance() {
+      const res = await api('/api/admin/treasury/pending');
+      const rows = []
+        .concat((res.deposits || []).map((x) => ({ ...x, kind: '充值' })))
+        .concat((res.withdrawals || []).map((x) => ({ ...x, kind: '提现' })));
+      const box = document.getElementById('finance-list');
+      box.innerHTML = rows.length ? rows.map((x) => `
+        <div class="admin-list-row" style="display:block;">
+          <div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center;">
+            <strong>${x.kind} · ${fmtMoney(x.amount)}</strong>
+            <span>
+              <button data-finance-act="approve" data-kind="${x.kind}" data-id="${x.id}" class="btn-green">通过</button>
+              <button data-finance-act="reject" data-kind="${x.kind}" data-id="${x.id}">驳回</button>
+            </span>
+          </div>
+          <div style="opacity:.78;margin-top:.25rem;">用户 ${x.userId || x.user_id || '--'} · ${x.status || 'pending'} · ${x.createdAt ? new Date(x.createdAt).toLocaleString('zh-CN') : '--'}</div>
+        </div>
+      `).join('') : '<p class="muted">暂无待审核充提</p>';
+      box.querySelectorAll('[data-finance-act]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const kind = btn.getAttribute('data-kind');
+          const id = btn.getAttribute('data-id');
+          const action = btn.getAttribute('data-finance-act');
+          const url = kind === '充值' ? `/api/admin/treasury/deposits/${id}` : `/api/admin/treasury/withdrawals/${id}`;
+          await api(url, { method: 'POST', json: { action, note: '后台控台处理' } });
+          toast('审核已处理');
+          await loadFinance();
+        });
+      });
+    }
+
+    async function loadOrders() {
+      const status = val('orders-status');
+      const qs = new URLSearchParams({ limit: '100' });
+      if (status) qs.set('status', status);
+      const res = await api('/api/admin/trade-orders?' + qs.toString());
+      const box = document.getElementById('orders-list');
+      const rows = res.list || [];
+      box.innerHTML = rows.length ? rows.map((o) => `
+        <div class="admin-list-row" style="display:block;">
+          <strong>${o.productName || o.productId || o.id}</strong>
+          <div style="opacity:.8;margin-top:.25rem;">${o.status || '--'} · ${o.direction || '--'} · ${o.orderKind || 'market'} · ${fmtMoney(o.amount)} · 盈亏 ${fmtMoney(o.profitAmount)}</div>
+          <div style="opacity:.65;margin-top:.2rem;">${o.userDisplay || o.userId || '--'} · ${o.createdAt ? new Date(o.createdAt).toLocaleString('zh-CN') : '--'}</div>
+        </div>
+      `).join('') : '<p class="muted">暂无订单</p>';
+    }
+
+    async function loadProducts() {
+      const rows = await api('/api/products');
+      const box = document.getElementById('products-list');
+      box.innerHTML = (Array.isArray(rows) && rows.length) ? rows.map((p) => `
+        <div class="admin-list-row" style="display:block;">
+          <strong>${p.name || p.tradeName || p.productCode || p.id}</strong>
+          <div style="opacity:.8;margin-top:.25rem;">现价 ${fmtMoney(p.livePrice || p.basePrice)} · ${p.marketSymbol || p.productCode || '--'} · ${p.listed === false ? '下架' : '上架'}</div>
+        </div>
+      `).join('') : '<p class="muted">暂无产品</p>';
+    }
+
+    async function loadUsers() {
+      const res = await api('/api/admin/users');
+      const rows = res.list || [];
+      const box = document.getElementById('users-list');
+      box.innerHTML = rows.length ? rows.map((u) => `
+        <div class="admin-list-row" style="display:block;">
+          <strong>${u.nickname || u.username || u.id}</strong>
+          <div style="opacity:.8;margin-top:.25rem;">余额 ${fmtMoney(u.account && u.account.available)} · 总资产 ${fmtMoney(u.account && u.account.totalAsset)} · ${u.userKind || 'real'}</div>
+          <div style="opacity:.65;margin-top:.2rem;">${u.id}</div>
+        </div>
+      `).join('') : '<p class="muted">暂无用户</p>';
+    }
+
+    async function loadSiteSections() {
+      const res = await api('/api/admin/cms');
+      const data = res.data && res.data.siteSections ? res.data.siteSections : {};
+      document.getElementById('site-sections-json').value = JSON.stringify(data, null, 2);
+    }
+
+    async function saveSiteSections() {
+      const text = document.getElementById('site-sections-json').value || '{}';
+      let data;
+      try { data = JSON.parse(text); } catch (e) { throw new Error('JSON 格式错误'); }
+      await api('/api/admin/cms/siteSections', { method: 'PUT', json: { data } });
+      toast('前台内容已保存');
+      await loadSiteSections();
+    }
+
+    async function loadMediaSchedules() {
+      const res = await api('/api/admin/media-schedules');
+      mediaSchedules = Array.isArray(res.list) ? res.list : [];
+      renderMediaSchedules();
+    }
+
+    async function saveMediaSchedules() {
+      const res = await api('/api/admin/media-schedules', { method: 'PUT', json: { list: mediaSchedules } });
+      mediaSchedules = Array.isArray(res.list) ? res.list : mediaSchedules;
+      renderMediaSchedules();
+    }
+
+    function renderMediaSchedules() {
+      const list = document.getElementById('media-list');
+      if (!list) return;
+      list.innerHTML = (mediaSchedules || []).map((row) => `
+        <div class="admin-list-row" style="display:block;">
+          <div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center;">
+            <strong>${row.title || row.id}</strong>
+            <button data-del-media="${row.id}">删除</button>
+          </div>
+          <div style="opacity:.82;margin-top:.25rem;">${row.pageKey}/${row.slotKey} · 优先级 ${row.priority || 0} · ${row.enabled === false ? '停用' : '启用'}</div>
+          <div style="opacity:.78;margin-top:.2rem;word-break:break-all;">${row.videoUrl || ''}</div>
+          <div style="opacity:.68;margin-top:.2rem;">${row.startsAt || '立即'} → ${row.endsAt || '长期'}</div>
+        </div>
+      `).join('') || '<p class="muted">暂无排期</p>';
+      list.querySelectorAll('[data-del-media]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const id = btn.getAttribute('data-del-media');
+          mediaSchedules = mediaSchedules.filter((row) => row.id !== id);
+          await saveMediaSchedules();
+          toast('视频排期已删除');
+        });
+      });
+    }
 
     async function loadDashboard() {
       const [overrideRes, productRes, entrustRes, ordersRes] = await Promise.all([
@@ -463,6 +673,27 @@
     }
 
     document.getElementById('ac-login-btn')?.addEventListener('click', login);
+    document.getElementById('orders-refresh')?.addEventListener('click', () => loadOrders().catch((e) => { loginMsg.textContent = e.message; }));
+    document.getElementById('orders-status')?.addEventListener('change', () => loadOrders().catch((e) => { loginMsg.textContent = e.message; }));
+    document.getElementById('site-sections-load')?.addEventListener('click', () => loadSiteSections().catch((e) => { loginMsg.textContent = e.message; }));
+    document.getElementById('site-sections-save')?.addEventListener('click', () => saveSiteSections().catch((e) => { loginMsg.textContent = e.message; }));
+    document.getElementById('media-add')?.addEventListener('click', async () => {
+      const row = {
+        id: 'media_' + Date.now(),
+        pageKey: val('media-page'),
+        slotKey: val('media-slot'),
+        title: val('media-title') || '前台视频',
+        videoUrl: val('media-video') || '/assets/videos/intro.mp4',
+        posterUrl: val('media-poster') || '/assets/images/zhongliang-wheat-field.jpg',
+        startsAt: val('media-from'),
+        endsAt: val('media-to'),
+        priority: Number(val('media-priority')) || 0,
+        enabled: true,
+      };
+      mediaSchedules = [row].concat(mediaSchedules || []);
+      await saveMediaSchedules();
+      toast('视频排期已保存');
+    });
     if (token) {
       secLogin.classList.add('hidden'); secDashboard.classList.remove('hidden');
       showSec('dashboard');

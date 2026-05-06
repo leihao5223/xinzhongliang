@@ -62,9 +62,6 @@
         var parent = img.parentElement;
         if (!parent || parent.classList.contains('img-reveal-wrap')) return;
         parent.classList.add('img-reveal-wrap');
-        var shine = document.createElement('div');
-        shine.className = 'img-reveal-shine';
-        parent.appendChild(shine);
       });
     });
   }
@@ -215,17 +212,9 @@
     });
   }
 
-  // ===================== 全局扫描线与光效层 =====================
+  // ===================== 全局扫光层已禁用 =====================
   function initGlobalEffects() {
-    if (isLoginPage) return;
-    if (document.querySelector('.effect-global-scan')) return;
-    var scan = document.createElement('div');
-    scan.className = 'effect-global-scan';
-    document.body.appendChild(scan);
-
-    var sweep = document.createElement('div');
-    sweep.className = 'effect-light-sweep';
-    document.body.appendChild(sweep);
+    return;
   }
 
   // ===================== 自动为页面元素添加reveal类 =====================

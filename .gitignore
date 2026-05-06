@@ -1,0 +1,8 @@
+node_modules/
+npm-debug.log*
+.env
+.env.*
+runtime/
+app/server/data/
+app/server/uploads/
+app/server/node_modules/

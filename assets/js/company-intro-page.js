@@ -93,20 +93,21 @@
 
   const style = document.createElement('style');
   style.textContent = `
-  .ci-shell{padding:4rem 0;background:linear-gradient(180deg,#081527,#0f213a)}
+  .ci-shell{padding:4rem 0;background:#ffffff}
   .ci-head{text-align:center;margin-bottom:1.2rem}
-  .ci-head h1{color:#f0f6ff;font-size:2rem;margin:.8rem 0}
-  .ci-head p{color:#b7cbe4;max-width:760px;margin:0 auto}
+  .ci-head h1{color:#1a1a1a;font-size:2rem;margin:.8rem 0}
+  .ci-head p{color:#555555;max-width:760px;margin:0 auto}
   .ci-tabs{display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center;margin:1.3rem 0 1.5rem}
-  .ci-tab{border:1px solid rgba(148,211,255,.45);background:rgba(11,47,82,.4);color:#d8ebff;padding:.45rem .95rem;border-radius:999px}
+  .ci-tab{border:1px solid rgba(0,0,0,.15);background:#f0f0f0;color:#333333;padding:.45rem .95rem;border-radius:999px}
   .ci-tab.is-active{background:linear-gradient(135deg,#0d5c2e,#1a7a3e,#2ecc71);border-color:rgba(200,255,220,.45);color:#fff}
   .ci-panel{display:none}.ci-panel.is-active{display:block}
   .ci-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:.9rem}
   .ci-grid--long{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
-  .ci-card{background:rgba(148,211,255,.14);border:1px solid rgba(148,211,255,.3);border-radius:14px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:1rem}
-  .ci-card h3{font-size:1rem;color:#ecf5ff;margin:0 0 .35rem}
-  .ci-card time{font-size:.75rem;color:#9ec7ea}
-  .ci-card p{font-size:.86rem;color:#c8def3;margin:.65rem 0 0;line-height:1.6}
+  .ci-card{background:rgba(232,245,233,.88);border:1px solid rgba(129,199,132,.35);border-radius:14px;padding:1rem;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+  @media(min-width:769px){.ci-card{backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}}
+  .ci-card h3{font-size:1rem;color:#1a1a1a;margin:0 0 .35rem}
+  .ci-card time{font-size:.75rem;color:#888888}
+  .ci-card p{font-size:.86rem;color:#555555;margin:.65rem 0 0;line-height:1.6}
   .ci-card header{display:flex;justify-content:space-between;gap:.6rem}
   `;
   document.head.appendChild(style);
