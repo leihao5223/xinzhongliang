@@ -1,516 +1,528 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>首页 - 中粮天下</title>
-    <link rel="stylesheet" href="assets/css/main.css?v=zhongliang5">
-    <link rel="stylesheet" href="assets/css/responsive.css?v=zhongliang5">
-    <link rel="stylesheet" href="assets/css/steris-effects.css?v=18">
-    <link rel="stylesheet" href="assets/css/white-theme.css?v=1">
-    <link rel="icon" href="assets/images/zhongliang-favicon.svg?v=1" type="image/svg+xml">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap">
-    <style>
-    body { margin: 0; padding: 0; background: #ffffff; }
-    .header-navbar-fixed { top: 0 !important; }
-    .about-showcase-section {
-        background: #ffffff;
-        padding: 5rem 0 6rem;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>中粮天下 - 数字农粮服务平台</title>
+  <meta name="description" content="中粮天下融合农粮产业链、数字交易、客户服务和内容运营，服务国计民生与产业协同。">
+  <link rel="icon" href="assets/images/zhongliang-favicon.svg?v=1" type="image/svg+xml">
+  <link rel="stylesheet" href="/echofy-template/assets/css/bootstrap.min.css" type="text/css" media="all">
+  <link rel="stylesheet" href="/echofy-template/assets/css/all.min.css" type="text/css" media="all">
+  <link rel="stylesheet" href="/echofy-template/assets/css/bootstrap-icons.css" type="text/css" media="all">
+  <link rel="stylesheet" href="/echofy-template/assets/css/animate.css" type="text/css" media="all">
+  <link rel="stylesheet" href="assets/css/main.css?v=zhongliang5">
+  <link rel="stylesheet" href="assets/css/steris-effects.css?v=18">
+  <style>
+    :root {
+      --zl-ink: #071527;
+      --zl-muted: #587083;
+      --zl-green: #0e7a3d;
+      --zl-lime: #a8d95d;
+      --zl-gold: #d6b35f;
+      --zl-cyan: #63e6be;
+      --zl-card: rgba(255, 255, 255, 0.84);
+      --zl-line: rgba(15, 118, 110, 0.18);
     }
-    .about-section-header {
-        text-align: center;
-        margin-bottom: 3.5rem;
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--zl-ink);
+      background:
+        radial-gradient(circle at 20% 5%, rgba(99, 230, 190, 0.16), transparent 32rem),
+        radial-gradient(circle at 80% 0%, rgba(214, 179, 95, 0.14), transparent 34rem),
+        linear-gradient(180deg, #f7fbf6 0%, #ffffff 42%, #eef8f1 100%);
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      overflow-x: hidden;
     }
-    .about-section-title {
-        font-size: 2.4rem;
-        font-weight: 700;
-        color: #0f172a;
-        margin: 0.8rem 0 1rem;
-        letter-spacing: 2px;
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    .zl-shell { position: relative; min-height: 100vh; }
+    .zl-container { width: min(1180px, calc(100% - 2rem)); margin: 0 auto; }
+    .zl-nav {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      width: min(1180px, calc(100% - 1rem));
+      border: 1px solid rgba(255,255,255,.24);
+      border-radius: 999px;
+      background: rgba(5, 18, 31, 0.64);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 22px 70px rgba(0, 34, 20, .22);
     }
-    .about-section-desc {
-        font-size: 1.05rem;
-        color: #475569;
-        max-width: 800px;
-        margin: 0 auto;
-        line-height: 1.8;
+    .zl-nav__inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .72rem .85rem .72rem 1.1rem; }
+    .zl-brand { display: inline-flex; align-items: center; gap: .75rem; color: #fff; font-weight: 800; letter-spacing: .08em; white-space: nowrap; }
+    .zl-brand img { height: 36px; width: auto; }
+    .zl-menu { display: flex; align-items: center; justify-content: center; gap: .35rem; margin: 0; padding: 0; list-style: none; }
+    .zl-menu a { display: inline-flex; align-items: center; padding: .55rem .75rem; color: rgba(255,255,255,.82); border-radius: 999px; font-size: .92rem; transition: .24s ease; }
+    .zl-menu a:hover { color: #fff; background: rgba(255,255,255,.12); }
+    .zl-actions { display: flex; align-items: center; gap: .5rem; }
+    .zl-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .45rem;
+      min-height: 42px;
+      padding: .7rem 1.1rem;
+      border: 0;
+      border-radius: 999px;
+      font-weight: 750;
+      letter-spacing: .03em;
+      cursor: pointer;
+      transition: transform .24s ease, box-shadow .24s ease, background .24s ease;
     }
-    .glass-cards-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1.8rem;
+    .zl-btn:hover { transform: translateY(-2px); }
+    .zl-btn--primary { color: #062013; background: linear-gradient(135deg, #d9ff8d, #63e6be); box-shadow: 0 12px 34px rgba(99, 230, 190, .28); }
+    .zl-btn--ghost { color: #fff; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.18); }
+    .zl-btn--dark { color: #fff; background: linear-gradient(135deg, #07251a, #0e7a3d); box-shadow: 0 12px 30px rgba(14, 122, 61, .22); }
+
+    .zl-hero {
+      position: relative;
+      min-height: 100vh;
+      display: grid;
+      align-items: center;
+      overflow: hidden;
+      color: #fff;
+      isolation: isolate;
     }
-    @media (max-width: 992px) {
-        .glass-cards-grid { grid-template-columns: repeat(2, 1fr); gap: 1.4rem; }
-        .about-section-title { font-size: 1.9rem; }
+    .zl-hero__video,
+    .zl-hero__poster {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -4;
+      background: #06130f;
     }
-    @media (max-width: 576px) {
-        .glass-cards-grid { grid-template-columns: 1fr; gap: 1.2rem; }
-        .about-section-title { font-size: 1.6rem; }
-        .about-showcase-section { padding: 3.5rem 0 4rem; }
+    .zl-hero__poster {
+      background: url("assets/images/zhongliang-wheat-field.jpg") center/cover no-repeat;
+      z-index: -5;
     }
-    .glass-card {
-        display: block;
-        background: rgba(255, 255, 255, 0.92);
-        border: 1px solid rgba(15, 118, 110, 0.12);
-        border-radius: 20px;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        overflow: hidden;
-        text-decoration: none;
-        color: inherit;
-        transition: transform 0.5s cubic-bezier(0.22,1,0.36,1), box-shadow 0.5s ease, border-color 0.4s ease;
+    .zl-hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -3;
+      background:
+        linear-gradient(90deg, rgba(2, 8, 13, .90) 0%, rgba(5, 31, 24, .66) 43%, rgba(2, 8, 13, .42) 100%),
+        radial-gradient(circle at 78% 25%, rgba(99, 230, 190, .26), transparent 28rem);
     }
-    .glass-card:hover {
-        transform: translateY(-8px) scale(1.02);
-        box-shadow: 0 24px 60px rgba(0,0,0,0.35);
-        border-color: rgba(255,255,255,0.25);
+    .zl-hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      background-image:
+        linear-gradient(rgba(255,255,255,.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+      background-size: 88px 88px;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,.68), transparent 86%);
     }
-    .glass-card-img-wrap {
-        width: 100%;
-        aspect-ratio: 16/10;
-        overflow: hidden;
-        border-bottom: 1px solid rgba(255,255,255,0.08);
+    .zl-hero__grid { display: grid; grid-template-columns: minmax(0, 1.04fr) minmax(320px, .72fr); gap: 2.5rem; align-items: center; padding: 9rem 0 5rem; }
+    .zl-kicker { display: inline-flex; align-items: center; gap: .55rem; color: #d9ff8d; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
+    .zl-kicker::before { content: ""; width: 38px; height: 2px; border-radius: 999px; background: currentColor; box-shadow: 0 0 18px currentColor; }
+    .zl-hero h1 { margin: 1.1rem 0 1rem; font-size: clamp(3.6rem, 9vw, 7.8rem); line-height: .92; letter-spacing: -.06em; font-weight: 950; }
+    .zl-hero h1 span { display: block; color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,.76); text-shadow: none; }
+    .zl-hero__lead { max-width: 680px; color: rgba(255,255,255,.82); font-size: clamp(1rem, 1.45vw, 1.25rem); line-height: 1.9; }
+    .zl-hero__cta { display: flex; gap: .8rem; flex-wrap: wrap; margin-top: 2rem; }
+    .zl-status-card {
+      position: relative;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 30px;
+      padding: 1.2rem;
+      background: linear-gradient(145deg, rgba(255,255,255,.16), rgba(255,255,255,.05));
+      backdrop-filter: blur(18px);
+      box-shadow: 0 30px 90px rgba(0,0,0,.24);
+      overflow: hidden;
     }
-    .glass-card-img-wrap img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.6s ease;
+    .zl-status-card::before { content: ""; position: absolute; inset: -60% -30% auto auto; width: 260px; height: 260px; background: radial-gradient(circle, rgba(217,255,141,.34), transparent 65%); }
+    .zl-console { border-radius: 24px; overflow: hidden; background: rgba(4, 18, 20, .78); border: 1px solid rgba(99,230,190,.2); }
+    .zl-console__top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .9rem 1rem; color: #a9f3d1; border-bottom: 1px solid rgba(99,230,190,.18); }
+    .zl-console__rows { padding: .85rem 1rem 1rem; display: grid; gap: .65rem; }
+    .zl-row { display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: center; color: rgba(255,255,255,.82); font-size: .92rem; }
+    .zl-row strong { color: #fff; font-size: 1.15rem; }
+    .zl-pulse { display: inline-flex; width: 10px; height: 10px; border-radius: 50%; background: #63e6be; box-shadow: 0 0 0 8px rgba(99,230,190,.12), 0 0 24px #63e6be; }
+    .zl-ticker {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      overflow: hidden;
+      border-top: 1px solid rgba(255,255,255,.12);
+      background: rgba(2, 12, 10, .58);
+      backdrop-filter: blur(10px);
     }
-    .glass-card:hover .glass-card-img-wrap img {
-        transform: scale(1.08);
+    .zl-ticker__track {
+      display: flex;
+      gap: 2rem;
+      min-width: max-content;
+      padding: .9rem 1rem;
+      animation: ticker 26s linear infinite;
+      color: rgba(255,255,255,.78);
+      white-space: nowrap;
     }
-    .glass-card-body {
-        padding: 1.4rem 1.6rem 1.8rem;
+    .zl-ticker b { color: #d9ff8d; }
+    @keyframes ticker { to { transform: translateX(-50%); } }
+
+    .zl-section { padding: clamp(4rem, 7vw, 7rem) 0; position: relative; }
+    .zl-section--dark { color: #fff; background: radial-gradient(circle at 15% 20%, rgba(99,230,190,.14), transparent 32rem), linear-gradient(135deg, #05131e, #082719 66%, #071527); }
+    .zl-section__head { display: flex; align-items: end; justify-content: space-between; gap: 2rem; margin-bottom: 2rem; }
+    .zl-section__eyebrow { margin: 0 0 .55rem; color: var(--zl-green); font-weight: 900; letter-spacing: .16em; text-transform: uppercase; }
+    .zl-section--dark .zl-section__eyebrow { color: #d9ff8d; }
+    .zl-section h2 { margin: 0; font-size: clamp(2rem, 4vw, 4rem); line-height: 1.08; font-weight: 950; letter-spacing: -.05em; }
+    .zl-section__desc { max-width: 680px; color: var(--zl-muted); line-height: 1.85; margin: .9rem 0 0; }
+    .zl-section--dark .zl-section__desc { color: rgba(255,255,255,.72); }
+    .zl-grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.1rem; }
+    .zl-grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+    .zl-card {
+      position: relative;
+      min-height: 100%;
+      border: 1px solid var(--zl-line);
+      border-radius: 28px;
+      padding: 1.35rem;
+      background: var(--zl-card);
+      box-shadow: 0 24px 60px rgba(5, 38, 24, .08);
+      overflow: hidden;
+      transition: transform .28s ease, box-shadow .28s ease;
     }
-    .glass-card-body h3 {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #0f172a;
-        margin-bottom: 0.6rem;
-        letter-spacing: 1px;
+    .zl-card:hover { transform: translateY(-7px); box-shadow: 0 32px 80px rgba(5, 38, 24, .14); }
+    .zl-card__image { height: 190px; border-radius: 22px; overflow: hidden; margin-bottom: 1rem; background: #e9f5ec; }
+    .zl-card__image img { width: 100%; height: 100%; object-fit: cover; transition: transform .45s ease; }
+    .zl-card:hover .zl-card__image img { transform: scale(1.07); }
+    .zl-card h3 { margin: 0 0 .6rem; font-size: 1.25rem; font-weight: 900; }
+    .zl-card p { margin: 0; color: var(--zl-muted); line-height: 1.75; }
+    .zl-section--dark .zl-card { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.14); box-shadow: none; }
+    .zl-section--dark .zl-card p { color: rgba(255,255,255,.70); }
+    .zl-metric { padding: 1.2rem; border-radius: 24px; background: linear-gradient(145deg, rgba(14,122,61,.12), rgba(99,230,190,.08)); border: 1px solid var(--zl-line); }
+    .zl-metric b { display: block; font-size: clamp(1.8rem, 4vw, 3rem); color: var(--zl-green); line-height: 1; }
+    .zl-metric span { display: block; margin-top: .45rem; color: var(--zl-muted); }
+    .zl-flow { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; align-items: stretch; }
+    .zl-flow__panel { border-radius: 32px; padding: 1.5rem; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); min-height: 100%; }
+    .zl-flow__panel img { border-radius: 24px; height: 320px; width: 100%; object-fit: cover; margin-bottom: 1.1rem; }
+    .zl-chip-list { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; }
+    .zl-chip { display: inline-flex; align-items: center; gap: .35rem; padding: .45rem .7rem; border-radius: 999px; background: rgba(255,255,255,.12); color: rgba(255,255,255,.84); font-size: .84rem; }
+    .zl-product-list { display: grid; gap: .65rem; }
+    .zl-product-row { display: grid; grid-template-columns: 1fr auto auto; gap: .8rem; align-items: center; padding: .8rem .9rem; border-radius: 18px; background: rgba(255,255,255,.78); border: 1px solid var(--zl-line); }
+    .zl-product-row small { color: var(--zl-muted); }
+    .zl-up { color: #0e7a3d; font-weight: 900; }
+    .zl-down { color: #dc2626; font-weight: 900; }
+    .zl-business-card { display: flex; flex-direction: column; gap: .8rem; }
+    .zl-business-card i { width: 46px; height: 46px; display: inline-grid; place-items: center; border-radius: 16px; color: #082016; background: linear-gradient(135deg, #d9ff8d, #63e6be); }
+    .zl-contact-band {
+      border-radius: 36px;
+      padding: clamp(2rem, 5vw, 4rem);
+      color: #fff;
+      background:
+        linear-gradient(90deg, rgba(5,19,30,.90), rgba(7,39,25,.78)),
+        url("assets/images/zhongliang-port-containers.jpg") center/cover no-repeat;
+      box-shadow: 0 28px 90px rgba(0, 31, 20, .22);
     }
-    .glass-card-body p {
-        font-size: 0.92rem;
-        color: #475569;
-        line-height: 1.7;
-        margin-bottom: 1.2rem;
+    .zl-footer { padding: 2rem 0; color: rgba(255,255,255,.70); background: #06130f; }
+    .zl-footer__inner { display: flex; justify-content: space-between; gap: 1rem; align-items: center; flex-wrap: wrap; }
+    .zl-footer a { color: #d9ff8d; }
+
+    @media (max-width: 980px) {
+      .zl-menu { display: none; }
+      .zl-hero__grid, .zl-flow { grid-template-columns: 1fr; }
+      .zl-grid-3, .zl-grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .zl-section__head { display: block; }
     }
-    .glass-card-link {
-        font-size: 0.9rem;
-        color: #5eead4;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        transition: gap 0.3s ease;
+    @media (max-width: 640px) {
+      .zl-nav { top: 8px; border-radius: 24px; }
+      .zl-nav__inner { align-items: flex-start; border-radius: 24px; }
+      .zl-actions { flex-wrap: wrap; justify-content: flex-end; }
+      .zl-btn { min-height: 38px; padding: .58rem .78rem; font-size: .86rem; }
+      .zl-brand span { display: none; }
+      .zl-hero__grid { padding-top: 7rem; }
+      .zl-hero h1 { font-size: clamp(3rem, 16vw, 5rem); }
+      .zl-grid-3, .zl-grid-4 { grid-template-columns: 1fr; }
+      .zl-product-row { grid-template-columns: 1fr; }
+      .zl-card__image { height: 170px; }
     }
-    .glass-card:hover .glass-card-link {
-        gap: 0.7rem;
-        color: #7fffea;
-    }
-    .modern-form input[type="text"],
-    .modern-form input[type="email"],
-    .modern-form input[type="tel"],
-    .modern-form textarea {
-        width: 100%;
-        padding: 14px 18px;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        background: #ffffff;
-        font-size: 1rem;
-        color: #1e293b;
-        outline: none;
-        transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        margin-bottom: 14px;
-    }
-    .modern-form input[type="text"]::placeholder,
-    .modern-form input[type="email"]::placeholder,
-    .modern-form input[type="tel"]::placeholder,
-    .modern-form textarea::placeholder {
-        color: #94a3b8;
-    }
-    .modern-form input[type="text"]:focus,
-    .modern-form input[type="email"]:focus,
-    .modern-form input[type="tel"]:focus,
-    .modern-form textarea:focus {
-        border-color: #0ea5e9;
-        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
-    }
-    .modern-form textarea {
-        resize: vertical;
-        min-height: 120px;
-    }
-    .modern-form .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 14px;
-    }
-    @media (max-width: 768px) {
-        .modern-form .form-row { grid-template-columns: 1fr; }
-    }
-    .modern-form button[type="submit"] {
-        width: 100%;
-        padding: 14px 28px;
-        border: none;
-        border-radius: 50px;
-        background: linear-gradient(90deg, #0f766e 0%, #0d9488 50%, #0ea5e9 100%);
-        color: #ffffff;
-        font-size: 1rem;
-        font-weight: 600;
-        letter-spacing: 2px;
-        cursor: pointer;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        margin-top: 6px;
-    }
-    .modern-form button[type="submit"]:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(13, 148, 136, 0.35);
-    }
-    </style>
+  </style>
 </head>
 <body>
-    <div class="effect-top-hud"></div>
-    <header>
-        <div class="header-container">
-            <div class="header-info-wrapper">
-                <div class="hero-container">
-                    <div class="header-info-container">
-                        <div class="header-info">
-                            <div class="header-info-item">
-                                <i class="fa-solid fa-envelope accent-color"></i>
-                                <span class="header-info-text">ir@cofco.com</span>
-                            </div>
-                            <div class="header-info-item">
-                                <i class="fa-solid fa-phone accent-color"></i>
-                                <span class="header-info-text">+86-10-85006688</span>
-                            </div>
-                        </div>
-                        <div class="header-social">
-                            <a href="#" class="social-icon"><i class="fa-brands fa-facebook-f"></i></a>
-                            <a href="#" class="social-icon"><i class="fa-brands fa-instagram"></i></a>
-                            <a href="#" class="social-icon"><i class="fa-brands fa-twitter"></i></a>
-                            <a href="#" class="social-icon"><i class="fa-brands fa-youtube"></i></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="header-navbar-fixed index-glass-navbar">
-                <div class="hero-container">
-                    <nav class="navbar navbar-expand-lg">
-                        <div class="container-fluid p-0">
-                            <div class="logo-container header-logo">
-                                <a class="navbar-brand" href="index.html"><img src="assets/images/zhongliang-logo-light.svg" class="img-fluid" alt="中粮天下"></a>
-                            </div>
-                            <div class="nav-link-wrapper">
-                                <button class="btn nav-btn" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                                aria-controls="navbarNav" aria-expanded="false" aria-label="切换导航">
-                                    <i class="fa-solid fa-bars"></i>
-                                </button>
-                                <div class="collapse navbar-collapse" id="navbarNav">
-                                    <ul class="navbar-nav">
-                                        <li class="nav-item"><a class="nav-link" href="index.html">首页</a></li>
-                                        <li class="nav-item"><a class="nav-link" href="about.html">公司介绍</a></li>
-                                        <li class="nav-item dropdown">
-                                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                交易中心 <i class="fa-solid fa-angle-down"></i>
-                                            </a>
-                                            <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item" href="product.html">交易中心</a></li>
-                                            </ul>
-                                        </li>
-                                        <li class="nav-item dropdown">
-                                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                资讯 <i class="fa-solid fa-angle-down"></i>
-                                            </a>
-                                            <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item" href="blog.html">资讯列表</a></li>
-                                                <li><a class="dropdown-item" href="single-post.html">文章详情</a></li>
-                                            </ul>
-                                        </li>
-                                        <li class="nav-item dropdown">
-                                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                个人主页 <i class="fa-solid fa-angle-down"></i>
-                                            </a>
-                                            <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item" href="personal-home.html">个人主页</a></li>
-                                                <li><a class="dropdown-item" href="contact.html">联系我们</a></li>
-                                                <li><a class="dropdown-item" href="case-studies.html">合作专题</a></li>
-                                                <li><a class="dropdown-item" href="faq.html">常见问题</a></li>
-                                                <li><a class="dropdown-item" href="team.html">团队介绍</a></li>
-                                                <li><a class="dropdown-item" href="admin-console.html">后台控台</a></li>
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="navbar-cta-container d-flex flex-row align-items-center gspace-2">
-                                <a href="login.html" class="btn btn-nav-login-green">账号登录</a>
-                                <a href="contact.html" class="btn btn-animated btn-animated--post-3 btn-nav-contact">
-                                    <span>联系客服</span>
-                                    <i class="fa-solid fa-chevron-right"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </nav>
-                </div>
-            </div>
+  <div class="zl-shell">
+    <nav class="zl-nav" aria-label="主导航">
+      <div class="zl-nav__inner">
+        <a class="zl-brand" href="index.html">
+          <img src="assets/images/zhongliang-logo-light.svg" alt="中粮天下">
+          <span>中粮天下</span>
+        </a>
+        <ul class="zl-menu">
+          <li><a href="#about">产业介绍</a></li>
+          <li><a href="#business">平台能力</a></li>
+          <li><a href="product.html">交易中心</a></li>
+          <li><a href="blog.html">资讯</a></li>
+          <li><a href="admin-console.html">后台</a></li>
+        </ul>
+        <div class="zl-actions">
+          <a class="zl-btn zl-btn--ghost" href="login.html">登录</a>
+          <a class="zl-btn zl-btn--primary" href="personal-home.html">个人主页</a>
         </div>
-    </header>
-
-    <aside>
-        <div class="sidebar-overlay"></div>
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo-container sidebar-logo">
-                    <img src="assets/images/zhongliang-logo-dark.svg" alt="中粮天下" class="img-fluid">
-                </div>
-                <button class="close-btn btn-white-accent"><span>关</span></button>
-            </div>
-            <ul class="menu">
-                <li><a href="index.html">首页</a></li>
-                <li><a href="about.html">公司介绍</a></li>
-                <li class="sidebar-dropdown">
-                    <div class="dropdown-header">
-                        <a href="#">交易中心</a>
-                        <button class="sidebar-dropdown-btn"><i class="fa-solid fa-chevron-down"></i></button>
-                    </div>
-                    <ul class="sidebar-dropdown-menu">
-                        <li><a href="product.html">交易中心</a></li>
-                    </ul>
-                </li>
-                <li class="sidebar-dropdown">
-                    <div class="dropdown-header">
-                        <a href="#">资讯</a>
-                        <button class="sidebar-dropdown-btn"><i class="fa-solid fa-chevron-down"></i></button>
-                    </div>
-                    <ul class="sidebar-dropdown-menu">
-                        <li><a href="blog.html">资讯列表</a></li>
-                        <li><a href="single-post.html">文章详情</a></li>
-                    </ul>
-                </li>
-                <li class="sidebar-dropdown">
-                    <div class="dropdown-header">
-                        <a href="#">个人主页</a>
-                        <button class="sidebar-dropdown-btn"><i class="fa-solid fa-chevron-down"></i></button>
-                    </div>
-                    <ul class="sidebar-dropdown-menu">
-                        <li><a href="personal-home.html">个人主页</a></li>
-                        <li><a href="contact.html">联系我们</a></li>
-                        <li><a href="case-studies.html">合作专题</a></li>
-                        <li><a href="faq.html">常见问题</a></li>
-                        <li><a href="team.html">团队介绍</a></li>
-                        <li><a href="admin-console.html">后台控台</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </aside>
+      </div>
+    </nav>
 
     <main>
-        <section class="section banner-home">
-            <div class="banner-home__media-base" aria-hidden="true"></div>
-            <video id="banner-hero-video" class="banner-home__video-bg is-ready" autoplay muted playsinline preload="metadata">
-                <source src="" type="video/mp4">
-            </video>
-            <div id="banner-sync-cover" class="banner-home__sync-cover" aria-hidden="true"></div>
-            <div class="banner-home__video-overlay"></div>
-            <div class="effect-particles-bg" data-count="24" style="z-index:4;"></div>
-            <div class="effect-hud" aria-hidden="true">
-                <div class="effect-hud__scanlines"></div>
-                <div class="effect-hud__grid"></div>
-                <div class="effect-hud__corners"></div>
-                <div class="effect-hud__status">
-                    <span><span class="effect-hud__dot"></span>系统在线</span>
-                    <span>AR MODE</span>
-                    <span>RENDER 60FPS</span>
-                    <span>DATA.SYNC ACTIVE</span>
-                </div>
-                <div class="effect-hud__metrics">
-                    <div>AR.CORE v2.0</div>
-                    <div>TRACKING LOCKED</div>
-                    <div>HOLOGRAPHIC DISPLAY</div>
-                </div>
-                <div class="effect-hud__crosshair">
-                    <div class="effect-hud__crosshair-ring"></div>
-                </div>
-                <div class="effect-hud__bar"></div>
-                <div class="effect-hud__data-stream">
-                    <span>LAT 39.9042° N</span>
-                    <span>COFCO DIGITAL PLATFORM v2.0</span>
-                    <span>LON 116.4074° E</span>
-                </div>
-                <div class="effect-data-stream" style="bottom:52px; left:32px; right:auto; gap:1.5rem;">
-                    <span class="effect-tech-id">OBJ-01</span>
-                    <span class="effect-tech-id">SCAN ACTIVE</span>
-                </div>
-                <div class="effect-tech-corners" aria-hidden="true">
-                    <div class="tc-tr"></div>
-                    <div class="tc-bl"></div>
-                </div>
+      <section class="zl-hero banner-home" id="top">
+        <div class="zl-hero__poster" aria-hidden="true"></div>
+        <video id="banner-hero-video" class="zl-hero__video banner-home__video-bg is-ready" autoplay muted playsinline preload="metadata" poster="assets/images/zhongliang-wheat-field.jpg">
+          <source src="assets/videos/intro.mp4" type="video/mp4">
+        </video>
+        <div id="banner-sync-cover" class="banner-home__sync-cover" aria-hidden="true"></div>
+        <div class="effect-particles-float" id="banner-particles" aria-hidden="true"></div>
+        <div class="zl-container">
+          <div class="zl-hero__grid">
+            <div>
+              <div class="zl-kicker">COFCO DIGITAL PLATFORM</div>
+              <h1>忠于国计 <span>良于民生</span></h1>
+              <p class="zl-hero__lead">以中粮产业链内容为底座，融合产品交易、个人资产、客服协同和后台控台，打造更具科技感、可运营、可排期的视频化数字农粮平台。</p>
+              <div class="zl-hero__cta">
+                <a class="zl-btn zl-btn--primary" href="login.html"><i class="bi bi-shield-lock-fill"></i> 进入登录</a>
+                <a class="zl-btn zl-btn--ghost" href="product.html"><i class="bi bi-graph-up-arrow"></i> 查看交易中心</a>
+                <button class="zl-btn zl-btn--ghost" type="button" id="play-advert-btn"><i class="bi bi-play-fill"></i> 播放品牌广告</button>
+              </div>
             </div>
-            <div class="effect-petals-css" aria-hidden="true"></div>
-            <div class="effect-particles-float" id="banner-particles" aria-hidden="true"></div>
-            <div class="hero-container">
-                <div class="home-hero-layout">
-                    <div class="home-heading-container home-hero-main">
-                        <div class="overflow-hidden">
-                            <h1 class="home-hero-slogan animate-box animated animate__animated" data-animate="animate__fadeInUp">忠于国计<br>良于民生</h1>
-                        </div>
-                        <p class="secondary-accent">中粮集团有限公司是国资委直属的国有重要骨干企业，业务涵盖粮油贸易与加工、食品制造、生物科技、地产金融等领域。「中粮天下」提供数字化服务与产业协同，服务国家粮食安全与民生消费升级。</p>
-                        <div class="d-flex flex-row align-items-center justify-content-start gspace-3 flex-wrap">
-                            <a href="about.html" class="btn btn-animated btn-animated--post-4 effect-star-cta" style="--m:1">
-                                <span>了解更多</span>
-                                <span class="effect-star-cta__wrap" aria-hidden="true">
-                                    <span class="particle" style="--a: -45deg; --x: 55%; --y: 12%; --d: 3.5em; --f: 0.65; --t: 0.12"></span>
-                                    <span class="particle" style="--a: 140deg; --x: 78%; --y: 55%; --d: 5em; --f: 0.75; --t: 0.22"></span>
-                                    <span class="particle" style="--a: 15deg; --x: 18%; --y: 70%; --d: 4em; --f: 0.55; --t: 0.35"></span>
-                                    <span class="particle" style="--a: -130deg; --x: 40%; --y: 8%; --d: 4.5em; --f: 0.8; --t: 0.48"></span>
-                                </span>
-                                <i class="fa-solid fa-chevron-right"></i>
-                            </a>
-
-                            <button type="button" class="request-loader" id="play-advert-btn" aria-label="播放中粮品牌广告"><i class="fa-solid fa-play"></i></button>
-                        </div>
-                    </div>
+            <aside class="zl-status-card" aria-label="平台状态">
+              <div class="zl-console">
+                <div class="zl-console__top">
+                  <span><span class="zl-pulse"></span> 系统在线</span>
+                  <span>MEDIA SCHEDULED</span>
                 </div>
-            </div>
-            <div class="banner-corner-carousel" aria-label="精选影像" aria-hidden="true">
-                <div class="pll-carousel-wrap" id="pll-carousel-wrap">
-                    <div class="pll-carousel" id="pll-carousel"></div>
-                    <div class="pll-nav-arrows" role="group" aria-label="切换">
-                        <button type="button" id="pll-prev" aria-label="上一页">&#10094;</button>
-                        <button type="button" id="pll-next" aria-label="下一页">&#10095;</button>
-                    </div>
-                    <div class="pll-dots" id="pll-dots" role="tablist" aria-label="分页"></div>
-                    <div class="pll-progress" id="pll-progress" style="width:0%"></div>
+                <div class="zl-console__rows">
+                  <div class="zl-row"><span>登录动态背景</span><strong>后台可控</strong></div>
+                  <div class="zl-row"><span>首页顶部视频</span><strong id="media-status">实时读取</strong></div>
+                  <div class="zl-row"><span>交易/订单/个人</span><strong>旧逻辑复用</strong></div>
+                  <div class="zl-row"><span>控台能力</span><strong>持续扩展</strong></div>
                 </div>
-            </div>
-        </section>
-
-        <div class="section p-0">
-            <div id="modal-overlay" class="modal-overlay">
-                <span class="my-close"><i class="fa-solid fa-xmark"></i></span>
-                <div class="my-modal">
-                <iframe id="my-video-frame" title="中粮宣传视频" allow="autoplay; fullscreen; encrypted-media" allowfullscreen></iframe>
-                </div>
-            </div>
+              </div>
+            </aside>
+          </div>
         </div>
-
-        <section class="section about-showcase-section" id="about-section">
-            <div class="hero-container">
-                <div class="about-section-header">
-                    <div class="sub-heading justify-content-center">
-                        <i class="fa-solid fa-circle"></i>
-                        <h4 class="accent-color">关于我们</h4>
-                    </div>
-                    <h2 class="about-section-title">走进中粮：服务国计民生的大粮商</h2>
-                    <p class="about-section-desc">中粮集团坚持市场化、国际化、专业化方向，持续完善从田间到餐桌的全产业链布局，推动粮油糖棉肉乳等主业高质量发展，并依托科技与创新提升供应链韧性与食品安全保障能力。</p>
-                </div>
-                <div class="glass-cards-grid">
-                    <a href="article-processing.html" class="glass-card" data-animate>
-                        <div class="glass-card-img-wrap"><img src="assets/images/zhongliang-grain-silo.jpg" alt="全球粮源与精深加工"></div>
-                        <div class="glass-card-body"><h3>全球粮源与精深加工</h3><p>从世界各地优质粮源采购到国内精深加工，构建全产业链竞争优势，确保每一粒粮食的品质可追溯。</p><span class="glass-card-link">阅读全文 <i class="fa-solid fa-arrow-right"></i></span></div>
-                    </a>
-                    <a href="article-grain-security.html" class="glass-card" data-animate>
-                        <div class="glass-card-img-wrap"><img src="assets/images/zhongliang-port-containers.jpg" alt="守护大国粮仓"></div>
-                        <div class="glass-card-body"><h3>守护大国粮仓</h3><p>服务国家粮食安全战略，筑牢储备与应急保障体系，关键时刻保供稳价，守护国人饭碗。</p><span class="glass-card-link">阅读全文 <i class="fa-solid fa-arrow-right"></i></span></div>
-                    </a>
-                    <a href="article-tech-innovation.html" class="glass-card" data-animate>
-                        <div class="glass-card-img-wrap"><img src="assets/images/advert/field-terraces.jpg" alt="科技创新驱动"></div>
-                        <div class="glass-card-body"><h3>科技创新驱动</h3><p>以生物技术、智慧农业和绿色低碳引领行业变革，持续提升粮食品质与加工效率。</p><span class="glass-card-link">阅读全文 <i class="fa-solid fa-arrow-right"></i></span></div>
-                    </a>
-                    <a href="article-partnership.html" class="glass-card" data-animate>
-                        <div class="glass-card-img-wrap"><img src="assets/images/zhongliang-corporate-handshake.jpg" alt="合作共赢生态"></div>
-                        <div class="glass-card-body"><h3>合作共赢生态</h3><p>携手产业链上下游伙伴共建稳定、透明、可持续的价值网络，共享发展红利。</p><span class="glass-card-link">阅读全文 <i class="fa-solid fa-arrow-right"></i></span></div>
-                    </a>
-                    <a href="article-green-transition.html" class="glass-card" data-animate>
-                        <div class="glass-card-img-wrap"><img src="assets/images/zhongliang-supermarket-grocery.jpg" alt="绿色低碳转型"></div>
-                        <div class="glass-card-body"><h3>绿色低碳转型</h3><p>践行可持续发展理念，推动农粮产业绿色革命，为子孙后代留下碧水蓝天。</p><span class="glass-card-link">阅读全文 <i class="fa-solid fa-arrow-right"></i></span></div>
-                    </a>
-                    <a href="article-people-livelihood.html" class="glass-card" data-animate>
-                        <div class="glass-card-img-wrap"><img src="assets/images/advert/rice-field.jpg" alt="服务民生福祉"></div>
-                        <div class="glass-card-body"><h3>服务民生福祉</h3><p>从田间到餐桌，以高品质产品守护亿万家庭的美好生活，奉献营养健康好食品。</p><span class="glass-card-link">阅读全文 <i class="fa-solid fa-arrow-right"></i></span></div>
-                    </a>
-                </div>
+        <div class="banner-corner-carousel" aria-label="精选影像" aria-hidden="true">
+          <div class="pll-carousel-wrap" id="pll-carousel-wrap">
+            <div class="pll-carousel" id="pll-carousel"></div>
+            <div class="pll-nav-arrows" role="group" aria-label="切换">
+              <button type="button" id="pll-prev" aria-label="上一页">&#10094;</button>
+              <button type="button" id="pll-next" aria-label="下一页">&#10095;</button>
             </div>
-        </section>
+            <div class="pll-dots" id="pll-dots" role="tablist" aria-label="分页"></div>
+            <div class="pll-progress" id="pll-progress" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="zl-ticker" aria-hidden="true">
+          <div class="zl-ticker__track">
+            <span><b>国家粮食安全</b> · 全产业链协同</span>
+            <span><b>数字交易</b> · 产品行情与风控结算</span>
+            <span><b>后台排期</b> · 登录/首页/广告视频可控</span>
+            <span><b>客户服务</b> · 在线客服与资金审核</span>
+            <span><b>国家粮食安全</b> · 全产业链协同</span>
+            <span><b>数字交易</b> · 产品行情与风控结算</span>
+          </div>
+        </div>
+      </section>
 
-        <!-- 后续的 Service、Company Overview、合作专题、为何选择我们、Contact、最新动态、Contact CTA 等 section 都完整保留，此处因长度限制省略，但你的文件里本来就有，不需要改动 -->
+      <section class="zl-section" id="about">
+        <div class="zl-container">
+          <div class="zl-section__head">
+            <div>
+              <p class="zl-section__eyebrow">About Zhongliang</p>
+              <h2>把静态展示升级成可运营的平台级首页</h2>
+              <p class="zl-section__desc">中粮天下首页不再只是图片和文字堆叠，而是围绕“国计民生、产业链、交易能力、客户服务、后台可控”重新组织顶层内容，所有核心入口都指向真实业务链路。</p>
+            </div>
+            <a class="zl-btn zl-btn--dark" href="about.html">公司介绍</a>
+          </div>
+          <div class="zl-grid-3">
+            <a class="zl-card" href="article-grain-security.html">
+              <div class="zl-card__image"><img src="assets/images/zhongliang-port-containers.jpg" alt="守护大国粮仓"></div>
+              <h3>守护大国粮仓</h3>
+              <p>服务国家粮食安全战略，连接储备、贸易、加工、物流和民生消费。</p>
+            </a>
+            <a class="zl-card" href="article-processing.html">
+              <div class="zl-card__image"><img src="assets/images/zhongliang-grain-silo.jpg" alt="全球粮源与精深加工"></div>
+              <h3>全球粮源与加工</h3>
+              <p>从全球优质粮源到国内精深加工，以透明链路支撑平台内容与产品表达。</p>
+            </a>
+            <a class="zl-card" href="article-tech-innovation.html">
+              <div class="zl-card__image"><img src="assets/images/advert/field-terraces.jpg" alt="科技创新驱动"></div>
+              <h3>科技创新驱动</h3>
+              <p>用数据、视频、行情和后台运营能力，提升前台高级感和用户信任。</p>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section class="zl-section zl-section--dark" id="business">
+        <div class="zl-container">
+          <div class="zl-section__head">
+            <div>
+              <p class="zl-section__eyebrow">Business Core</p>
+              <h2>逻辑性板块沿用 zhongliang-live</h2>
+              <p class="zl-section__desc">交易板块、个人资料、订单中心、资金和控台不重造算法，继续复用旧项目已跑通的 Express API、JWT、订单结算、控盘和客服数据结构。</p>
+            </div>
+            <a class="zl-btn zl-btn--primary" href="admin-console.html">进入后台控台</a>
+          </div>
+          <div class="zl-grid-4">
+            <a class="zl-card zl-business-card" href="product.html">
+              <i class="bi bi-bar-chart-line-fill"></i>
+              <h3>交易中心</h3>
+              <p>产品、行情、买涨买跌、委买和订单提交接旧版 `/api/products`、`/api/trade/order`。</p>
+            </a>
+            <a class="zl-card zl-business-card" href="personal-home.html">
+              <i class="bi bi-person-vcard-fill"></i>
+              <h3>个人资料</h3>
+              <p>余额、总资产、冻结金额、资金流水、充值和提现沿用 `/api/me/*`。</p>
+            </a>
+            <a class="zl-card zl-business-card" href="product.html#orders">
+              <i class="bi bi-receipt-cutoff"></i>
+              <h3>订单中心</h3>
+              <p>进行中与已结算订单统一读取 `/api/orders`，后端定时结算。</p>
+            </a>
+            <a class="zl-card zl-business-card" href="admin-console.html#media">
+              <i class="bi bi-camera-video-fill"></i>
+              <h3>视频排期</h3>
+              <p>后台按时间段控制登录页、首页顶部、品牌广告播放内容。</p>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section class="zl-section">
+        <div class="zl-container">
+          <div class="zl-flow">
+            <div class="zl-flow__panel" style="background:#fff;border:1px solid var(--zl-line);color:var(--zl-ink);">
+              <img src="assets/images/zhongliang-supermarket-grocery.jpg" alt="民生消费">
+              <p class="zl-section__eyebrow">Content Architecture</p>
+              <h2 style="font-size:clamp(1.9rem,3vw,3rem);">前台内容全部向后台可编辑演进</h2>
+              <p class="zl-section__desc">首页、公司介绍、资讯、FAQ、联系方式、广告素材、视频排期都纳入后台 CMS 的扩展方向，不再长期写死在 HTML 中。</p>
+              <div class="zl-chip-list">
+                <span class="zl-chip" style="background:#eef8f1;color:#0e7a3d;">首页板块</span>
+                <span class="zl-chip" style="background:#eef8f1;color:#0e7a3d;">文章资讯</span>
+                <span class="zl-chip" style="background:#eef8f1;color:#0e7a3d;">广告视频</span>
+                <span class="zl-chip" style="background:#eef8f1;color:#0e7a3d;">后台排期</span>
+              </div>
+            </div>
+            <div class="zl-flow__panel">
+              <img src="assets/images/zhongliang-corporate-handshake.jpg" alt="平台协同">
+              <p class="zl-section__eyebrow">Live Products</p>
+              <h2 style="font-size:clamp(1.9rem,3vw,3rem);">产品行情预览</h2>
+              <p class="zl-section__desc">以下列表实时读取旧后端产品接口，页面视觉升级但业务来源保持一致。</p>
+              <div class="zl-product-list" id="home-product-list">
+                <div class="zl-product-row"><span>读取产品数据中...</span><small>/api/products</small><b>--</b></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="zl-section" style="padding-top:0;">
+        <div class="zl-container">
+          <div class="zl-grid-4">
+            <div class="zl-metric"><b>77</b><span>年品牌积淀与产业协同</span></div>
+            <div class="zl-metric"><b>30+</b><span>农粮产品行情与交易标的</span></div>
+            <div class="zl-metric"><b>24h</b><span>后台排期和前端内容联动</span></div>
+            <div class="zl-metric"><b>1套</b><span>旧业务逻辑 + 新视觉体验</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="zl-section zl-section--dark">
+        <div class="zl-container">
+          <div class="zl-contact-band">
+            <p class="zl-section__eyebrow">Next Action</p>
+            <h2>登录保持原静态页逻辑，主页升级为顶级内容入口</h2>
+            <p style="max-width:720px;color:rgba(255,255,255,.78);line-height:1.85;">如果用户直接访问根路径，仍按当前部署策略进入登录；用户从登录页浏览官网时，看到的是重构后的高级主页。交易、个人、订单和控台继续走旧版业务接口。</p>
+            <div class="zl-hero__cta">
+              <a class="zl-btn zl-btn--primary" href="login.html">立即登录</a>
+              <a class="zl-btn zl-btn--ghost" href="contact.html">联系客服</a>
+              <a class="zl-btn zl-btn--ghost" href="/echofy-template/index.html">查看 Echofy 原模板</a>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
 
-    <footer>
-        <!-- Footer 内容完整保留，此处因长度限制省略，你的文件里本来就有 -->
+    <footer class="zl-footer">
+      <div class="zl-container zl-footer__inner">
+        <span>版权所有 © 2026 中粮天下。权威信息请以中粮集团有限公司官网为准。</span>
+        <span><a href="https://www.cofco.com/" target="_blank" rel="noopener noreferrer">中粮集团官网</a> · <a href="admin-console.html">后台控台</a></span>
+      </div>
     </footer>
+  </div>
 
-    <script type="module" src="assets/js/banner-media-carousel.mjs?v=18"></script>
-    <script src="assets/js/vendor/jquery.min.js"></script>
-    <script src="assets/js/vendor/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/vendor/swiper-bundle.min.js"></script>
-    <script src="assets/js/vendor/fslightbox.js"></script>
-    <script src="assets/js/script.js"></script>
-    <script src="assets/js/form-script.js"></script>
-    <script src="assets/js/swiper-script.js"></script>
-    <script src="assets/js/video_embedded.js"></script>
-    <script>
-    // Banner floating particles
-    (function() {
-      const container = document.getElementById('banner-particles');
-      if (!container) return;
-      for (let i = 0; i < 18; i++) {
-        const p = document.createElement('div');
-        p.className = 'fp';
-        p.style.left = (Math.random() * 100) + '%';
-        p.style.bottom = (Math.random() * 20) + '%';
-        p.style.width = (2 + Math.random() * 4) + 'px';
-        p.style.height = p.style.width;
-        p.style.animationDuration = (6 + Math.random() * 10) + 's';
-        p.style.animationDelay = (Math.random() * 8) + 's';
-        container.appendChild(p);
-      }
-    })();
-    </script>
-    <script src="assets/data/grain-products-fallback.js?v=1"></script>
-    <script src="assets/js/dc-heritage-core.js?v=4"></script>
-    <script src="assets/js/zhongliang-animations.js"></script>
-
-    <!-- ==================== 品牌广告弹窗（iframe 加载完整 advert.html） ==================== -->
-    <script>
-    (function() {
-        const btn = document.getElementById('play-advert-btn');
-        if (!btn) return;
-
-        const overlay = document.createElement('div');
-        overlay.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999;';
-        overlay.innerHTML = `
-            <button id="advert-close-btn" style="position:absolute;top:1rem;right:1rem;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,0.35);background:rgba(255,255,255,0.1);color:#fff;font-size:1.5rem;cursor:pointer;z-index:10000;">×</button>
-            <iframe id="advert-iframe" src="advert.html" style="width:100%;height:100%;border:none;" allow="autoplay; fullscreen"></iframe>
-        `;
-        document.body.appendChild(overlay);
-
-        const closeBtn = overlay.querySelector('#advert-close-btn');
-
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            overlay.style.display = 'block';
-            const bgVideo = document.getElementById('banner-hero-video');
-            if (bgVideo) bgVideo.pause();
-        });
-
-        function closePopup() {
-            overlay.style.display = 'none';
-            const bgVideo = document.getElementById('banner-hero-video');
-            if (bgVideo) bgVideo.play().catch(() => {});
+  <script type="module" src="assets/js/banner-media-carousel.mjs?v=19"></script>
+  <script src="assets/js/vendor/jquery.min.js"></script>
+  <script src="assets/js/vendor/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/script.js"></script>
+  <script>
+    (function () {
+      var container = document.getElementById('banner-particles');
+      if (container) {
+        for (var i = 0; i < 18; i += 1) {
+          var p = document.createElement('div');
+          p.className = 'fp';
+          p.style.left = Math.random() * 100 + '%';
+          p.style.bottom = Math.random() * 20 + '%';
+          p.style.width = 2 + Math.random() * 4 + 'px';
+          p.style.height = p.style.width;
+          p.style.animationDuration = 6 + Math.random() * 10 + 's';
+          p.style.animationDelay = Math.random() * 8 + 's';
+          container.appendChild(p);
         }
+      }
 
-        closeBtn.addEventListener('click', closePopup);
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && overlay.style.display === 'block') {
-                closePopup();
-            }
+      var advertBtn = document.getElementById('play-advert-btn');
+      if (advertBtn) {
+        var overlay = document.createElement('div');
+        overlay.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:9999;';
+        overlay.innerHTML = '<button id="advert-close-btn" style="position:absolute;top:1rem;right:1rem;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.1);color:#fff;font-size:1.5rem;cursor:pointer;z-index:10000;">×</button><iframe src="advert.html" style="width:100%;height:100%;border:0;" allow="autoplay; fullscreen"></iframe>';
+        document.body.appendChild(overlay);
+        advertBtn.addEventListener('click', function () {
+          overlay.style.display = 'block';
+          var bgVideo = document.getElementById('banner-hero-video');
+          if (bgVideo) bgVideo.pause();
         });
+        overlay.querySelector('#advert-close-btn').addEventListener('click', function () {
+          overlay.style.display = 'none';
+          var bgVideo = document.getElementById('banner-hero-video');
+          if (bgVideo) bgVideo.play().catch(function () {});
+        });
+      }
+
+      fetch('/api/site/active-media?pageKey=home&slotKey=hero-bg', { cache: 'no-store' })
+        .then(function (res) { return res.ok ? res.json() : null; })
+        .then(function (data) {
+          var el = document.getElementById('media-status');
+          if (el && data && data.item && data.item.title) el.textContent = data.item.title;
+        })
+        .catch(function () {});
+
+      fetch('/api/products', { cache: 'no-store' })
+        .then(function (res) { return res.ok ? res.json() : []; })
+        .then(function (rows) {
+          var list = document.getElementById('home-product-list');
+          if (!list) return;
+          var items = Array.isArray(rows) ? rows.slice(0, 6) : [];
+          if (!items.length) {
+            list.innerHTML = '<div class="zl-product-row"><span>暂无产品数据</span><small>请检查后端</small><b>--</b></div>';
+            return;
+          }
+          list.innerHTML = items.map(function (p) {
+            var name = p.name || p.tradeName || p.productCode || p.id;
+            var price = Number(p.livePrice || p.basePrice || 0);
+            var pct = Number(p.changePct || 0);
+            var cls = pct >= 0 ? 'zl-up' : 'zl-down';
+            var sign = pct >= 0 ? '+' : '';
+            return '<a class="zl-product-row" href="product.html"><span><strong>' + name + '</strong><br><small>' + (p.marketSymbol || p.productCode || '农粮产品') + '</small></span><small>' + (price ? price.toFixed(2) : '--') + '</small><b class="' + cls + '">' + sign + pct.toFixed(2) + '%</b></a>';
+          }).join('');
+        })
+        .catch(function () {});
     })();
-    </script>
+  </script>
 </body>
 </html>
