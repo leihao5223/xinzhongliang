@@ -131,7 +131,7 @@ function buildCarousel(slides) {
       const abs = escAttr(absoluteMediaUrl(s.url));
       const media =
         s.type === 'video'
-          ? `<video src="${abs}" data-pll-video muted playsinline preload="metadata"></video>`
+          ? `<video src="${abs}" data-pll-video muted loop playsinline preload="auto"></video>`
           : `<img src="${abs}" alt="${escAttr(s.title)}" width="640" height="400" decoding="async" fetchpriority="low" />`;
       return `
       <div class="pll-carousel-slide ${i === 0 ? 'active' : ''}" data-index="${i}" role="tabpanel" id="pll-panel-${i + 1}" aria-labelledby="pll-dot-${i + 1}" ${i !== 0 ? 'inert' : ''}>
@@ -160,12 +160,35 @@ function syncVideos(slidesEl, activeIndex) {
     if (!v) return;
     if (i === activeIndex) {
       v.muted = true;
+      v.loop = true;
+      v.autoplay = true;
+      v.setAttribute('muted', 'muted');
+      v.setAttribute('loop', 'loop');
+      v.setAttribute('playsinline', 'playsinline');
+      v.setAttribute('webkit-playsinline', 'webkit-playsinline');
       v.play().catch(() => {});
     } else {
       v.pause();
       v.currentTime = 0;
     }
   });
+}
+
+function forceHeroAutoplay(video) {
+  if (!video) return;
+  video.muted = true;
+  video.defaultMuted = true;
+  video.loop = true;
+  video.autoplay = true;
+  video.playsInline = true;
+  video.setAttribute('muted', 'muted');
+  video.setAttribute('loop', 'loop');
+  video.setAttribute('autoplay', 'autoplay');
+  video.setAttribute('playsinline', 'playsinline');
+  video.setAttribute('webkit-playsinline', 'webkit-playsinline');
+  if (video.readyState >= 2) {
+    video.play().catch(() => {});
+  }
 }
 
 function syncHeroBackdrop(slide) {
@@ -194,7 +217,7 @@ function syncHeroBackdrop(slide) {
   const nextAbs = absoluteMediaUrl(nextSrc);
   if (currentAbs === nextAbs && video.classList.contains('is-ready')) {
     // 同一段视频，只需确保继续播放
-    video.muted = true;
+    forceHeroAutoplay(video);
     video.play().catch(() => {});
     return;
   }
@@ -203,7 +226,7 @@ function syncHeroBackdrop(slide) {
   cover.style.backgroundImage = '';
   if (srcEl) srcEl.src = nextAbs;
   video.load();
-  video.muted = true;
+  forceHeroAutoplay(video);
   video.play().catch(() => {});
   video.classList.remove('is-ready');
   video.style.opacity = '0';
@@ -215,6 +238,7 @@ function syncHeroBackdrop(slide) {
   video._bannerCanplayHandler = function () {
     video.classList.add('is-ready');
     video.style.opacity = '1';
+    forceHeroAutoplay(video);
   };
   video.addEventListener('canplay', video._bannerCanplayHandler, { once: true });
 }
@@ -222,6 +246,7 @@ function syncHeroBackdrop(slide) {
 function revealDefaultHeroVideo() {
   const video = document.getElementById('banner-hero-video');
   if (!video) return;
+  forceHeroAutoplay(video);
   video.classList.add('is-ready');
   video.style.opacity = '1';
 }
@@ -253,6 +278,19 @@ async function init() {
   let autoTimer = null;
   let progressTimer = null;
   let isHovering = false;
+  const heroVideo = document.getElementById('banner-hero-video');
+  if (heroVideo) {
+    forceHeroAutoplay(heroVideo);
+    heroVideo.addEventListener('ended', () => {
+      heroVideo.currentTime = 0;
+      forceHeroAutoplay(heroVideo);
+    });
+    heroVideo.addEventListener('pause', () => {
+      if (document.visibilityState !== 'hidden') {
+        window.setTimeout(() => forceHeroAutoplay(heroVideo), 120);
+      }
+    });
+  }
 
   function goTo(index) {
     const slideEls = carousel.querySelectorAll('.pll-carousel-slide');
@@ -344,12 +382,19 @@ async function init() {
       scheduleAutoAdvance();
       syncVideos(carousel, current);
       syncHeroBackdrop(slides[current]);
+      forceHeroAutoplay(heroVideo);
     }
   });
 
   syncVideos(carousel, current);
   syncHeroBackdrop(slides[current]);
   scheduleAutoAdvance();
+  window.setInterval(() => {
+    if (document.visibilityState !== 'hidden') {
+      syncVideos(carousel, current);
+      forceHeroAutoplay(heroVideo);
+    }
+  }, 3000);
 
   setTimeout(() => {
     const v = document.getElementById('banner-hero-video');

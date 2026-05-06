@@ -3070,3 +3070,78 @@ body.zl-page-with-unified-nav > aside {
     }
 }
 
+/* Global mobile bottom navigation */
+.zl-mobile-bottom-nav {
+    display: none;
+}
+
+@media (max-width: 767.98px) {
+    body.zl-has-mobile-bottom-nav {
+        padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+
+    .zl-mobile-bottom-nav {
+        position: fixed;
+        left: 50%;
+        right: auto;
+        bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+        z-index: 2147483000;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        width: min(calc(100vw - 1rem), 440px);
+        min-height: 62px;
+        padding: .42rem;
+        border: 1px solid rgba(134, 239, 172, .28);
+        border-radius: 24px;
+        background: linear-gradient(135deg, rgba(5, 46, 22, .94), rgba(6, 95, 70, .86));
+        box-shadow: 0 18px 54px rgba(3, 24, 13, .34);
+        transform: translateX(-50%);
+        -webkit-backdrop-filter: blur(18px) saturate(1.12);
+        backdrop-filter: blur(18px) saturate(1.12);
+        gap: .2rem;
+    }
+
+    .zl-mobile-bottom-nav__link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 0;
+        min-height: 46px;
+        border-radius: 18px;
+        color: rgba(255, 255, 255, .78);
+        font-family: var(--font-family-heading);
+        font-size: .82rem;
+        font-weight: 850;
+        letter-spacing: .01em;
+        line-height: 1.15;
+        text-align: center;
+        text-decoration: none;
+        white-space: nowrap;
+        -webkit-tap-highlight-color: transparent;
+        transition: color .2s ease, background .2s ease, box-shadow .2s ease;
+    }
+
+    .zl-mobile-bottom-nav__link:hover,
+    .zl-mobile-bottom-nav__link:focus-visible {
+        color: #fff;
+        outline: none;
+    }
+
+    .zl-mobile-bottom-nav__link.is-active {
+        color: #052e16;
+        background: linear-gradient(135deg, #dcfce7, #86efac);
+        box-shadow: 0 10px 24px rgba(134, 239, 172, .22);
+    }
+}
+
+@media (max-width: 575.98px) {
+    body.zl-has-mobile-bottom-nav {
+        padding-bottom: calc(138px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+
+    .zl-mobile-bottom-nav {
+        width: min(calc(70vw - .7rem), 308px);
+        zoom: 1.428571;
+    }
+}
+

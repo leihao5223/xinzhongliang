@@ -4,6 +4,7 @@ jQuery(function ($) {
     initSidebarDropdown();
     initUnifiedTopNav();
     initAuthAwareTopNav();
+    initMobileBottomNav();
     initMobileVideoAutoplay();
     initNavLink();
     initCounterCount();
@@ -167,6 +168,52 @@ function initAuthAwareTopNav() {
 }
 
 /* =====================
+   Mobile Bottom Nav
+===================== */
+function initMobileBottomNav() {
+    if (document.querySelector('.zl-mobile-bottom-nav')) return;
+
+    var navItems = [
+        { label: '首页', href: 'index.html', pages: ['index.html', ''] },
+        { label: '交易中心', href: 'product.html', pages: ['product.html'] },
+        {
+            label: '动态资讯',
+            href: 'blog.html',
+            pages: [
+                'blog.html',
+                'single-post.html',
+                'article-tech-innovation.html',
+                'article-partnership.html',
+                'article-green-transition.html',
+                'article-people-livelihood.html',
+                'article-processing.html',
+                'article-grain-security.html'
+            ]
+        },
+        { label: '个人主页', href: 'personal-home.html', pages: ['personal-home.html'] }
+    ];
+    var pathName = window.location.pathname || '';
+    var currentPage = pathName.substring(pathName.lastIndexOf('/') + 1).toLowerCase();
+    var nav = document.createElement('nav');
+
+    nav.className = 'zl-mobile-bottom-nav';
+    nav.setAttribute('aria-label', '手机端底部导航');
+    navItems.forEach(function (item) {
+        var link = document.createElement('a');
+        var isActive = item.pages.indexOf(currentPage) !== -1;
+
+        link.className = 'zl-mobile-bottom-nav__link' + (isActive ? ' is-active' : '');
+        link.href = item.href;
+        link.textContent = item.label;
+        if (isActive) link.setAttribute('aria-current', 'page');
+        nav.appendChild(link);
+    });
+
+    document.body.appendChild(nav);
+    document.body.classList.add('zl-has-mobile-bottom-nav');
+}
+
+/* =====================
    Mobile Video Autoplay
 ===================== */
 function initMobileVideoAutoplay() {
@@ -179,7 +226,12 @@ function initMobileVideoAutoplay() {
         videos.forEach(function (v) {
             try {
                 v.muted = true;
+                v.defaultMuted = true;
+                v.loop = true;
+                v.autoplay = true;
                 v.setAttribute('muted', 'muted');
+                v.setAttribute('loop', 'loop');
+                v.setAttribute('autoplay', 'autoplay');
                 v.setAttribute('playsinline', 'playsinline');
                 v.setAttribute('webkit-playsinline', 'webkit-playsinline');
                 if (v.readyState === 0 && typeof v.load === 'function') v.load();
@@ -190,6 +242,7 @@ function initMobileVideoAutoplay() {
     }
 
     tryPlayAll();
+    window.setInterval(tryPlayAll, 3000);
     document.addEventListener('visibilitychange', function () {
         if (!document.hidden) tryPlayAll();
     });

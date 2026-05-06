@@ -53,6 +53,8 @@
     boundaryForce: 0.68,
     maxSpeed: 2.9,
     maxForce: 0.12,
+    minCruiseSpeed: 0.32,
+    wanderForce: 0.055,
     trailLength: 12
   };
   var palette = ['#e3e9f2', '#cfdbe9', '#f4f7fc', '#7fd9b5', '#6bc8ff', '#89e0c0'];
@@ -74,17 +76,38 @@
     return [vx, vy];
   }
 
+  function sampleActivity() {
+    var roll = Math.random();
+    if (roll < 0.82) {
+      return 0.3 + ((Math.random() + Math.random()) / 2) * 0.4;
+    }
+    if (roll < 0.91) {
+      return 0.02 + Math.random() * 0.28;
+    }
+    return 0.7 + Math.random() * 0.3;
+  }
+
   function createPoint() {
+    var activity = sampleActivity();
+    var angle = Math.random() * Math.PI * 2;
+    var startSpeed = 0.38 + activity * 0.92;
+
     return {
       x: Math.random() * window.innerWidth,
       y: Math.random() * window.innerHeight,
-      vx: (Math.random() - 0.5) * 2.3,
-      vy: (Math.random() - 0.5) * 2.3,
+      vx: Math.cos(angle) * startSpeed,
+      vy: Math.sin(angle) * startSpeed,
       r: 1.6 + Math.random() * 3.2,
       color: palette[Math.floor(Math.random() * palette.length)],
       trail: [],
+      activity: activity,
       phase: Math.random() * Math.PI * 2,
-      pulseSpeed: 0.6 + Math.random() * 1.15
+      maxSpeed: 1.25 + activity * 2.25,
+      minSpeed: cfg.minCruiseSpeed + activity * 0.42,
+      wander: 0.72 + activity * 1.28,
+      reaction: 0.62 + activity * 1.18,
+      glow: 0.58 + activity * 0.72,
+      pulseSpeed: 0.55 + activity * 1.35 + Math.random() * 0.28
     };
   }
 
@@ -106,6 +129,9 @@
   }
 
   function updatePoint(point, index) {
+    var activity = point.activity || 0.5;
+    var maxSpeed = point.maxSpeed || cfg.maxSpeed;
+    var maxForce = cfg.maxForce * (0.72 + activity * 0.7);
     var cohesionX = 0;
     var cohesionY = 0;
     var cohesionCount = 0;
@@ -145,30 +171,40 @@
       var targetY = cohesionY / cohesionCount;
       var cfX = targetX - point.x;
       var cfY = targetY - point.y;
-      var limitedC = limitVector(cfX, cfY, cfg.maxSpeed);
+      var limitedC = limitVector(cfX, cfY, maxSpeed);
       cfX = limitedC[0] - point.vx;
       cfY = limitedC[1] - point.vy;
-      limitedC = limitVector(cfX, cfY, cfg.maxForce);
-      point.vx += limitedC[0] * cfg.cohesionWeight;
-      point.vy += limitedC[1] * cfg.cohesionWeight;
+      limitedC = limitVector(cfX, cfY, maxForce);
+      point.vx += limitedC[0] * cfg.cohesionWeight * (0.86 + activity * 0.24);
+      point.vy += limitedC[1] * cfg.cohesionWeight * (0.86 + activity * 0.24);
     }
 
     if (separationCount > 0) {
-      var limitedS = limitVector(separationX, separationY, cfg.maxSpeed);
+      var limitedS = limitVector(separationX, separationY, maxSpeed);
       var sfX = limitedS[0] - point.vx;
       var sfY = limitedS[1] - point.vy;
-      limitedS = limitVector(sfX, sfY, cfg.maxForce);
-      point.vx += limitedS[0] * cfg.separationWeight;
-      point.vy += limitedS[1] * cfg.separationWeight;
+      limitedS = limitVector(sfX, sfY, maxForce);
+      point.vx += limitedS[0] * cfg.separationWeight * (0.9 + activity * 0.28);
+      point.vy += limitedS[1] * cfg.separationWeight * (0.9 + activity * 0.28);
     }
 
     if (alignmentCount > 0) {
       var afX = alignmentX / alignmentCount - point.vx;
       var afY = alignmentY / alignmentCount - point.vy;
-      var limitedA = limitVector(afX, afY, cfg.maxForce);
-      point.vx += limitedA[0] * cfg.alignmentWeight;
-      point.vy += limitedA[1] * cfg.alignmentWeight;
+      var limitedA = limitVector(afX, afY, maxForce);
+      point.vx += limitedA[0] * cfg.alignmentWeight * (0.82 + activity * 0.32);
+      point.vy += limitedA[1] * cfg.alignmentWeight * (0.82 + activity * 0.32);
     }
+
+    var wanderTime = timeAcc * (0.82 + activity * 1.85) + point.phase;
+    point.vx += (
+      Math.sin(wanderTime) * 0.75 +
+      Math.sin(wanderTime * 0.43 + point.phase) * 0.42
+    ) * cfg.wanderForce * point.wander;
+    point.vy += (
+      Math.cos(wanderTime * 0.92) * 0.75 +
+      Math.cos(wanderTime * 0.39 + point.phase) * 0.42
+    ) * cfg.wanderForce * point.wander;
 
     var mouseActive = mouse.x > 0 && mouse.x < window.innerWidth && mouse.y > 0 && mouse.y < window.innerHeight;
     if (mouseActive) {
@@ -176,11 +212,11 @@
       var mdy = point.y - mouse.y;
       var md = Math.hypot(mdx, mdy);
       if (md < cfg.predatorRadius && md > 0.5) {
-        var strength = ((cfg.predatorRadius - md) / cfg.predatorRadius) * cfg.predatorWeight * (mouse.isDown ? 2.6 : 1.35);
+        var strength = ((cfg.predatorRadius - md) / cfg.predatorRadius) * cfg.predatorWeight * point.reaction * (mouse.isDown ? 2.35 : 1.18);
         var angle = Math.atan2(mdy, mdx);
         if (mouse.isDown) {
-          point.vx += (mdx / md) * strength * 1.15 - Math.sin(angle) * strength * 0.86;
-          point.vy += (mdy / md) * strength * 1.15 + Math.cos(angle) * strength * 0.86;
+          point.vx += (mdx / md) * strength * 1.08 - Math.sin(angle) * strength * 0.74;
+          point.vy += (mdy / md) * strength * 1.08 + Math.cos(angle) * strength * 0.74;
         } else {
           point.vx += (mdx / md) * strength;
           point.vy += (mdy / md) * strength;
@@ -190,7 +226,7 @@
 
     if (Math.random() < 0.03) {
       var swirl = (timeAcc + point.phase) * 1.35;
-      var vortex = mouse.isDown ? 1.65 : 0.62;
+      var vortex = (mouse.isDown ? 1.45 : 0.48) * (0.62 + activity * 0.85);
       point.vx += Math.sin(swirl) * 0.1 * vortex;
       point.vy += Math.cos(swirl * 0.92) * 0.1 * vortex;
     }
@@ -201,7 +237,17 @@
     if (point.y < margin) point.vy += cfg.boundaryForce * (margin - point.y) / margin;
     if (point.y > window.innerHeight - margin) point.vy -= cfg.boundaryForce * (point.y - (window.innerHeight - margin)) / margin;
 
-    var limited = limitVector(point.vx, point.vy, cfg.maxSpeed);
+    var speed = Math.hypot(point.vx, point.vy);
+    var minSpeed = point.minSpeed || cfg.minCruiseSpeed;
+    if (speed < minSpeed && speed > 0.001) {
+      point.vx = (point.vx / speed) * minSpeed;
+      point.vy = (point.vy / speed) * minSpeed;
+    } else if (speed <= 0.001) {
+      point.vx = Math.cos(point.phase) * minSpeed;
+      point.vy = Math.sin(point.phase) * minSpeed;
+    }
+
+    var limited = limitVector(point.vx, point.vy, maxSpeed);
     point.vx = limited[0];
     point.vy = limited[1];
 
@@ -221,27 +267,27 @@
       ctx.beginPath();
       ctx.moveTo(point.trail[0].x, point.trail[0].y);
       for (var i = 1; i < point.trail.length; i += 1) ctx.lineTo(point.trail[i].x, point.trail[i].y);
-      ctx.strokeStyle = point.color + 'aa';
-      ctx.lineWidth = point.r * 0.48;
+      ctx.strokeStyle = point.color + (point.activity > 0.72 ? 'c2' : point.activity < 0.24 ? '66' : '99');
+      ctx.lineWidth = point.r * (0.34 + point.activity * 0.24);
       ctx.stroke();
     }
 
-    var pulse = 0.82 + Math.sin(Date.now() * 0.004 * point.pulseSpeed) * 0.24;
-    var glowSize = point.r * (1 + pulse * 0.3);
+    var pulse = 0.82 + Math.sin(Date.now() * 0.004 * point.pulseSpeed + point.phase) * 0.24;
+    var glowSize = point.r * (1 + pulse * 0.3 * point.glow);
 
     ctx.beginPath();
-    ctx.arc(point.x, point.y, point.r * 0.9, 0, Math.PI * 2);
+    ctx.arc(point.x, point.y, point.r * (0.78 + point.activity * 0.24), 0, Math.PI * 2);
     ctx.fillStyle = point.color;
     ctx.fill();
 
     ctx.beginPath();
     ctx.arc(point.x, point.y, glowSize * 1.35, 0, Math.PI * 2);
-    ctx.fillStyle = point.color + '55';
+    ctx.fillStyle = point.color + (point.activity > 0.72 ? '66' : point.activity < 0.24 ? '38' : '55');
     ctx.fill();
 
     ctx.beginPath();
     ctx.arc(point.x, point.y, glowSize * 2.05, 0, Math.PI * 2);
-    ctx.fillStyle = point.color + '24';
+    ctx.fillStyle = point.color + (point.activity > 0.72 ? '2d' : point.activity < 0.24 ? '18' : '24');
     ctx.fill();
   }
 

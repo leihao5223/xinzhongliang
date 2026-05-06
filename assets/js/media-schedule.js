@@ -20,9 +20,19 @@
     if (item.posterUrl) video.setAttribute('poster', absoluteUrl(item.posterUrl));
     if (current !== next) video.load();
     video.muted = true;
+    video.defaultMuted = true;
+    video.loop = true;
+    video.autoplay = true;
     video.setAttribute('muted', 'muted');
+    video.setAttribute('loop', 'loop');
+    video.setAttribute('autoplay', 'autoplay');
     video.setAttribute('playsinline', 'playsinline');
     video.setAttribute('webkit-playsinline', 'webkit-playsinline');
+    video.addEventListener('ended', function () {
+      video.currentTime = 0;
+      var replay = video.play && video.play();
+      if (replay && typeof replay.catch === 'function') replay.catch(function () {});
+    });
     var p = video.play && video.play();
     if (p && typeof p.catch === 'function') p.catch(function () {});
   }
