@@ -63,13 +63,13 @@
 
   function getParticleCount() {
     var area = window.innerWidth * window.innerHeight;
-    var doubledCount = Math.floor(area / 5200);
-
+    var raw;
     if (window.innerWidth <= 768) {
-      return Math.max(105, Math.min(165, Math.floor(area / 3900)));
+      raw = Math.max(105, Math.min(165, Math.floor(area / 3900)));
+    } else {
+      raw = Math.max(150, Math.min(360, Math.floor(area / 5200)));
     }
-
-    return Math.max(150, Math.min(360, doubledCount));
+    return Math.max(16, Math.round(raw * 0.2));
   }
 
   function limitVector(vx, vy, max) {

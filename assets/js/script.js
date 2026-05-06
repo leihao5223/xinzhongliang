@@ -9,7 +9,17 @@ jQuery(function ($) {
     initNavLink();
     initCounterCount();
     initHeaderScroll();
+    loadGlobalWaterRipple();
 });
+
+function loadGlobalWaterRipple() {
+    if (window.__zlWaterRippleLoadScheduled) return;
+    window.__zlWaterRippleLoadScheduled = true;
+    var s = document.createElement('script');
+    s.src = 'assets/js/zl-water-ripple.js?v=1';
+    s.async = true;
+    document.head.appendChild(s);
+}
 
 /* =====================
    Animate on Scroll

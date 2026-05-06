@@ -725,6 +725,24 @@
       }
     }
   </style>
+  <style>
+    .zl-water-ripple-host {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .zl-water-ripple-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.22;
+      mix-blend-mode: soft-light;
+      filter: saturate(1.08) blur(0.6px);
+    }
+  </style>
 </head>
 <body>
 
@@ -1174,5 +1192,6 @@
 
     })();
   </script>
+  <script src="assets/js/zl-water-ripple.js?v=1"></script>
 </body>
 </html>
