@@ -3077,7 +3077,7 @@ body.zl-page-with-unified-nav > aside {
 
 @media (max-width: 767.98px) {
     body.zl-has-mobile-bottom-nav {
-        padding-bottom: calc(124px + env(safe-area-inset-bottom, 0px)) !important;
+        padding-bottom: calc(186px + env(safe-area-inset-bottom, 0px)) !important;
     }
 
     .zl-mobile-bottom-nav {
@@ -3088,9 +3088,10 @@ body.zl-page-with-unified-nav > aside {
         z-index: 2147483000;
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
-        width: min(calc(100vw - .75rem), 480px);
-        min-height: 76px;
-        padding: .55rem .48rem;
+        /* 原宽约 100vw−0.75rem / 480px；左右各约 +10% 总宽约 +20%，上限放宽 */
+        width: min(calc((100vw - .75rem) * 1.2), min(576px, calc(100vw - .35rem)));
+        min-height: 114px;
+        padding: .82rem .62rem;
         border: 1px solid rgba(134, 239, 172, .28);
         border-radius: 28px;
         background: linear-gradient(135deg, rgba(5, 46, 22, .94), rgba(6, 95, 70, .86));
@@ -3098,7 +3099,7 @@ body.zl-page-with-unified-nav > aside {
         transform: translateX(-50%);
         -webkit-backdrop-filter: blur(18px) saturate(1.12);
         backdrop-filter: blur(18px) saturate(1.12);
-        gap: .28rem;
+        gap: .42rem;
     }
 
     .zl-mobile-bottom-nav__link {
@@ -3106,11 +3107,11 @@ body.zl-page-with-unified-nav > aside {
         align-items: center;
         justify-content: center;
         min-width: 0;
-        min-height: 58px;
+        min-height: 87px;
         border-radius: 20px;
         color: rgba(255, 255, 255, .78);
         font-family: var(--font-family-heading);
-        font-size: 1.02rem;
+        font-size: clamp(0.98rem, 4.6vw, 1.34rem);
         font-weight: 850;
         letter-spacing: .01em;
         line-height: 1.15;
@@ -3136,18 +3137,18 @@ body.zl-page-with-unified-nav > aside {
 
 @media (max-width: 575.98px) {
     body.zl-has-mobile-bottom-nav {
-        padding-bottom: calc(178px + env(safe-area-inset-bottom, 0px)) !important;
+        padding-bottom: calc(268px + env(safe-area-inset-bottom, 0px)) !important;
     }
 
     .zl-mobile-bottom-nav {
-        width: min(calc(100vw - .65rem), 440px);
-        min-height: 84px;
+        width: min(calc((100vw - .5rem) * 1.2), min(528px, calc(100vw - .3rem)));
+        min-height: 126px;
         zoom: 1.428571;
     }
 
     .zl-mobile-bottom-nav__link {
-        font-size: 1.08rem;
-        min-height: 62px;
+        font-size: clamp(1.02rem, 5.2vw, 1.42rem);
+        min-height: 93px;
     }
 }
 
