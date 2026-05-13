@@ -1,0 +1,105 @@
+# 中粮站点 — Nginx 反代 + TLS（生产基线）
+#
+# 1) 将本文件复制到 /etc/nginx/sites-available/zhongliang ，全局替换 YOUR_PRIMARY_DOMAIN
+# 2) 将 include 路径改为服务器上本仓库 deploy/nginx 的绝对路径（默认 /srv/zhongliang/deploy/nginx/）
+# 3) mkdir -p /var/www/certbot ，Certbot 签发证书后：nginx -t && systemctl reload nginx
+# 4) Nginx ≥ 1.25.1 时可将 listen 改为「443 ssl」并单独写 http2 on;（见官方文档）
+#
+# HSTS 由 Node（生产 + HTTPS + TRUST_PROXY=1）下发；勿在 Nginx 再写 Strict-Transport-Security，以免重复。
+
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    ''      '';
+}
+
+upstream zhongliang_node {
+    server 127.0.0.1:3101;
+    keepalive 64;
+}
+
+limit_req_zone $binary_remote_addr zone=zhong_auth:10m rate=6r/m;
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name YOUR_PRIMARY_DOMAIN www.YOUR_PRIMARY_DOMAIN;
+
+    location ^~ /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+        default_type text/plain;
+        allow all;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name YOUR_PRIMARY_DOMAIN www.YOUR_PRIMARY_DOMAIN;
+
+    ssl_certificate     /etc/letsencrypt/live/YOUR_PRIMARY_DOMAIN/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/YOUR_PRIMARY_DOMAIN/privkey.pem;
+    ssl_trusted_certificate /etc/letsencrypt/live/YOUR_PRIMARY_DOMAIN/chain.pem;
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers off;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305;
+
+    ssl_session_timeout 1d;
+    ssl_session_cache shared:SSL:50m;
+    ssl_session_tickets off;
+
+    ssl_stapling on;
+    ssl_stapling_verify on;
+    resolver 1.1.1.1 8.8.8.8 valid=300s;
+    resolver_timeout 5s;
+
+    # openssl dhparam -out /etc/nginx/dhparam.pem 2048
+    # ssl_dhparam /etc/nginx/dhparam.pem;
+
+    client_max_body_size 16m;
+    client_body_buffer_size 128k;
+
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()" always;
+
+    server_tokens off;
+
+    location = /api/auth/login {
+        limit_req zone=zhong_auth burst=8 nodelay;
+        include /srv/zhongliang/deploy/nginx/include-proxy-headers.conf;
+        proxy_pass http://zhongliang_node;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+    }
+
+    location = /api/admin/login {
+        limit_req zone=zhong_auth burst=8 nodelay;
+        include /srv/zhongliang/deploy/nginx/include-proxy-headers.conf;
+        proxy_pass http://zhongliang_node;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+    }
+
+    location /socket.io/ {
+        include /srv/zhongliang/deploy/nginx/include-proxy-headers.conf;
+        proxy_pass http://zhongliang_node;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        proxy_buffering off;
+        proxy_cache off;
+    }
+
+    location / {
+        include /srv/zhongliang/deploy/nginx/include-proxy-headers.conf;
+        proxy_pass http://zhongliang_node;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+    }
+}
